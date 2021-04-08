@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/background_color"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        style="@style/CardShadowLayout">
+        <com.hlife.qcloud.tim.uikit.component.LineControllerView
+            android:id="@+id/update_pwd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:name="@string/user_setting_update_pwd"
+            app:canNav="true"
+            app:isTop="true"/>
+
+        <com.hlife.qcloud.tim.uikit.component.LineControllerView
+            android:id="@+id/modify_version"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:name="@string/user_setting_version"
+            app:canNav="true"/>
+        <com.hlife.qcloud.tim.uikit.component.LineControllerView
+            android:id="@+id/modify_cache"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:name="@string/user_setting_cache"
+            app:canNav="true"/>
+
+        <com.hlife.qcloud.tim.uikit.component.LineControllerView
+            android:id="@+id/modify_about"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:isBottom="false"
+            app:name="@string/user_setting_about"
+            app:canNav="true"/>
+    </LinearLayout>
+    <Button
+        android:id="@+id/logout"
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginLeft="@dimen/dp_15"
+        android:layout_marginRight="@dimen/dp_15"
+        android:text="@string/exit"
+        android:gravity="center"
+        android:background="@drawable/btn_bg_red"
+        android:textColor="@color/white"/>
+</LinearLayout>

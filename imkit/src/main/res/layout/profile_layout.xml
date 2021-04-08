@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/background_color"
+    android:orientation="vertical">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="20dp"
+            android:orientation="vertical">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:id="@+id/user_bg_layout"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center"
+                    style="@style/CardShadowLayout"
+                    android:layout_marginTop="60dp">
+                    <LinearLayout
+                       android:layout_marginTop="50dp"
+                       android:gravity="center"
+                        android:paddingLeft="@dimen/dp_10"
+                        android:paddingRight="@dimen/dp_10"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content">
+                       <TextView
+                           android:id="@+id/self_account"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:gravity="center_vertical"
+                           android:textSize="20sp"
+                           tools:text="@string/app_name"
+                           android:textColor="@color/text_color_black"/>
+                       <androidx.appcompat.widget.AppCompatImageView
+                           android:id="@+id/gender"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:layout_marginStart="5dp"
+                           android:src="@drawable/icon_male_fill"/>
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/sub_message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="@dimen/dp_5"
+                        android:textSize="12sp"
+                        android:paddingStart="@dimen/dp_10"
+                        android:paddingEnd="10dp"
+                        tools:text="@string/app_name"
+                        android:textColor="@color/color_999999" />
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/color_999999"
+                        android:text="@string/text_user_remark"
+                        android:drawablePadding="@dimen/dp_4"
+                        android:gravity="center_vertical"
+                        android:textSize="@dimen/sp_12"
+                        tools:text="@string/app_name"
+                        android:paddingStart="@dimen/dp_10"
+                        android:paddingEnd="10dp"
+                        android:drawableStart="@drawable/icon_location_fill" />
+                    <com.hlife.qcloud.tim.uikit.component.LineControllerView
+                        android:id="@+id/modify_mobile"
+                        app:isTop="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="25dp"
+                        app:name="@string/im_phone" />
+                    <com.hlife.qcloud.tim.uikit.component.LineControllerView
+                        android:id="@+id/modify_email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:name="@string/im_email" />
+                    <com.hlife.qcloud.tim.uikit.component.LineControllerView
+                        android:id="@+id/modify_qrcode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:name="@string/text_qr_code"
+                        app:canNav="true"/>
+                </LinearLayout>
+                <ImageView
+                    android:id="@+id/self_icon"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:padding="20dp"
+                    android:background="@drawable/icon_avatar_bg"
+                    android:src="@drawable/default_head"/>
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/user_editor"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="70dp"
+                    android:layout_marginEnd="@dimen/dp_24"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/icon_user_editor"/>
+            </FrameLayout>
+
+            <LinearLayout
+                style="@style/CardShadowLayout"
+                android:layout_marginBottom="@dimen/dp_10">
+                <com.hlife.qcloud.tim.uikit.component.LineControllerView
+                    android:id="@+id/modify_department"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_20"
+                    android:visibility="gone"
+                    app:name="@string/im_department"
+                    app:isTop="true"/>
+                <com.hlife.qcloud.tim.uikit.component.LineControllerView
+                    android:id="@+id/modify_position"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:name="@string/im_position" />
+                <com.hlife.qcloud.tim.uikit.component.LineControllerView
+                    android:id="@+id/modify_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:name="@string/im_card" />
+                <com.hlife.qcloud.tim.uikit.component.LineControllerView
+                    android:id="@+id/modify_scan"
+                    app:isTop="true"
+                    app:canNav="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:name="@string/scan_qr_code" />
+                <com.hlife.qcloud.tim.uikit.component.LineControllerView
+                    android:id="@+id/modify_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:canNav="true"
+                    app:name="@string/modify_setting"/>
+                <com.hlife.qcloud.tim.uikit.component.LineControllerView
+                    android:id="@+id/modify_agreement"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:canNav="true"
+                    app:name="@string/text_agreement_"/>
+                <com.hlife.qcloud.tim.uikit.component.LineControllerView
+                    android:id="@+id/modify_conceal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:canNav="true"
+                    app:name="@string/text_conceal_" />
+
+                <com.hlife.qcloud.tim.uikit.component.LineControllerView
+                    android:id="@+id/modify_allow_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:visibility="gone"
+                    app:name="@string/add_rule" />
+                <Button
+                    android:id="@+id/custom_im_message"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:visibility="gone"
+                    android:background="@color/bg_negative_btn"
+                    android:text="模拟外部分享链接卡片形式"
+                    android:textColor="@color/negative_text" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+</LinearLayout>

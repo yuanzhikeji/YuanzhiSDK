@@ -1,0 +1,9 @@
+include ':netwrok'
+include ':api'
+include ':imkit'
+include ':utils'
+include ':recycler_view_helper'
+include ':base'
+include ':update_app'
+include ':app'
+rootProject.name = "HLifeYzAndroid"
