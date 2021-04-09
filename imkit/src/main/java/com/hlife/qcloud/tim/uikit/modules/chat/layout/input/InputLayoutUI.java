@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
+import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.chat.interfaces.IInputLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.inputmore.InputMoreActionUnit;
@@ -73,12 +74,16 @@ abstract class InputLayoutUI extends LinearLayout implements IInputLayout {
     protected ChatInfo mChatInfo;
     protected List<InputMoreActionUnit> mInputMoreActionList = new ArrayList<>();
     protected List<InputMoreActionUnit> mInputMoreCustomActionList = new ArrayList<>();
-    private boolean mSendPhotoDisable;
-    private boolean mCaptureDisable;
-    private boolean mVideoRecordDisable;
-    private boolean mSendFileDisable;
+//    private boolean mSendPhotoDisable;
+//    private boolean mCaptureDisable;
+//    private boolean mVideoRecordDisable;
+//    private boolean mSendFileDisable;
+//    private boolean mSendLocationDisable;
     private boolean mEnableAudioCall;
     private boolean mEnableVideoCall;
+
+    private ChatViewConfig mChatConfig;
+
 
     public InputLayoutUI(Context context) {
         super(context);
@@ -114,7 +119,7 @@ abstract class InputLayoutUI extends LinearLayout implements IInputLayout {
     protected void assembleActions() {
         mInputMoreActionList.clear();
         InputMoreActionUnit action = new InputMoreActionUnit();
-        if (!mSendPhotoDisable) {
+        if (!mChatConfig.isDisableSendPhotoAction()) {
             action.setIconResId(R.drawable.icon_photo);
             action.setTitleId(R.string.pic);
             action.setOnClickListener(new OnClickListener() {
@@ -126,7 +131,7 @@ abstract class InputLayoutUI extends LinearLayout implements IInputLayout {
             mInputMoreActionList.add(action);
         }
 
-        if (!mCaptureDisable) {
+        if (!mChatConfig.isDisableCaptureAction()) {
             action = new InputMoreActionUnit();
             action.setIconResId(R.drawable.img_camera);
             action.setTitleId(R.string.photo);
@@ -139,7 +144,7 @@ abstract class InputLayoutUI extends LinearLayout implements IInputLayout {
             mInputMoreActionList.add(action);
         }
 
-        if (!mVideoRecordDisable) {
+        if (!mChatConfig.isDisableVideoRecordAction()) {
             action = new InputMoreActionUnit();
             action.setIconResId(R.drawable.img_video);
             action.setTitleId(R.string.video);
@@ -152,7 +157,7 @@ abstract class InputLayoutUI extends LinearLayout implements IInputLayout {
             mInputMoreActionList.add(action);
         }
 
-        if (!mSendFileDisable) {
+        if (!mChatConfig.isDisableSendFileAction()) {
             action = new InputMoreActionUnit();
             action.setIconResId(R.drawable.img_document);
             action.setTitleId(R.string.file);
@@ -164,7 +169,18 @@ abstract class InputLayoutUI extends LinearLayout implements IInputLayout {
             });
             mInputMoreActionList.add(action);
         }
-
+        if(!mChatConfig.isDisableSendLocationAction()){
+            action = new InputMoreActionUnit();
+            action.setIconResId(R.drawable.img_location_im);
+            action.setTitleId(R.string.self_location);
+            action.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startLocation();
+                }
+            });
+            mInputMoreActionList.add(action);
+        }
         int functionPrem = YzIMKitAgent.instance().getFunctionPrem();
         if (mEnableVideoCall && (functionPrem & 32)>0) {
             action = new InputMoreActionUnit();
@@ -191,16 +207,6 @@ abstract class InputLayoutUI extends LinearLayout implements IInputLayout {
             });
             mInputMoreActionList.add(action);
         }
-        action = new InputMoreActionUnit();
-        action.setIconResId(R.drawable.img_location_im);
-        action.setTitleId(R.string.self_location);
-        action.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startLocation();
-            }
-        });
-        mInputMoreActionList.add(action);
         mInputMoreActionList.addAll(mInputMoreCustomActionList);
 
     }
@@ -283,24 +289,35 @@ abstract class InputLayoutUI extends LinearLayout implements IInputLayout {
         mMoreInputEvent = listener;
     }
 
-    @Override
-    public void disableSendPhotoAction(boolean disable) {
-        mSendPhotoDisable = disable;
-    }
+//    @Override
+//    public void disableSendPhotoAction(boolean disable) {
+//        mSendPhotoDisable = disable;
+//    }
+//
+//    @Override
+//    public void disableCaptureAction(boolean disable) {
+//        mCaptureDisable = disable;
+//    }
+//
+//    @Override
+//    public void disableVideoRecordAction(boolean disable) {
+//        mVideoRecordDisable = disable;
+//    }
+//
+//    @Override
+//    public void disableSendFileAction(boolean disable) {
+//        mSendFileDisable = disable;
+//    }
+//
+//    @Override
+//    public void disableSendLocationAction(boolean disable) {
+//        mSendLocationDisable = disable;
+//    }
+
 
     @Override
-    public void disableCaptureAction(boolean disable) {
-        mCaptureDisable = disable;
-    }
-
-    @Override
-    public void disableVideoRecordAction(boolean disable) {
-        mVideoRecordDisable = disable;
-    }
-
-    @Override
-    public void disableSendFileAction(boolean disable) {
-        mSendFileDisable = disable;
+    public void setChatViewConfig(ChatViewConfig chatViewConfig) {
+        mChatConfig = chatViewConfig;
     }
 
     @Override

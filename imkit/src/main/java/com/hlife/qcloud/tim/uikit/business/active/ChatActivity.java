@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 
 import com.hlife.qcloud.tim.uikit.business.Constants;
 import com.hlife.qcloud.tim.uikit.business.fragment.ChatFragment;
+import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.hlife.qcloud.tim.uikit.R;
@@ -62,6 +63,7 @@ public class ChatActivity extends IMBaseActivity {
             ChatFragment mChatFragment = new ChatFragment();
             bundle.putBoolean(Constants.CHAT_TO_CONVERSATION,getIntent().getBooleanExtra(Constants.CHAT_TO_CONVERSATION,true));
             mChatFragment.setArguments(bundle);
+            mChatFragment.setConfig((ChatViewConfig) getIntent().getSerializableExtra(Constants.CHAT_CONFIG));
             getSupportFragmentManager().beginTransaction().replace(R.id.empty_view, mChatFragment).commitAllowingStateLoss();
         } else {
             finish();

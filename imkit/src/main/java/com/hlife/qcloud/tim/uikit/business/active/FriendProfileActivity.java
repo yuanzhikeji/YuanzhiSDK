@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.text.TextUtils;
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
+import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.contact.ContactItemBean;
 import com.hlife.qcloud.tim.uikit.modules.contact.FriendProfileLayout;
+import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 import com.hlife.qcloud.tim.uikit.R;
 
@@ -25,7 +27,10 @@ public class FriendProfileActivity extends IMBaseActivity {
                 } else if (!TextUtils.isEmpty(info.getNickname())) {
                     chatName = info.getNickname();
                 }
-                YzIMKitAgent.instance().startChat(info.getId(),chatName,true);
+                ChatInfo chatInfo = new ChatInfo();
+                chatInfo.setChatName(chatName);
+                chatInfo.setId(info.getId());
+                YzIMKitAgent.instance().startChat(chatInfo,null);
             }
 
             @Override

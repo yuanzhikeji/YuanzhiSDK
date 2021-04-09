@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.hlife.qcloud.tim.uikit.business.message.CustomMessage;
+import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.modules.chat.ChatLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.BaseInputFragment;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.input.InputLayout;
@@ -38,8 +39,7 @@ public class ChatLayoutHelper {
         mContext = context;
     }
 
-    public void customizeChatLayout(final ChatLayout layout) {
-
+    public void customizeChatLayout(final ChatLayout layout,final ChatViewConfig config) {
 //        //====== NoticeLayout使用范例 ======//
 //        NoticeLayout noticeLayout = layout.getNoticeLayout();
 //        noticeLayout.alwaysShow(true);
@@ -150,27 +150,34 @@ public class ChatLayoutHelper {
 //        inputLayout.replaceMoreInput(new CustomInputFragment().setChatLayout(layout));
 //
 //        // TODO 可以disable更多面板上的各个功能，可以打开下面代码测试
-//        inputLayout.disableCaptureAction(true);
-//        inputLayout.disableSendFileAction(true);
-//        inputLayout.disableSendPhotoAction(true);
-//        inputLayout.disableVideoRecordAction(true);
-        inputLayout.enableAudioCall();
-        inputLayout.enableVideoCall();
+        inputLayout.setChatViewConfig(config);
+//        inputLayout.disableSendPhotoAction(config.isDisableSendPhotoAction());
+//        inputLayout.disableCaptureAction(config.isDisableCaptureAction());
+//        inputLayout.disableVideoRecordAction(config.isDisableVideoRecordAction());
+//        inputLayout.disableSendFileAction(config.isDisableSendFileAction());
+//        inputLayout.disableSendLocationAction(config.isDisableSendLocationAction());
+        if(!config.isDisableAudioCall()){
+            inputLayout.enableAudioCall();
+        }
+        if(!config.isDisableVideoCall()){
+            inputLayout.enableVideoCall();
+        }
+        inputLayout.setVisibility(config.isDisableChatInput()?View.GONE:View.VISIBLE);
         // TODO 可以自己增加一些功能，可以打开下面代码测试
         // 增加一个欢迎提示富文本
-        InputMoreActionUnit unit = new InputMoreActionUnit();
-        unit.setIconResId(R.drawable.custom);
-        unit.setTitleId(R.string.test_custom_action);
-        unit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Gson gson = new Gson();
-                CustomMessage customHelloMessage = new CustomMessage();
-                String data = gson.toJson(customHelloMessage);
-                MessageInfo info = MessageInfoUtil.buildCustomMessage(data);
-                layout.sendMessage(info, false);
-            }
-        });
+//        InputMoreActionUnit unit = new InputMoreActionUnit();
+//        unit.setIconResId(R.drawable.custom);
+//        unit.setTitleId(R.string.test_custom_action);
+//        unit.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Gson gson = new Gson();
+//                CustomMessage customHelloMessage = new CustomMessage();
+//                String data = gson.toJson(customHelloMessage);
+//                MessageInfo info = MessageInfoUtil.buildCustomMessage(data);
+//                layout.sendMessage(info, false);
+//            }
+//        });
 //        inputLayout.addAction(unit);
     }
 

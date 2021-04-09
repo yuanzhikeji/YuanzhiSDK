@@ -23,6 +23,7 @@ import com.hlife.qcloud.tim.uikit.business.fragment.ContactFragment;
 import com.hlife.qcloud.tim.uikit.business.fragment.ConversationFragment;
 import com.hlife.qcloud.tim.uikit.business.fragment.ProfileFragment;
 import com.hlife.qcloud.tim.uikit.business.fragment.WorkFragment;
+import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.business.thirdpush.HUAWEIHmsMessageService;
 import com.hlife.qcloud.tim.uikit.modules.chat.GroupChatManagerKit;
@@ -122,7 +123,7 @@ public class MwWorkActivity extends IMBaseActivity implements
         mFragments = new ArrayList<>();
         int functionPrem = YzIMKitAgent.instance().getFunctionPrem();
         if((functionPrem & 1)>0){
-            mFragments.add(new ConversationFragment());
+            mFragments.add(ConversationFragment.newConversation(YzChatType.ALL));
         }
         if((functionPrem & 2)>0){
             mFragments.add(new ContactFragment());

@@ -14,6 +14,7 @@ import com.hlife.qcloud.tim.uikit.business.MorePopWindow;
 import com.hlife.qcloud.tim.uikit.business.active.ScanIMQRCodeActivity;
 import com.hlife.qcloud.tim.uikit.business.active.SearchAddMoreActivity;
 import com.hlife.qcloud.tim.uikit.business.active.StartGroupChatActivity;
+import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
 import com.hlife.qcloud.tim.uikit.modules.conversation.interfaces.IConversationAdapter;
 import com.hlife.qcloud.tim.uikit.modules.conversation.interfaces.IConversationLayout;
@@ -61,7 +62,7 @@ public class ConversationLayout extends RelativeLayout implements IConversationL
         mConversationList = findViewById(R.id.conversation_list);
     }
     private IConversationAdapter adapter;
-    public void initDefault() {
+    public void initDefault(YzChatType type) {
         final View mAddMore = findViewById(R.id.add_more);
         int functionPrem = YzIMKitAgent.instance().getFunctionPrem();
         if((functionPrem & 2)>0){
@@ -105,7 +106,7 @@ public class ConversationLayout extends RelativeLayout implements IConversationL
             adapter = new ConversationListAdapter();
             mConversationList.setAdapter(adapter);
         }
-        ConversationManagerKit.getInstance().loadConversation(new IUIKitCallBack() {
+        ConversationManagerKit.getInstance().loadConversation(type,new IUIKitCallBack() {
             @Override
             public void onSuccess(Object data) {
                 adapter.setDataProvider((ConversationProvider) data);

@@ -2,6 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:padding="@dimen/dp_20"
+    android:orientation="vertical"
     android:layout_height="match_parent">
     <TextView
         android:textSize="20sp"
@@ -9,4 +10,17 @@
         android:layout_height="wrap_content"
         android:textColor="@color/black"
         android:text="SDK能力展示"/>
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/chat_single"
+        android:layout_marginTop="@dimen/dp_20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="启动单聊页面"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/chat_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_20"
+        android:text="启动群聊页面"/>
 </LinearLayout>

@@ -12,12 +12,15 @@ import android.widget.PopupWindow;
 import androidx.annotation.Nullable;
 
 import com.hlife.qcloud.tim.uikit.TUIKit;
+import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.base.BaseFragment;
 import com.hlife.qcloud.tim.uikit.business.Constants;
 import com.hlife.qcloud.tim.uikit.business.active.ChatActivity;
+import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.component.action.PopActionClickListener;
 import com.hlife.qcloud.tim.uikit.component.action.PopDialogAdapter;
 import com.hlife.qcloud.tim.uikit.component.action.PopMenuAction;
+import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationLayout;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationListLayout;
@@ -36,7 +39,12 @@ public class ConversationFragment extends BaseFragment {
     private ConversationLayout mConversationLayout;
     private PopupWindow mConversationPopWindow;
     private final List<PopMenuAction> mConversationPopActions = new ArrayList<>();
+    private ConversationListLayout.OnItemClickListener mOnItemClickListener;
+    private YzChatType mType = YzChatType.ALL;
 
+    private ConversationFragment(){
+
+    }
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -49,16 +57,25 @@ public class ConversationFragment extends BaseFragment {
         // 从布局文件中获取会话列表面板
         mConversationLayout = mBaseView.findViewById(R.id.conversation_layout);
         // 会话列表面板的默认UI和交互初始化
-        mConversationLayout.initDefault();
+        mConversationLayout.initDefault(mType);
         // 通过API设置ConversataonLayout各种属性的样例，开发者可以打开注释，体验效果
 //        ConversationLayoutHelper.customizeConversation(mConversationLayout);
-        mConversationLayout.getConversationList().setOnItemClickListener(new ConversationListLayout.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position, ConversationInfo conversationInfo) {
-                //此处为demo的实现逻辑，更根据会话类型跳转到相关界面，开发者可根据自己的应用场景灵活实现
-                startChatActivity(conversationInfo);
-            }
-        });
+        if(mOnItemClickListener!=null){
+            mConversationLayout.getConversationList().setOnItemClickListener(mOnItemClickListener);
+        }else{
+            mConversationLayout.getConversationList().setOnItemClickListener(new ConversationListLayout.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position, ConversationInfo conversationInfo) {
+                    //此处为demo的实现逻辑，更根据会话类型跳转到相关界面，开发者可根据自己的应用场景灵活实现
+//                    startChatActivity(conversationInfo,null);
+                    ChatInfo chatInfo = new ChatInfo();
+                    chatInfo.setType(conversationInfo.isGroup() ? V2TIMConversation.V2TIM_GROUP : V2TIMConversation.V2TIM_C2C);
+                    chatInfo.setId(conversationInfo.getId());
+                    chatInfo.setChatName(conversationInfo.getTitle());
+                    YzIMKitAgent.instance().startChat(chatInfo,null);
+                }
+            });
+        }
         mConversationLayout.getConversationList().setOnItemLongClickListener(new ConversationListLayout.OnItemLongClickListener() {
             @Override
             public void OnItemLongClick(View view, int position, ConversationInfo conversationInfo) {
@@ -70,7 +87,7 @@ public class ConversationFragment extends BaseFragment {
 
     public void refreshData(){
         if(mConversationLayout!=null){
-            mConversationLayout.initDefault();
+            mConversationLayout.initDefault(mType);
         }
     }
 
@@ -153,15 +170,29 @@ public class ConversationFragment extends BaseFragment {
         showItemPopMenu(position, info, view.getX(), view.getY() + view.getHeight() / 2);
     }
 
-    private void startChatActivity(ConversationInfo conversationInfo) {
-        ChatInfo chatInfo = new ChatInfo();
-        chatInfo.setType(conversationInfo.isGroup() ? V2TIMConversation.V2TIM_GROUP : V2TIMConversation.V2TIM_C2C);
-        chatInfo.setId(conversationInfo.getId());
-        chatInfo.setChatName(conversationInfo.getTitle());
-        Intent intent = new Intent(TUIKit.getAppContext(), ChatActivity.class);
-        intent.putExtra(Constants.CHAT_INFO, chatInfo);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        TUIKit.getAppContext().startActivity(intent);
+//    public void startChatActivity(ConversationInfo conversationInfo, ChatViewConfig config) {
+//        ChatInfo chatInfo = new ChatInfo();
+//        chatInfo.setType(conversationInfo.isGroup() ? V2TIMConversation.V2TIM_GROUP : V2TIMConversation.V2TIM_C2C);
+//        chatInfo.setId(conversationInfo.getId());
+//        chatInfo.setChatName(conversationInfo.getTitle());
+//        Intent intent = new Intent(TUIKit.getAppContext(), ChatActivity.class);
+//        intent.putExtra(Constants.CHAT_INFO, chatInfo);
+//        intent.putExtra(Constants.CHAT_CONFIG,config);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        TUIKit.getAppContext().startActivity(intent);
+//    }
+
+    public void setType(YzChatType mType) {
+        this.mType = mType;
     }
 
+    public void setOnItemClickListener(ConversationListLayout.OnItemClickListener mOnItemClickListener) {
+        this.mOnItemClickListener = mOnItemClickListener;
+    }
+
+    public static ConversationFragment newConversation(YzChatType type){
+        ConversationFragment fragment = new ConversationFragment();
+        fragment.setType(type);
+        return fragment;
+    }
 }

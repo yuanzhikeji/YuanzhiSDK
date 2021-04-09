@@ -4,7 +4,9 @@
     android:orientation="vertical">
 
     <RelativeLayout
+        android:id="@+id/conversation_title"
         android:layout_width="match_parent"
+        android:visibility="gone"
         android:layout_height="48dp">
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"

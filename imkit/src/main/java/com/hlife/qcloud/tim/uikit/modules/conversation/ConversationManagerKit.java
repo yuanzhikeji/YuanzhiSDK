@@ -46,6 +46,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
     private SharedPreferences mConversationPreferences;
     private LinkedList<ConversationInfo> mTopLinkedList = new LinkedList<>();
     private int mUnreadTotal;
+    private YzChatType mType = YzChatType.ALL;
 
     private ConversationManagerKit() {
         init();
@@ -154,7 +155,11 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
      *
      * @param callBack
      */
-    public void loadConversation(final IUIKitCallBack callBack) {
+    public void loadConversation(final IUIKitCallBack callBack){
+        loadConversation(mType,callBack);
+    }
+    public void loadConversation(YzChatType chatType,final IUIKitCallBack callBack) {
+        this.mType = chatType;
         mConversationPreferences = TUIKit.getAppContext().getSharedPreferences(
                 TUIKitConfigs.getConfigs().getGeneralConfig().getSDKAppId() + "-"
                         + V2TIMManager.getInstance().getLoginUser() + SP_NAME,
@@ -164,34 +169,57 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         if (mProvider == null) {
             mProvider = new ConversationProvider();
         }
+        mUnreadTotal = 0;
+        allConversation(0,new ArrayList<ConversationInfo>(),callBack);
+//        V2TIMManager.getConversationManager().getConversationList(0, 100, new V2TIMValueCallback<V2TIMConversationResult>() {
+//            @Override
+//            public void onError(int code, String desc) {
+//                SLog.v( "loadConversation getConversationList error, code = " + code + ", desc = " + desc);
+//            }
+//
+//            @Override
+//            public void onSuccess(V2TIMConversationResult v2TIMConversationResult) {
+//                ArrayList<ConversationInfo> infos = new ArrayList<>();
+//                List<V2TIMConversation> v2TIMConversationList = v2TIMConversationResult.getConversationList();
+//                mUnreadTotal = 0;
+//                for (V2TIMConversation v2TIMConversation : v2TIMConversationList) {
+//                    //将 imsdk v2TIMConversation 转换为 UIKit ConversationInfo
+//                    ConversationInfo conversationInfo = TIMConversation2ConversationInfo(v2TIMConversation);
+//                    if (conversationInfo != null && !V2TIMManager.GROUP_TYPE_AVCHATROOM.equals(v2TIMConversation.getGroupType())) {
+//                        mUnreadTotal = mUnreadTotal + conversationInfo.getUnRead();
+//                        conversationInfo.setType(ConversationInfo.TYPE_COMMON);
+//                        infos.add(conversationInfo);
+//                    }
+//                }
+//                //排序，imsdk加载处理的已按时间排序，但应用层有置顶会话操作，所有需根据置顶标识再次排序（置顶可考虑做到imsdk同步到服务器？）
+//                mProvider.setDataSource(sortConversations(infos));
+//                SharedPreferenceUtils.putListData(mConversationPreferences, TOP_LIST, mTopLinkedList);
+//                //更新消息未读总数
+//                updateUnreadTotal(mUnreadTotal);
+//                if (callBack != null) {
+//                    callBack.onSuccess(mProvider);
+//                }
+//            }
+//        });
+    }
 
-        V2TIMManager.getConversationManager().getConversationList(0, 100, new V2TIMValueCallback<V2TIMConversationResult>() {
+    private void allConversation(long nextSeq,final ArrayList<ConversationInfo> dataArray,final IUIKitCallBack callBack){
+        loadConversation(nextSeq, mType, new YzConversationDataListener() {
             @Override
-            public void onError(int code, String desc) {
-                SLog.v( "loadConversation getConversationList error, code = " + code + ", desc = " + desc);
-            }
-
-            @Override
-            public void onSuccess(V2TIMConversationResult v2TIMConversationResult) {
-                ArrayList<ConversationInfo> infos = new ArrayList<>();
-                List<V2TIMConversation> v2TIMConversationList = v2TIMConversationResult.getConversationList();
-                mUnreadTotal = 0;
-                for (V2TIMConversation v2TIMConversation : v2TIMConversationList) {
-                    //将 imsdk v2TIMConversation 转换为 UIKit ConversationInfo
-                    ConversationInfo conversationInfo = TIMConversation2ConversationInfo(v2TIMConversation);
-                    if (conversationInfo != null && !V2TIMManager.GROUP_TYPE_AVCHATROOM.equals(v2TIMConversation.getGroupType())) {
-                        mUnreadTotal = mUnreadTotal + conversationInfo.getUnRead();
-                        conversationInfo.setType(ConversationInfo.TYPE_COMMON);
-                        infos.add(conversationInfo);
+            public void onConversationData(List<ConversationInfo> data, long unRead, long nextSeq) {
+                super.onConversationData(data, unRead, nextSeq);
+                dataArray.addAll(data);
+                mUnreadTotal+=unRead;
+                if(nextSeq!=-1){
+                    allConversation(nextSeq,dataArray,callBack);
+                }else{
+                    //排序，imsdk加载处理的已按时间排序，但应用层有置顶会话操作，所有需根据置顶标识再次排序（置顶可考虑做到imsdk同步到服务器？）
+                    mProvider.setDataSource(sortConversations(dataArray));
+                    SharedPreferenceUtils.putListData(mConversationPreferences, TOP_LIST, mTopLinkedList);
+                    updateUnreadTotal(mUnreadTotal);
+                    if (callBack != null) {
+                        callBack.onSuccess(mProvider);
                     }
-                }
-                //排序，imsdk加载处理的已按时间排序，但应用层有置顶会话操作，所有需根据置顶标识再次排序（置顶可考虑做到imsdk同步到服务器？）
-                mProvider.setDataSource(sortConversations(infos));
-                SharedPreferenceUtils.putListData(mConversationPreferences, TOP_LIST, mTopLinkedList);
-                //更新消息未读总数
-                updateUnreadTotal(mUnreadTotal);
-                if (callBack != null) {
-                    callBack.onSuccess(mProvider);
                 }
             }
         });
@@ -677,7 +705,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
     public void handleInvoke(String msgID) {
         SLog.i( "handleInvoke msgID:" + msgID);
         if (mProvider != null) {
-            loadConversation(null);
+            loadConversation(mType,null);
         }
     }
 

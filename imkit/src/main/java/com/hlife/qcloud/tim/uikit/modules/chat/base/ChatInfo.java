@@ -13,6 +13,7 @@ public class ChatInfo implements Serializable {
 
     private String chatName;
     private int type = V2TIMConversation.V2TIM_C2C;
+    private boolean isGroup;
     private String id;
     private boolean isTopChat;
     private List<V2TIMGroupAtInfo> atInfoList;
@@ -110,4 +111,12 @@ public class ChatInfo implements Serializable {
         this.atInfoList = atInfoList;
     }
 
+    public void setGroup(boolean group) {
+        isGroup = group;
+        type = group?V2TIMConversation.V2TIM_GROUP:V2TIMConversation.V2TIM_C2C;
+    }
+
+    public boolean isGroup() {
+        return isGroup;
+    }
 }

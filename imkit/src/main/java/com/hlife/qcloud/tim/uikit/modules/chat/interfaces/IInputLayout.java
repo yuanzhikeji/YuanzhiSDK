@@ -3,6 +3,7 @@ package com.hlife.qcloud.tim.uikit.modules.chat.interfaces;
 import android.view.View;
 import android.widget.EditText;
 
+import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.BaseInputFragment;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.input.InputLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.inputmore.InputMoreActionUnit;
@@ -35,7 +36,6 @@ public interface IInputLayout {
      * @param disable
      */
     void disableMoreInput(boolean disable);
-
     /**
      * 替换点击“+”弹出的面板
      *
@@ -55,32 +55,38 @@ public interface IInputLayout {
      *
      * @param disable
      */
-    void disableSendPhotoAction(boolean disable);
+//    void disableSendPhotoAction(boolean disable);
 
     /**
      * disable 拍照后，会隐藏更多面板上的按钮
      *
      * @param disable
      */
-    void disableCaptureAction(boolean disable);
+//    void disableCaptureAction(boolean disable);
 
     /**
      * disable 录像后，会隐藏更多面板上的按钮
      *
      * @param disable
      */
-    void disableVideoRecordAction(boolean disable);
+//    void disableVideoRecordAction(boolean disable);
 
     /**
      * disable 发送文件后，会隐藏更多面板上的按钮
      *
      * @param disable
      */
-    void disableSendFileAction(boolean disable);
+//    void disableSendFileAction(boolean disable);
+    /**
+     * 位置消息
+     */
+//    void disableSendLocationAction(boolean disable);
 
     boolean enableAudioCall();
 
     boolean enableVideoCall();
+
+    void setChatViewConfig(ChatViewConfig chatViewConfig);
 
     /**
      * 增加更多面板上的事件单元

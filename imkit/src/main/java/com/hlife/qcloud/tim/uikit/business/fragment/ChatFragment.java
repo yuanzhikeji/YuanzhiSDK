@@ -15,10 +15,11 @@ import com.hlife.qcloud.tim.uikit.base.BaseFragment;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.business.Constants;
 import com.hlife.qcloud.tim.uikit.business.active.FriendProfileActivity;
-import com.hlife.qcloud.tim.uikit.business.active.MwWorkActivity;
 import com.hlife.qcloud.tim.uikit.business.helper.ChatLayoutHelper;
+import com.hlife.qcloud.tim.uikit.business.inter.YzMessageClickListener;
 import com.hlife.qcloud.tim.uikit.component.AudioPlayer;
 import com.hlife.qcloud.tim.uikit.component.TitleBarLayout;
+import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.modules.chat.ChatLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.input.InputLayout;
@@ -49,6 +50,8 @@ public class ChatFragment extends BaseFragment {
     private View mBaseView;
     private ChatLayout mChatLayout;
     private ChatInfo mChatInfo;
+    private ChatViewConfig mConfig;
+    private YzMessageClickListener mYzMessageClickListener;
 
     @Nullable
     @Override
@@ -63,12 +66,13 @@ public class ChatFragment extends BaseFragment {
             PermissionsManager.getInstance().requestPermissionsIfNecessaryForResult(this, PERMISSIONS, null);
         }
         final Bundle bundle = getArguments();
-        if(bundle==null){
-            getActivity().finish();
-            return;
+        if(mChatInfo==null){
+            mChatInfo = (ChatInfo) bundle.getSerializable(Constants.CHAT_INFO);
         }
-        mChatInfo = (ChatInfo) bundle.getSerializable(Constants.CHAT_INFO);
         if (mChatInfo == null) {
+            if(getActivity()!=null){
+                getActivity().finish();
+            }
             return;
         }
         //从布局文件中获取聊天面板组件
@@ -89,13 +93,13 @@ public class ChatFragment extends BaseFragment {
         mTitleBar.setOnLeftClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(bundle.getBoolean(Constants.CHAT_TO_CONVERSATION,true)){
-                    if(MwWorkActivity.instance==null){
-                        Intent intent = new Intent(getActivity(),MwWorkActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    }
-                }
+//                if(bundle.getBoolean(Constants.CHAT_TO_CONVERSATION,true)){
+//                    if(MwWorkActivity.instance==null){
+//                        Intent intent = new Intent(getActivity(),MwWorkActivity.class);
+//                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                        startActivity(intent);
+//                    }
+//                }
                 getActivity().finish();
             }
         });
@@ -123,6 +127,10 @@ public class ChatFragment extends BaseFragment {
                 if (null == messageInfo) {
                     return;
                 }
+                if(mYzMessageClickListener!=null){
+                    mYzMessageClickListener.onUserIconClick(messageInfo.getFromUser());
+                    return;
+                }
                 ChatInfo info = new ChatInfo();
                 info.setShowAddGroup(true);
                 info.setId(messageInfo.getFromUser());
@@ -135,12 +143,18 @@ public class ChatFragment extends BaseFragment {
         mChatLayout.getInputLayout().setStartActivityListener(new InputLayout.onStartActivityListener() {
             @Override
             public void onStartGroupMemberSelectActivity() {
-                Intent intent = new Intent(TUIKit.getAppContext(), StartGroupMemberSelectActivity.class);
-                GroupInfo groupInfo = new GroupInfo();
-                groupInfo.setId(mChatInfo.getId());
-                groupInfo.setChatName(mChatInfo.getChatName());
-                intent.putExtra(IMKitConstants.Group.GROUP_INFO, groupInfo);
-                startActivityForResult(intent, 1);
+                if(mConfig.isCustomAtGroupMember()){
+                    if(mYzMessageClickListener!=null){
+                        mYzMessageClickListener.onAtGroupMember(mChatInfo.getId());
+                    }
+                }else{
+                    Intent intent = new Intent(TUIKit.getAppContext(), StartGroupMemberSelectActivity.class);
+                    GroupInfo groupInfo = new GroupInfo();
+                    groupInfo.setId(mChatInfo.getId());
+                    groupInfo.setChatName(mChatInfo.getChatName());
+                    intent.putExtra(IMKitConstants.Group.GROUP_INFO, groupInfo);
+                    startActivityForResult(intent, 1);
+                }
             }
 
         });
@@ -261,16 +275,44 @@ public class ChatFragment extends BaseFragment {
         if (requestCode == 1 && resultCode == 3) {
             String result_id = data.getStringExtra(IMKitConstants.Selection.USER_ID_SELECT);
             String result_name = data.getStringExtra(IMKitConstants.Selection.USER_NAMECARD_SELECT);
-            mChatLayout.getInputLayout().updateInputText(result_name, result_id);
+            updateInputText(result_name,result_id);
         }
     }
 
+    public void updateInputText(String names,String ids){
+        mChatLayout.getInputLayout().updateInputText(names, ids);
+    }
+
+    public void setConfig(ChatViewConfig mConfig) {
+        this.mConfig = mConfig;
+    }
+
+    public void setChatInfo(ChatInfo mChatInfo) {
+        this.mChatInfo = mChatInfo;
+    }
+
+    public void setYzMessageClickListener(YzMessageClickListener mYzMessageClickListener) {
+        this.mYzMessageClickListener = mYzMessageClickListener;
+    }
+
+    public static ChatFragment newChatFragment(ChatInfo chatInfo, ChatViewConfig config){
+        ChatFragment chatFragment = new ChatFragment();
+        chatFragment.setChatInfo(chatInfo);
+        chatFragment.setConfig(config);
+        return chatFragment;
+    }
+    ChatLayoutHelper helper;
     @Override
     public void onResume() {
         super.onResume();
         // TODO 通过api设置ChatLayout各种属性的样例
-        ChatLayoutHelper helper = new ChatLayoutHelper(getActivity());
-        helper.customizeChatLayout(mChatLayout);
+        if(helper == null){
+            helper = new ChatLayoutHelper(getActivity());
+        }
+        if(mConfig==null){
+            mConfig = new ChatViewConfig();
+        }
+        helper.customizeChatLayout(mChatLayout,mConfig);
     }
 
     @Override

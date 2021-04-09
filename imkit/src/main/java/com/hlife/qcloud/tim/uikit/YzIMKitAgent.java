@@ -21,11 +21,13 @@ import com.hlife.qcloud.tim.uikit.business.message.CustomMessage;
 import com.hlife.qcloud.tim.uikit.business.message.MessageNotification;
 import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
 import com.hlife.qcloud.tim.uikit.business.thirdpush.HUAWEIHmsMessageService;
+import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.config.GeneralConfig;
 import com.hlife.qcloud.tim.uikit.config.TUIKitConfigs;
 import com.hlife.qcloud.tim.uikit.modules.chat.C2CChatManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationManagerKit;
+import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
 import com.hlife.qcloud.tim.uikit.utils.BrandUtil;
@@ -234,31 +236,16 @@ public final class YzIMKitAgent {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(intent);
     }
-    /**
-     * 去聊天
-     */
-    public void startChat(String toChatId,String chatName,boolean finishToConversation){
+    public void startChat(ChatInfo chatInfo, ChatViewConfig config){
         if((getFunctionPrem() & 1)<=0){
             ToastUtil.error(mContext, R.string.toast_conversation_permission);
             return;
         }
-//        if("de241446a50499bb77a8684cf610fd04".equals(yzAppId)){//只有元信才需要去验证是否升级
-//        }else{
-//
-//        }
-        toChatInfo(toChatId,chatName,finishToConversation);
-
-    }
-    private void toChatInfo(String toChatId,String chatName,boolean finishToConversation){
-        ChatInfo chatInfo = new ChatInfo();
-        chatInfo.setType(V2TIMConversation.V2TIM_C2C);
-        chatInfo.setId(toChatId);
-        chatInfo.setChatName(chatName);
-        Intent intent = new Intent(mContext, ChatActivity.class);
+        Intent intent = new Intent(TUIKit.getAppContext(), ChatActivity.class);
         intent.putExtra(Constants.CHAT_INFO, chatInfo);
-        intent.putExtra(Constants.CHAT_TO_CONVERSATION, finishToConversation);
+        intent.putExtra(Constants.CHAT_CONFIG,config);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        mContext.startActivity(intent);
+        TUIKit.getAppContext().startActivity(intent);
     }
     /**
      * 分享卡片消息
@@ -282,7 +269,7 @@ public final class YzIMKitAgent {
                 @Override
                 public void onSuccess(Object data) {
                     SLog.e("custom message send success:"+data);
-                    YzIMKitAgent.instance().startChat(chatInfo.getId(),chatInfo.getChatName(),false);
+                    YzIMKitAgent.instance().startChat(chatInfo,null);
                 }
 
                 @Override
