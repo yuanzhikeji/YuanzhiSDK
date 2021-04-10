@@ -83,7 +83,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
                         continue;
                     }
                     if(type== YzChatType.GROUP && conversationInfo.isGroup()
-                        || (type == YzChatType.SINGLE && !conversationInfo.isGroup())
+                        || (type == YzChatType.C2C && !conversationInfo.isGroup())
                         || (type == YzChatType.ALL)){
                         unRead += conversationInfo.getUnRead();
                         data.add(conversationInfo);

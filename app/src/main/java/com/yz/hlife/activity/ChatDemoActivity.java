@@ -20,7 +20,6 @@ import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMes
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationListLayout;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
-import com.work.util.SLog;
 import com.work.util.ToastUtil;
 import com.yz.hlife.R;
 
@@ -29,7 +28,6 @@ public class ChatDemoActivity extends BaseActivity implements ConversationListLa
     public void onInitView() throws Exception {
         super.onInitView();
         int flag = getIntent().getIntExtra(ChatDemoActivity.class.getSimpleName(),0);
-        SLog.e("flag:"+flag);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         if(flag == 1){
             ConversationFragment fragment1 = ConversationFragment.newConversation(YzChatType.GROUP);
@@ -45,17 +43,14 @@ public class ChatDemoActivity extends BaseActivity implements ConversationListLa
 
             ChatFragment chatFragment = ChatFragment.newChatFragment(chatInfo,chatViewConfig);
             chatFragment.setYzMessageClickListener(this);
-            chatFragment.setYzCustomMessageDrawListener(new YzCustomMessageDrawListener() {
-                @Override
-                public void onDraw(YzCustomMessageViewGroup parent, MessageInfo info) {
-                    View view = LayoutInflater.from(TUIKit.getAppContext()).inflate(com.hlife.qcloud.tim.uikit.R.layout.test_custom_message_layout1, null, false);
-                    parent.addMessageContentView(view);
-                }
+            chatFragment.setYzCustomMessageDrawListener((parent, info) -> {
+                View view = LayoutInflater.from(TUIKit.getAppContext()).inflate(com.hlife.qcloud.tim.uikit.R.layout.test_custom_message_layout1, null, false);
+                parent.addMessageContentView(view);
             });
             fragmentTransaction.replace(R.id.container,chatFragment);
             fragmentTransaction.commitAllowingStateLoss();
         }else{
-            ConversationFragment fragment0 = ConversationFragment.newConversation(YzChatType.SINGLE);
+            ConversationFragment fragment0 = ConversationFragment.newConversation(YzChatType.C2C);
             fragment0.setOnItemClickListener(this);
             fragmentTransaction.replace(R.id.container,fragment0);
             fragmentTransaction.commitAllowingStateLoss();

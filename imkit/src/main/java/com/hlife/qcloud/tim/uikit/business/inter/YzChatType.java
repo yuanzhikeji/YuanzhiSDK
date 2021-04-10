@@ -7,7 +7,7 @@ package com.hlife.qcloud.tim.uikit.business.inter;
  */
 
 public enum YzChatType {
-    SINGLE,
+    C2C,
     GROUP,
     ALL
 }
