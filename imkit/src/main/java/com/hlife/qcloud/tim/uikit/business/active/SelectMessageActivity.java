@@ -43,12 +43,11 @@ public class SelectMessageActivity extends BaseActivity {
     public void onInitValue() throws Exception {
         super.onInitValue();
         setTitleName("选择");
-        CustomMessage message = (CustomMessage) getIntent().getSerializableExtra(SelectMessageActivity.class.getSimpleName());
-        if(message==null){
+        final String message =getIntent().getStringExtra(SelectMessageActivity.class.getSimpleName());
+        if(TextUtils.isEmpty(message)){
             finish();
             return;
         }
-        final String customData = new Gson().toJson(message);
         mContactLayout.initDefault(ContactListView.DataSource.CONTACT_GROUP_SELECT);
         mContactLayout.getContactListView().setOnItemClickListener(new ContactListView.OnItemClickListener() {
             @Override
@@ -56,7 +55,7 @@ public class SelectMessageActivity extends BaseActivity {
                 if (position == 0) {
                     Intent intent = new Intent(TUIKit.getAppContext(), GroupListActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra(GroupListActivity.class.getSimpleName(),customData);
+                    intent.putExtra(GroupListActivity.class.getSimpleName(),message);
                     TUIKit.getAppContext().startActivity(intent);
                     finish();
                 } else {
@@ -72,7 +71,7 @@ public class SelectMessageActivity extends BaseActivity {
                     chatInfo.setChatName(chatName);
                     C2CChatManagerKit c2CChatManagerKit = C2CChatManagerKit.getInstance();
                     c2CChatManagerKit.setCurrentChatInfo(chatInfo);
-                    MessageInfo info = MessageInfoUtil.buildCustomMessage(customData);
+                    MessageInfo info = MessageInfoUtil.buildCustomMessage(message);
                     c2CChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
                         @Override
                         public void onSuccess(Object data) {
@@ -94,7 +93,7 @@ public class SelectMessageActivity extends BaseActivity {
     public int onCustomContentId() {
         return R.layout.fragment_im_contact;
     }
-    public static void sendCustomMessage(Context context, CustomMessage message){
+    public static void sendCustomMessage(Context context, String message){
         Intent intent = new Intent(context, SelectMessageActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(SelectMessageActivity.class.getSimpleName(),message);

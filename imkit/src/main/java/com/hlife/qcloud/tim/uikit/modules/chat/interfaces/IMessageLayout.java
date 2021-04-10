@@ -3,7 +3,7 @@ package com.hlife.qcloud.tim.uikit.modules.chat.interfaces;
 import com.hlife.qcloud.tim.uikit.component.action.PopMenuAction;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.MessageLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.MessageListAdapter;
-import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.IOnCustomMessageDrawListener;
+import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageDrawListener;
 
 import java.util.List;
 
@@ -51,7 +51,7 @@ public interface IMessageLayout extends IMessageProperties {
     /**
      * 设置自定义的消息渲染时的回调，当TUIKit内部在刷新自定义消息时会调用这个回调
      *
-     * @param listener {@link IOnCustomMessageDrawListener}
+     * @param listener {@link YzCustomMessageDrawListener}
      */
-    void setOnCustomMessageDrawListener(IOnCustomMessageDrawListener listener);
+    void setOnCustomMessageDrawListener(YzCustomMessageDrawListener listener);
 }

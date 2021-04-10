@@ -5,7 +5,7 @@ import android.view.View;
 /**
  * 自定义消息的容器
  */
-public interface ICustomMessageViewGroup {
+public interface YzCustomMessageViewGroup {
 
     /**
      * 把自定义消息的整个view添加到容器里

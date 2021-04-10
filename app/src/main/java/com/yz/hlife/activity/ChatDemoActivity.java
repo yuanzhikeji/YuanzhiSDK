@@ -2,10 +2,12 @@ package com.yz.hlife.activity;
 
 
 import android.content.Intent;
+import android.view.LayoutInflater;
 import android.view.View;
 
 import androidx.fragment.app.FragmentTransaction;
 
+import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.base.BaseActivity;
 import com.hlife.qcloud.tim.uikit.business.fragment.ChatFragment;
 import com.hlife.qcloud.tim.uikit.business.fragment.ConversationFragment;
@@ -13,8 +15,11 @@ import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageClickListener;
 import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
+import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageViewGroup;
+import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageDrawListener;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationListLayout;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
+import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.work.util.SLog;
 import com.work.util.ToastUtil;
 import com.yz.hlife.R;
@@ -40,6 +45,13 @@ public class ChatDemoActivity extends BaseActivity implements ConversationListLa
 
             ChatFragment chatFragment = ChatFragment.newChatFragment(chatInfo,chatViewConfig);
             chatFragment.setYzMessageClickListener(this);
+            chatFragment.setYzCustomMessageDrawListener(new YzCustomMessageDrawListener() {
+                @Override
+                public void onDraw(YzCustomMessageViewGroup parent, MessageInfo info) {
+                    View view = LayoutInflater.from(TUIKit.getAppContext()).inflate(com.hlife.qcloud.tim.uikit.R.layout.test_custom_message_layout1, null, false);
+                    parent.addMessageContentView(view);
+                }
+            });
             fragmentTransaction.replace(R.id.container,chatFragment);
             fragmentTransaction.commitAllowingStateLoss();
         }else{
@@ -84,5 +96,11 @@ public class ChatDemoActivity extends BaseActivity implements ConversationListLa
     public void onAtGroupMember(String groupId) {
 
     }
+    public static class customMessageLayout implements YzCustomMessageDrawListener {
 
+        @Override
+        public void onDraw(YzCustomMessageViewGroup parent, MessageInfo info) {
+
+        }
+    }
 }

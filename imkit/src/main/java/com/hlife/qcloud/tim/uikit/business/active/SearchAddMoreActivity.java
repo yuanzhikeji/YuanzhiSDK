@@ -155,7 +155,7 @@ public class SearchAddMoreActivity extends IMBaseActivity implements View.OnClic
     }
 
     private void loadConversationAsync(){
-        ConversationManagerKit.getInstance().loadConversation(mSearch.getText().toString().trim(),new IUIKitCallBack() {
+        ConversationManagerKit.getInstance().searchConversation(mSearch.getText().toString().trim(),new IUIKitCallBack() {
             @Override
             public void onSuccess(Object data) {
                 mConversationAdapter.setDataProvider((ConversationProvider) data);

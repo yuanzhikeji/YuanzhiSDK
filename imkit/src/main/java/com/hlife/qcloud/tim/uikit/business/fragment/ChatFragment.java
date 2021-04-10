@@ -24,6 +24,7 @@ import com.hlife.qcloud.tim.uikit.modules.chat.ChatLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.input.InputLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.MessageLayout;
+import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageDrawListener;
 import com.hlife.qcloud.tim.uikit.modules.group.info.GroupInfo;
 import com.hlife.qcloud.tim.uikit.modules.group.info.StartGroupMemberSelectActivity;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
@@ -52,6 +53,7 @@ public class ChatFragment extends BaseFragment {
     private ChatInfo mChatInfo;
     private ChatViewConfig mConfig;
     private YzMessageClickListener mYzMessageClickListener;
+    private YzCustomMessageDrawListener mYzCustomMessageDrawListener;
 
     @Nullable
     @Override
@@ -295,6 +297,10 @@ public class ChatFragment extends BaseFragment {
         this.mYzMessageClickListener = mYzMessageClickListener;
     }
 
+    public void setYzCustomMessageDrawListener(YzCustomMessageDrawListener mYzCustomMessageDrawListener) {
+        this.mYzCustomMessageDrawListener = mYzCustomMessageDrawListener;
+    }
+
     public static ChatFragment newChatFragment(ChatInfo chatInfo, ChatViewConfig config){
         ChatFragment chatFragment = new ChatFragment();
         chatFragment.setChatInfo(chatInfo);
@@ -312,7 +318,7 @@ public class ChatFragment extends BaseFragment {
         if(mConfig==null){
             mConfig = new ChatViewConfig();
         }
-        helper.customizeChatLayout(mChatLayout,mConfig);
+        helper.customizeChatLayout(mChatLayout,mConfig,mYzCustomMessageDrawListener);
     }
 
     @Override

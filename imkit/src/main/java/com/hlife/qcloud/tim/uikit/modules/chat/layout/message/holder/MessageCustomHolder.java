@@ -9,7 +9,7 @@ import android.widget.TextView;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.R;
 
-public class MessageCustomHolder extends MessageContentHolder implements ICustomMessageViewGroup {
+public class MessageCustomHolder extends MessageContentHolder implements YzCustomMessageViewGroup {
 
     private MessageInfo mMessageInfo;
     private int mPosition;

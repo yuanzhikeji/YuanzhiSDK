@@ -250,21 +250,16 @@ public final class YzIMKitAgent {
     /**
      * 分享卡片消息
      */
-    public void startCustomMessage(CustomMessage message){
-        startCustomMessage(null,null,message);
+    public void startCustomMessage(String customMessage){
+        startCustomMessage(null,customMessage);
     }
-    public void startCustomMessage(String toChatId,String chatName, CustomMessage message){
-        if(TextUtils.isEmpty(toChatId)){
-            SelectMessageActivity.sendCustomMessage(mContext,message);
+    public void startCustomMessage(final ChatInfo chatInfo, String customMessage){
+        if(chatInfo==null){
+            SelectMessageActivity.sendCustomMessage(mContext,customMessage);
         }else{
-            final ChatInfo chatInfo = new ChatInfo();
-            chatInfo.setType(V2TIMConversation.V2TIM_C2C);
-            chatInfo.setId(toChatId);
-            chatInfo.setChatName(chatName);
             C2CChatManagerKit c2CChatManagerKit = C2CChatManagerKit.getInstance();
             c2CChatManagerKit.setCurrentChatInfo(chatInfo);
-            final String customData = new Gson().toJson(message);
-            MessageInfo info = MessageInfoUtil.buildCustomMessage(customData);
+            MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
             c2CChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
                 @Override
                 public void onSuccess(Object data) {

@@ -16,10 +16,9 @@ import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.modules.chat.ChatLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.BaseInputFragment;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.input.InputLayout;
-import com.hlife.qcloud.tim.uikit.modules.chat.layout.inputmore.InputMoreActionUnit;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.MessageLayout;
-import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.ICustomMessageViewGroup;
-import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.IOnCustomMessageDrawListener;
+import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageViewGroup;
+import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageDrawListener;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
@@ -39,7 +38,7 @@ public class ChatLayoutHelper {
         mContext = context;
     }
 
-    public void customizeChatLayout(final ChatLayout layout,final ChatViewConfig config) {
+    public void customizeChatLayout(final ChatLayout layout, final ChatViewConfig config, YzCustomMessageDrawListener customMessageDrawListener) {
 //        //====== NoticeLayout使用范例 ======//
 //        NoticeLayout noticeLayout = layout.getNoticeLayout();
 //        noticeLayout.alwaysShow(true);
@@ -99,7 +98,11 @@ public class ChatLayoutHelper {
 //        messageLayout.setTipsMessageFontColor(0xFF7E848C);
 //
         // 设置自定义的消息渲染时的回调
-        messageLayout.setOnCustomMessageDrawListener(new CustomMessageDraw());
+        if(customMessageDrawListener!=null){
+            messageLayout.setOnCustomMessageDrawListener(customMessageDrawListener);
+        }else{
+            messageLayout.setOnCustomMessageDrawListener(new CustomMessageDraw());
+        }
 //
 //        // 新增一个PopMenuAction
 //        PopMenuAction action = new PopMenuAction();
@@ -219,7 +222,7 @@ public class ChatLayoutHelper {
 
     }
 
-    public static class CustomMessageDraw implements IOnCustomMessageDrawListener {
+    public static class CustomMessageDraw implements YzCustomMessageDrawListener {
 
         /**
          * 自定义消息渲染时，会调用该方法，本方法实现了自定义消息的创建，以及交互逻辑
@@ -228,7 +231,7 @@ public class ChatLayoutHelper {
          * @param info   消息的具体信息
          */
         @Override
-        public void onDraw(ICustomMessageViewGroup parent, MessageInfo info) {
+        public void onDraw(YzCustomMessageViewGroup parent, MessageInfo info) {
             // 获取到自定义消息的json数据
             if (info.getTimMessage().getElemType() != V2TIMMessage.V2TIM_ELEM_TYPE_CUSTOM) {
                 return;

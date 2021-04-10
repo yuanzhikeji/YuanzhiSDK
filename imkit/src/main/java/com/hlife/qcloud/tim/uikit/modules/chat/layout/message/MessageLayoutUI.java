@@ -12,7 +12,7 @@ import android.util.AttributeSet;
 import com.hlife.qcloud.tim.uikit.component.CustomLinearLayoutManager;
 import com.hlife.qcloud.tim.uikit.modules.chat.interfaces.IMessageLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.interfaces.IMessageProperties;
-import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.IOnCustomMessageDrawListener;
+import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageDrawListener;
 import com.hlife.qcloud.tim.uikit.component.action.PopMenuAction;
 import com.hlife.qcloud.tim.uikit.utils.ScreenUtil;
 
@@ -236,7 +236,7 @@ public abstract class MessageLayoutUI extends RecyclerView implements IMessageLa
     }
 
     @Override
-    public void setOnCustomMessageDrawListener(IOnCustomMessageDrawListener listener) {
+    public void setOnCustomMessageDrawListener(YzCustomMessageDrawListener listener) {
         mAdapter.setOnCustomMessageDrawListener(listener);
     }
 

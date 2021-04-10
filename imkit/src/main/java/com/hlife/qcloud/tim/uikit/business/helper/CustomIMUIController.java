@@ -9,13 +9,13 @@ import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.business.active.WebActivity;
 import com.hlife.qcloud.tim.uikit.business.message.CustomMessage;
 import com.hlife.qcloud.tim.uikit.component.picture.imageEngine.impl.GlideEngine;
-import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.ICustomMessageViewGroup;
+import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageViewGroup;
 import com.hlife.qcloud.tim.uikit.R;
 
 public class CustomIMUIController {
 
 
-    public static void onDraw(ICustomMessageViewGroup parent, final CustomMessage data) {
+    public static void onDraw(YzCustomMessageViewGroup parent, final CustomMessage data) {
         // 把自定义消息view添加到TUIKit内部的父容器里
         View view = LayoutInflater.from(TUIKit.getAppContext()).inflate(R.layout.test_custom_message_layout1, null, false);
         parent.addMessageContentView(view);

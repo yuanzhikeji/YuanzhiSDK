@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hlife.qcloud.tim.uikit.modules.chat.interfaces.IChatProvider;
-import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.IOnCustomMessageDrawListener;
+import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageDrawListener;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.MessageContentHolder;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.MessageCustomHolder;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.MessageEmptyHolder;
@@ -26,9 +26,9 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     private MessageLayout mRecycleView;
     private List<MessageInfo> mDataSource = new ArrayList<>();
     private MessageLayout.OnItemClickListener mOnItemClickListener;
-    private IOnCustomMessageDrawListener mOnCustomMessageDrawListener;
+    private YzCustomMessageDrawListener mOnCustomMessageDrawListener;
 
-    public void setOnCustomMessageDrawListener(IOnCustomMessageDrawListener listener) {
+    public void setOnCustomMessageDrawListener(YzCustomMessageDrawListener listener) {
         mOnCustomMessageDrawListener = listener;
     }
 
