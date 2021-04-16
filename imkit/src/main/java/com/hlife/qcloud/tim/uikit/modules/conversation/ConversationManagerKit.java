@@ -93,18 +93,30 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
             }
         });
     }
-    public void getConversation(String conversionId, final YzConversationDataListener listener){
-        V2TIMManager.getConversationManager().getConversation(conversionId, new V2TIMValueCallback<V2TIMConversation>() {
+    public void getConversation(final String id, final YzConversationDataListener listener){
+        searchConversation(id,0,listener);
+    }
+    private void searchConversation(final String id,long nextSeq,final YzConversationDataListener listener){
+        loadConversation(nextSeq, YzChatType.ALL, new YzConversationDataListener() {
             @Override
-            public void onError(int code, String desc) {
-
-            }
-
-            @Override
-            public void onSuccess(V2TIMConversation v2TIMConversation) {
-                ConversationInfo conversationInfo = TIMConversation2ConversationInfo(v2TIMConversation);
-                if(listener!=null){
-                    listener.onConversationData(conversationInfo);
+            public void onConversationData(List<ConversationInfo> data, long unRead, long nextSeq) {
+                super.onConversationData(data, unRead, nextSeq);
+                if(data.size()==0){
+                    listener.onConversationData(null);
+                }else{
+                    ConversationInfo conversationInfo = null;
+                    for (int i = 0; i < data.size(); i++) {
+                        ConversationInfo item = data.get(i);
+                        if(item.getId().equals(id)){
+                            conversationInfo = item;
+                            break;
+                        }
+                    }
+                    if(conversationInfo==null && nextSeq!=-1){
+                        searchConversation(id,nextSeq,listener);
+                    }else{
+                        listener.onConversationData(conversationInfo);
+                    }
                 }
             }
         });
@@ -171,36 +183,6 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         }
         mUnreadTotal = 0;
         allConversation(0,new ArrayList<ConversationInfo>(),callBack);
-//        V2TIMManager.getConversationManager().getConversationList(0, 100, new V2TIMValueCallback<V2TIMConversationResult>() {
-//            @Override
-//            public void onError(int code, String desc) {
-//                SLog.v( "loadConversation getConversationList error, code = " + code + ", desc = " + desc);
-//            }
-//
-//            @Override
-//            public void onSuccess(V2TIMConversationResult v2TIMConversationResult) {
-//                ArrayList<ConversationInfo> infos = new ArrayList<>();
-//                List<V2TIMConversation> v2TIMConversationList = v2TIMConversationResult.getConversationList();
-//                mUnreadTotal = 0;
-//                for (V2TIMConversation v2TIMConversation : v2TIMConversationList) {
-//                    //将 imsdk v2TIMConversation 转换为 UIKit ConversationInfo
-//                    ConversationInfo conversationInfo = TIMConversation2ConversationInfo(v2TIMConversation);
-//                    if (conversationInfo != null && !V2TIMManager.GROUP_TYPE_AVCHATROOM.equals(v2TIMConversation.getGroupType())) {
-//                        mUnreadTotal = mUnreadTotal + conversationInfo.getUnRead();
-//                        conversationInfo.setType(ConversationInfo.TYPE_COMMON);
-//                        infos.add(conversationInfo);
-//                    }
-//                }
-//                //排序，imsdk加载处理的已按时间排序，但应用层有置顶会话操作，所有需根据置顶标识再次排序（置顶可考虑做到imsdk同步到服务器？）
-//                mProvider.setDataSource(sortConversations(infos));
-//                SharedPreferenceUtils.putListData(mConversationPreferences, TOP_LIST, mTopLinkedList);
-//                //更新消息未读总数
-//                updateUnreadTotal(mUnreadTotal);
-//                if (callBack != null) {
-//                    callBack.onSuccess(mProvider);
-//                }
-//            }
-//        });
     }
 
     private void allConversation(long nextSeq,final ArrayList<ConversationInfo> dataArray,final IUIKitCallBack callBack){

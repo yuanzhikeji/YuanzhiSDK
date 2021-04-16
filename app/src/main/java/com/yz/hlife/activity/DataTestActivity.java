@@ -43,8 +43,9 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
 
             @Override
             public void onConversationData(List<ConversationInfo> data, long unRead, long nextSeq) {
+                SLog.e("获取会话列表数据："+data);
                 if(data!=null && data.size()>0){
-                    getConversation(data.get(0).getConversationId());
+                    getConversation(data.get(0).getId());
                 }
             }
 
@@ -54,8 +55,8 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
             }
         });
     }
-    public void getConversation(String conversionId){
-        YzIMKitAgent.instance().getConversation(conversionId, new YzConversationDataListener() {
+    public void getConversation(String id){
+        YzIMKitAgent.instance().getConversation(id, new YzConversationDataListener() {
 
             @Override
             public void onConversationData(ConversationInfo data) {

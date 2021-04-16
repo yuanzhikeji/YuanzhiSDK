@@ -27,6 +27,7 @@ import com.tencent.imsdk.v2.V2TIMElem;
 import com.tencent.imsdk.v2.V2TIMImageElem;
 import com.hlife.qcloud.tim.uikit.R;
 import com.work.util.FileUtils;
+import com.work.util.SLog;
 import com.work.util.ToastUtil;
 import com.workstation.view.MaterialMenuDrawable;
 import com.workstation.view.MaterialMenuView;
@@ -81,9 +82,9 @@ public class PhotoViewActivity extends BaseActivity {
             return;
         }
         Uri uri = FileUtil.getUriFromPath(imageData);
-        boolean isSelf = getIntent().getBooleanExtra(IMKitConstants.SELF_MESSAGE, false);
+//        boolean isSelf = getIntent().getBooleanExtra(IMKitConstants.SELF_MESSAGE, false);
         mViewOriginalBtn = findViewById(R.id.view_original_btn);
-        if (isSelf || mCurrentOriginalImage == null) {
+        if (mCurrentOriginalImage == null) {
             mPhotoView.setImageURI(uri);
         } else {
             final String path = IMKitConstants.IMAGE_DOWNLOAD_DIR + mCurrentOriginalImage.getUUID();

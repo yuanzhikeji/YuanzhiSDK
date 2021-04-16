@@ -280,8 +280,8 @@ public final class YzIMKitAgent {
     public void loadConversation(int nextSeq, YzChatType type, final YzConversationDataListener callBack){
         ConversationManagerKit.getInstance().loadConversation(nextSeq,type,callBack);
     }
-    public void getConversation(String conversionId, YzConversationDataListener listener){
-        ConversationManagerKit.getInstance().getConversation(conversionId,listener);
+    public void getConversation(String id, YzConversationDataListener listener){
+        ConversationManagerKit.getInstance().getConversation(id,listener);
     }
     public void conversationUnRead(YzConversationDataListener listener){
         ConversationManagerKit.getInstance().conversationUnRead(listener);
