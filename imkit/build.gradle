@@ -68,10 +68,6 @@ dependencies {
 //    api 'com.github.dmytrodanylyk.android-process-button:library:1.0.4'
     //x5 内核
     implementation 'com.tencent.tbs.tbssdk:sdk:43939'
-    //umeng统计
-    implementation "com.umeng.umsdk:common:9.3.0"
-    implementation "com.umeng.umsdk:asms:1.1.3" // asms包依赖(必选)
-    implementation "com.umeng.umsdk:crash:0.0.5" // native crash包依赖(必选)
     //地图相关
     api 'com.amap.api:3dmap:7.8.0'
     api 'com.amap.api:location:4.7.2'

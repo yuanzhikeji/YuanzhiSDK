@@ -3,15 +3,15 @@ package com.hlife.qcloud.tim.uikit.config;
 import java.io.Serializable;
 
 public class ChatViewConfig implements Serializable {
-    private boolean disableSendPhotoAction;
-    private boolean disableCaptureAction;
-    private boolean disableVideoRecordAction;
-    private boolean disableSendFileAction;
-    private boolean disableSendLocationAction;
-    private boolean disableAudioCall = true;
-    private boolean disableVideoCall = true;
-    private boolean disableChatInput;
-    private boolean isCustomAtGroupMember;
+    private boolean disableSendPhotoAction;//禁用发送图片
+    private boolean disableCaptureAction;//禁用拍照
+    private boolean disableVideoRecordAction;//禁用摄像
+    private boolean disableSendFileAction;//禁用发文件
+    private boolean disableSendLocationAction;//禁用发位置
+    private boolean disableAudioCall = true;//禁用发实时音频
+    private boolean disableVideoCall = true;//禁用发实时视频
+    private boolean disableChatInput;//禁用聊天面板全部功能
+    private boolean isCustomAtGroupMember;//是否开启自定义消息类型
 
     public void setCustomAtGroupMember(boolean customAtGroupMember) {
         isCustomAtGroupMember = customAtGroupMember;

@@ -35,13 +35,10 @@ import com.http.network.listener.OnResultDataListener;
 import com.http.network.model.RequestWork;
 import com.http.network.model.ResponseWork;
 import com.tencent.imsdk.v2.V2TIMCallback;
-import com.tencent.imsdk.v2.V2TIMConversation;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.imsdk.v2.V2TIMMessage;
 import com.tencent.smtt.export.external.TbsCoreSettings;
 import com.tencent.smtt.sdk.QbSdk;
-import com.umeng.analytics.MobclickAgent;
-import com.umeng.commonsdk.UMConfigure;
 import com.work.api.open.ApiClient;
 import com.work.api.open.Yz;
 import com.work.api.open.model.LoginResp;
@@ -128,9 +125,6 @@ public final class YzIMKitAgent {
 
     private void loadConfig(){
         SharedUtils.init(mContext);
-        //umeng统计
-        UMConfigure.init(mContext, "5f8d583980455950e4af10d9", "Yz", UMConfigure.DEVICE_TYPE_PHONE, "");
-        MobclickAgent.setPageCollectionMode(MobclickAgent.PageMode.AUTO);
         //初始化im
         TUIKit.init(mContext,1400432221,getConfigs());
         //加载腾讯x5的浏览器引擎
