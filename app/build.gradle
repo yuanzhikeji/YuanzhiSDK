@@ -136,8 +136,8 @@ dependencies {
 //    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
     implementation 'com.google.code.gson:gson:2.8.6'
     //im
-    implementation project(path: ':imkit')
-//    implementation 'com.github.tangyxgit.HLifeYzAndroid:imkit:1.0.0'
+//    implementation project(path: ':imkit')
+    implementation 'com.github.tangyxgit.HLifeYzAndroid:imkit:1.0.1'
     // bugly sdk
 //    implementation 'com.tencent.bugly:crashreport:3.2.422'
 //    implementation 'com.tencent.bugly:nativecrashreport:3.7.471'
