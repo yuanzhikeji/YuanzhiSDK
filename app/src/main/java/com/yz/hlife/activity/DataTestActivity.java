@@ -41,7 +41,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
         findViewById(R.id.start_chat).setOnClickListener(this);
         findViewById(R.id.send_custom).setOnClickListener(this);
         SysUserReq sysUserReq = new SysUserReq();
-        sysUserReq.setNickName("试试123");
+        sysUserReq.setNickName("试试2233");
         YzIMKitAgent.instance().register(sysUserReq,null);
     }
 

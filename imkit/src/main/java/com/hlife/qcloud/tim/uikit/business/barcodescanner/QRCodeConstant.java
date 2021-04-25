@@ -6,7 +6,7 @@ public class QRCodeConstant {
     public final static boolean QR_VIBRATE_MODE = false;
 
 
-    public final static String BASE_URL = "https://dev-imapi.yzmetax.com/";
+    public final static String BASE_URL = "https://imapi.yzmetax.com/";
 
     public final static String BASE_URL_QUERY_CONTENT = "key";
 
