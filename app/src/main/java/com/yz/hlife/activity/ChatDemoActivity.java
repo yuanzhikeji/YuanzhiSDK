@@ -7,12 +7,16 @@ import android.view.View;
 
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.gson.Gson;
 import com.hlife.qcloud.tim.uikit.TUIKit;
+import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.base.BaseActivity;
 import com.hlife.qcloud.tim.uikit.business.fragment.ChatFragment;
 import com.hlife.qcloud.tim.uikit.business.fragment.ConversationFragment;
+import com.hlife.qcloud.tim.uikit.business.helper.CustomIMUIController;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageClickListener;
+import com.hlife.qcloud.tim.uikit.business.message.CustomMessage;
 import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageViewGroup;
@@ -20,13 +24,21 @@ import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMes
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationListLayout;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
+import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
+import com.tencent.imsdk.v2.V2TIMCustomElem;
+import com.tencent.imsdk.v2.V2TIMMessage;
+import com.work.util.SLog;
 import com.work.util.ToastUtil;
 import com.yz.hlife.R;
 
+import static com.hlife.qcloud.tim.uikit.utils.IMKitConstants.BUSINESS_ID_CUSTOM_CARD;
+
 public class ChatDemoActivity extends BaseActivity implements ConversationListLayout.OnItemClickListener, YzMessageClickListener {
+
     @Override
     public void onInitView() throws Exception {
         super.onInitView();
+
         int flag = getIntent().getIntExtra(ChatDemoActivity.class.getSimpleName(),0);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         if(flag == 1){
@@ -36,16 +48,50 @@ public class ChatDemoActivity extends BaseActivity implements ConversationListLa
             fragmentTransaction.commitAllowingStateLoss();
         }else if(flag == 2){
             ChatInfo chatInfo = (ChatInfo) getIntent().getSerializableExtra("chatInfo");
-
             ChatViewConfig chatViewConfig = new ChatViewConfig();
             chatViewConfig.setDisableVideoCall(false);
             chatViewConfig.setDisableAudioCall(false);
+            chatViewConfig.setCustomAtGroupMember(true);
+            View sendCustom = findViewById(R.id.send_custom);
+            sendCustom.setVisibility(View.VISIBLE);
+            sendCustom.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    CustomMessage message = new CustomMessage();
+                    message.setBusinessID(IMKitConstants.BUSINESS_ID_CUSTOM_CARD);
+                    message.setLogo("https://yzkj-im.oss-cn-beijing.aliyuncs.com/user/16037885020911603788500745.png");
+                    message.setDesc("欢迎加入元讯大家庭！欢迎加入元讯大家庭！欢迎加入元讯大家庭！欢迎加入元讯大家庭！");
+                    message.setTitle("元讯IM生态工具元讯IM生态工具元讯IM生态工具元讯IM生态工具元讯IM生态工具");
+                    message.setLink("http://yzmsri.com/");
+                    message.setBusinessID(IMKitConstants.BUSINESS_ID_CUSTOM_CARD);
 
+                    YzIMKitAgent.instance().sendCustomMessage(new Gson().toJson(message));
+                }
+            });
             ChatFragment chatFragment = ChatFragment.newChatFragment(chatInfo,chatViewConfig);
             chatFragment.setYzMessageClickListener(this);
             chatFragment.setYzCustomMessageDrawListener((parent, info) -> {
-                View view = LayoutInflater.from(TUIKit.getAppContext()).inflate(com.hlife.qcloud.tim.uikit.R.layout.test_custom_message_layout1, null, false);
-                parent.addMessageContentView(view);
+                ToastUtil.info(ChatDemoActivity.this,"监听到自定义内容："+ info.getTimMessage().getCustomElem());
+                // 获取到自定义消息的json数据
+                if (info.getTimMessage().getElemType() != V2TIMMessage.V2TIM_ELEM_TYPE_CUSTOM) {
+                    return;
+                }
+                V2TIMCustomElem elem = info.getTimMessage().getCustomElem();
+                // 自定义的json数据，需要解析成bean实例
+                CustomMessage data = null;
+                try {
+                    data = new Gson().fromJson(new String(elem.getData()), CustomMessage.class);
+                } catch (Exception e) {
+                    SLog.w("invalid json: " + new String(elem.getData()) + " " + e.getMessage());
+                }
+                if (data == null) {
+                    SLog.e( "No Custom Data: " + new String(elem.getData()));
+                } else if (data.version == IMKitConstants.JSON_VERSION_1
+                        || (data.version == IMKitConstants.JSON_VERSION_4 && data.getBusinessID().equals(BUSINESS_ID_CUSTOM_CARD))) {
+                    CustomIMUIController.onDraw(parent, data);
+                } else {
+                    SLog.w("unsupported version: " + data);
+                }
             });
             fragmentTransaction.replace(R.id.container,chatFragment);
             fragmentTransaction.commitAllowingStateLoss();
@@ -89,13 +135,6 @@ public class ChatDemoActivity extends BaseActivity implements ConversationListLa
 
     @Override
     public void onAtGroupMember(String groupId) {
-
-    }
-    public static class customMessageLayout implements YzCustomMessageDrawListener {
-
-        @Override
-        public void onDraw(YzCustomMessageViewGroup parent, MessageInfo info) {
-
-        }
+        ToastUtil.info(this,"监听到触发了@能力："+groupId);
     }
 }

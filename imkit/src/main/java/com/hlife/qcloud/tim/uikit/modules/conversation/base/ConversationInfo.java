@@ -188,7 +188,7 @@ public class ConversationInfo implements Serializable, Comparable<ConversationIn
                 ", isGroup=" + isGroup +
                 ", top=" + top +
                 ", lastMessageTime=" + lastMessageTime +
-                ", lastMessage=" + lastMessage +
+                ", lastMessage=" + lastMessage.getExtra() +
                 '}';
     }
 }

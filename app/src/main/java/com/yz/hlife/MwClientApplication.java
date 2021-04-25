@@ -15,10 +15,7 @@ import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.business.inter.YzStatusListener;
 import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
 import com.hlife.qcloud.tim.uikit.business.modal.WorkApp;
-import com.tencent.wemeet.sdk.app.AppGlobals;
 import com.work.api.open.ApiClient;
-import com.work.mw.wemeet.RdmSDK;
-import com.work.mw.wemeet.WemeetSdkHelper;
 import com.yz.hlife.activity.LoginActivity;
 
 /**
@@ -45,7 +42,7 @@ public class MwClientApplication extends MultiDexApplication {
             @Override
             public void logout() {
                 super.logout();
-                WemeetSdkHelper.logout();
+//                WemeetSdkHelper.logout();
                 Intent intent = new Intent(MwClientApplication.this, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
@@ -56,17 +53,17 @@ public class MwClientApplication extends MultiDexApplication {
                 WorkApp wp = (WorkApp) item;
                 if(wp.isWemeet()){
                     //先初始化会议
-                    WemeetSdkHelper.init(MwClientApplication.this,wp.getWemeetToken());
+//                    WemeetSdkHelper.init(MwClientApplication.this,wp.getWemeetToken());
                     //启动会议
-                    WemeetSdkHelper.startAuth(wp.getUrl());
+//                    WemeetSdkHelper.startAuth(wp.getUrl());
                 }
             }
         });
         //增加消息前后台逻辑监听器
         registerActivityLifecycleCallbacks(new StatisticActivityLifecycleCallback());
         //腾讯会议
-        AppGlobals.INSTANCE.init(this);
-        RdmSDK.INSTANCE.init(this);
+//        AppGlobals.INSTANCE.init(this);
+//        RdmSDK.INSTANCE.init(this);
     }
 
     private String getCurrentProcessName() {

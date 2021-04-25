@@ -25,6 +25,7 @@ import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.config.GeneralConfig;
 import com.hlife.qcloud.tim.uikit.config.TUIKitConfigs;
 import com.hlife.qcloud.tim.uikit.modules.chat.C2CChatManagerKit;
+import com.hlife.qcloud.tim.uikit.modules.chat.GroupChatManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
@@ -251,21 +252,51 @@ public final class YzIMKitAgent {
         if(chatInfo==null){
             SelectMessageActivity.sendCustomMessage(mContext,customMessage);
         }else{
-            C2CChatManagerKit c2CChatManagerKit = C2CChatManagerKit.getInstance();
-            c2CChatManagerKit.setCurrentChatInfo(chatInfo);
-            MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
-            c2CChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
-                @Override
-                public void onSuccess(Object data) {
-                    SLog.e("custom message send success:"+data);
-                    YzIMKitAgent.instance().startChat(chatInfo,null);
-                }
+            if(chatInfo.isGroup()){
+                GroupChatManagerKit groupChatManagerKit = GroupChatManagerKit.getInstance();
+                groupChatManagerKit.setCurrentChatInfo(chatInfo);
+                MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
+                groupChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
+                    @Override
+                    public void onSuccess(Object data) {
+                        SLog.e("custom message send success:"+data);
+                        YzIMKitAgent.instance().startChat(chatInfo,null);
+                    }
 
-                @Override
-                public void onError(String module, int errCode, String errMsg) {
-                    ToastUtil.warning(mContext,errCode+">"+errMsg);
-                }
-            });
+                    @Override
+                    public void onError(String module, int errCode, String errMsg) {
+                        ToastUtil.warning(mContext,errCode+">"+errMsg);
+                    }
+                });
+            }else{
+                C2CChatManagerKit c2CChatManagerKit = C2CChatManagerKit.getInstance();
+                c2CChatManagerKit.setCurrentChatInfo(chatInfo);
+                MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
+                c2CChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
+                    @Override
+                    public void onSuccess(Object data) {
+                        SLog.e("custom message send success:"+data);
+                        YzIMKitAgent.instance().startChat(chatInfo,null);
+                    }
+
+                    @Override
+                    public void onError(String module, int errCode, String errMsg) {
+                        ToastUtil.warning(mContext,errCode+">"+errMsg);
+                    }
+                });
+            }
+        }
+    }
+    public void sendCustomMessage(String customMessage){
+        MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
+        C2CChatManagerKit c2CChatManagerKit = C2CChatManagerKit.getInstance();
+        if(c2CChatManagerKit.getCurrentChatInfo()!=null){
+            c2CChatManagerKit.sendMessage(info,false,null);
+        }else{
+            GroupChatManagerKit groupChatManagerKit = GroupChatManagerKit.getInstance();
+            if(groupChatManagerKit.getCurrentChatInfo()!=null){
+                groupChatManagerKit.sendMessage(info,false,null);
+            }
         }
     }
     /**

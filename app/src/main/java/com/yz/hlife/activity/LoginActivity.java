@@ -185,7 +185,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                             SLog.e("im success:"+data);
                             dismissProgress();
                             finish();
-                            YzIMKitAgent.instance().startAuto();
+//                            YzIMKitAgent.instance().startAuto();
+                            startActivity(new Intent(LoginActivity.this,DataTestActivity.class));
                         }
 
                         @Override

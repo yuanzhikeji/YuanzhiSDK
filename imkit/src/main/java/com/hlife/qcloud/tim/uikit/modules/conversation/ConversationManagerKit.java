@@ -149,9 +149,9 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
                         continue;
                     }
                     if(conversationInfo.isGroup()){
-                        sUnRead+=conversationInfo.getUnRead();
+                        gUnRead += conversationInfo.getUnRead();
                     }else{
-                        gUnRead = conversationInfo.getUnRead();
+                        sUnRead += conversationInfo.getUnRead();
                     }
                 }
                 if(v2TIMConversationResult.isFinished()){
@@ -447,7 +447,9 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
                     }
                 }
                 info.setIconUrlList(urlList);
-                mProvider.updateAdapter(info.getConversationId());
+                if(mProvider!=null){
+                    mProvider.updateAdapter(info.getConversationId());
+                }
                 if(mSearchProvide!=null){
                     mSearchProvide.updateAdapter(info.getConversationId());
                 }

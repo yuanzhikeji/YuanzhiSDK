@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">元讯</string>
+    <string name="app_name" translatable="false">壹镇通测试SDK测试DEMO</string>
     <string name="activity_forgetpassword" translatable="false">忘记密码</string>
     <string name="activity_register" translatable="false">注册</string>
 
