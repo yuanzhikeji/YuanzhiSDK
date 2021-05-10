@@ -6,6 +6,7 @@ import com.http.network.listener.OnResultDataListener;
 import com.http.network.task.ConnectDataTask;
 import com.work.api.open.contacts.ModeApi;
 import com.work.api.open.model.AddApplyStaticsReq;
+import com.work.api.open.model.GroupMemberResp;
 import com.work.api.open.model.BaseReq;
 import com.work.api.open.model.BaseResp;
 import com.work.api.open.model.CheckToolTokenReq;
@@ -123,10 +124,22 @@ public class Yz extends ApiClient {
         requestPost(ModeApi.createGroup,createGroupReq,new CreateGroupResp(),onResultDataListener);
     }
     /**
+     * 加入一个群
+     */
+    public void addGroupUser(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
+        requestPost(ModeApi.addGroupUser,createGroupReq,new GroupMemberResp(),onResultDataListener);
+    }
+    /**
+     * 移除群组的人员
+     */
+    public void deleteGroupUser(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
+        requestPost(ModeApi.deleteGroupUser,createGroupReq,new GroupMemberResp(),onResultDataListener);
+    }
+    /**
      * 解散群组
      */
     public void destroyGroup(DestroyGroupReq destroyGroupReq,OnResultDataListener onResultDataListener){
-        requestPost(ModeApi.destroyGroup,destroyGroupReq,new BaseResp(),onResultDataListener);
+        requestPost(ModeApi.destroyGroupdestroyGroup,destroyGroupReq,new BaseResp(),onResultDataListener);
     }
     /**
      * 获取群信息

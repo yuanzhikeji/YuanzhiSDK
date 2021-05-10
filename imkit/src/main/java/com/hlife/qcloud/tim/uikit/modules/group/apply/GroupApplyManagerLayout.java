@@ -7,21 +7,18 @@ import android.content.Intent;
 import androidx.annotation.Nullable;
 
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.hlife.qcloud.tim.uikit.modules.group.interfaces.IGroupMemberLayout;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.component.TitleBarLayout;
-import com.hlife.qcloud.tim.uikit.modules.chat.GroupChatManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.group.info.GroupInfo;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 
 
 public class GroupApplyManagerLayout extends LinearLayout implements IGroupMemberLayout {
 
-    private TitleBarLayout mTitleBar;
     private ListView mApplyMemberList;
     private GroupApplyAdapter mAdapter;
 
@@ -53,22 +50,11 @@ public class GroupApplyManagerLayout extends LinearLayout implements IGroupMembe
             }
         });
         mApplyMemberList.setAdapter(mAdapter);
-        mTitleBar = findViewById(R.id.group_apply_title_bar);
-        mTitleBar.getRightGroup().setVisibility(View.GONE);
-        mTitleBar.setTitle(getResources().getString(R.string.group_apply_members), TitleBarLayout.POSITION.MIDDLE);
-        mTitleBar.setOnLeftClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                GroupChatManagerKit.getInstance().onApplied(mAdapter.getUnHandledSize());
-                if (getContext() instanceof Activity) {
-                    ((Activity) getContext()).finish();
-                }
-            }
-        });
     }
 
+    @Override
     public TitleBarLayout getTitleBar() {
-        return mTitleBar;
+        return null;
     }
 
     @Override

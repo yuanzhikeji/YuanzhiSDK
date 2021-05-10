@@ -45,37 +45,37 @@ public class FileUtil {
 
     public static void initPath() {
 
-        File f = new File(IMKitConstants.MEDIA_DIR);
+        File f = new File(TUIKitConstants.MEDIA_DIR);
         if (!f.exists()) {
             f.mkdirs();
         }
 
-        f = new File(IMKitConstants.RECORD_DIR);
+        f = new File(TUIKitConstants.RECORD_DIR);
         if (!f.exists()) {
             f.mkdirs();
         }
 
-        f = new File(IMKitConstants.RECORD_DOWNLOAD_DIR);
+        f = new File(TUIKitConstants.RECORD_DOWNLOAD_DIR);
         if (!f.exists()) {
             f.mkdirs();
         }
 
-        f = new File(IMKitConstants.VIDEO_DOWNLOAD_DIR);
+        f = new File(TUIKitConstants.VIDEO_DOWNLOAD_DIR);
         if (!f.exists()) {
             f.mkdirs();
         }
 
-        f = new File(IMKitConstants.IMAGE_DOWNLOAD_DIR);
+        f = new File(TUIKitConstants.IMAGE_DOWNLOAD_DIR);
         if (!f.exists()) {
             f.mkdirs();
         }
 
-        f = new File(IMKitConstants.FILE_DOWNLOAD_DIR);
+        f = new File(TUIKitConstants.FILE_DOWNLOAD_DIR);
         if (!f.exists()) {
             f.mkdirs();
         }
 
-        f = new File(IMKitConstants.CRASH_LOG_DIR);
+        f = new File(TUIKitConstants.CRASH_LOG_DIR);
         if (!f.exists()) {
             f.mkdirs();
         }
@@ -83,7 +83,7 @@ public class FileUtil {
     }
 
     public static String saveBitmap(String dir, Bitmap b) {
-        String jpegName = IMKitConstants.MEDIA_DIR + File.separator + "picture_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".jpg";
+        String jpegName = TUIKitConstants.MEDIA_DIR + File.separator + "picture_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".jpg";
         try {
             FileOutputStream fout = new FileOutputStream(jpegName);
             BufferedOutputStream bos = new BufferedOutputStream(fout);
@@ -169,7 +169,7 @@ public class FileUtil {
     }
 
     public static boolean checkAudioExist(String fileName) {
-        File file = new File(IMKitConstants.RECORD_DOWNLOAD_DIR);
+        File file = new File(TUIKitConstants.RECORD_DOWNLOAD_DIR);
         if (!file.exists())
             return false;
         String files[] = file.list();
@@ -185,10 +185,8 @@ public class FileUtil {
      */
     public static String getPath(final Context context, final Uri uri) {
 
-        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-
         // DocumentProvider
-        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+        if (DocumentsContract.isDocumentUri(context, uri)) {
             // ExternalStorageProvider
             if (isExternalStorageDocument(uri)) {
 
@@ -216,7 +214,7 @@ public class FileUtil {
                 };
 
                 for (String contentUriPrefix : contentUriPrefixesToTry) {
-                    Uri contentUri = ContentUris.withAppendedId(Uri.parse(contentUriPrefix), Long.parseLong(id));
+                    Uri contentUri = ContentUris.withAppendedId(Uri.parse(contentUriPrefix), Long.valueOf(id));
                     try {
                         String path = getDataColumn(context, contentUri, null, null);
                         if (path != null) {
@@ -585,9 +583,9 @@ public class FileUtil {
 
     public static String reNameFile(File file, final String fileName) {
 
-        String filePath = IMKitConstants.FILE_DOWNLOAD_DIR + fileName;
+        String filePath = TUIKitConstants.FILE_DOWNLOAD_DIR + fileName;
         if (new File(filePath).exists()) {
-            File baseFile = new File(IMKitConstants.FILE_DOWNLOAD_DIR);
+            File baseFile = new File(TUIKitConstants.FILE_DOWNLOAD_DIR);
             FileFilter fileFilter = new FileFilter() {
 
                 @Override
@@ -611,7 +609,7 @@ public class FileUtil {
                 index++;
             }
             String newName = fileName + "(" + index + ")";
-            File dest = new File(IMKitConstants.FILE_DOWNLOAD_DIR + newName);
+            File dest = new File(TUIKitConstants.FILE_DOWNLOAD_DIR + newName);
             file.renameTo(dest);
             return newName;
         } else {

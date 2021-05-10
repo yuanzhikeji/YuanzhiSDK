@@ -118,9 +118,7 @@ public class GroupMemberManagerLayout extends LinearLayout implements IGroupMemb
         mAllMemberManager = new ArrayList<>(contactItemBeans);
         mContactListView.setDataSource(contactItemBeans);
 //        mAdapter.setDataSource(groupInfo);
-        if (groupInfo != null) {
-            mTitleBar.setTitle("群成员(" + groupInfo.getMemberDetails().size() + ")", TitleBarLayout.POSITION.MIDDLE);
-        }
+        mTitleBar.setTitle("群成员(" + groupInfo.getMemberDetails().size() + ")", TitleBarLayout.POSITION.MIDDLE);
     }
 
     private void buildPopMenu() {
@@ -137,6 +135,10 @@ public class GroupMemberManagerLayout extends LinearLayout implements IGroupMemb
                 }
             });
             Button addBtn = moreActionView.findViewById(R.id.add_group_member);
+            if(mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_PUBLIC)){
+                addBtn.setVisibility(GONE);
+                moreActionView.findViewById(R.id.line1).setVisibility(GONE);
+            }
             addBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

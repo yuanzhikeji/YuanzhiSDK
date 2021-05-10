@@ -280,4 +280,6 @@
     <string name="zxing_scan_from_picture" translatable="false">选择图片</string>
     <string name="common_network_unavailable" translatable="false">当前网络不可用</string>
     <string name="common_network_check" translatable="false">请检查网络设置</string>
+
+    <string name="toast_file_error" translatable="false">文件错误或者不存在</string>
 </resources>

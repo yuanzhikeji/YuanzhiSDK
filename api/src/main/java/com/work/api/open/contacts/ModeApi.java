@@ -57,7 +57,15 @@ public final class ModeApi {
     /**
      * 创建群
      */
-    public final static String createGroup="group/createGroup";
+    public final static String createGroup="newgroup/createGroup";
+    /**
+     * 加入一个群
+     */
+    public final static String addGroupUser = "newgroup/addGroupUser";
+    /**
+     * 移除群组的人员
+     */
+    public final static String deleteGroupUser = "newgroup/deleteGroupUser";
     /**
      * 更新群资料
      */
@@ -66,6 +74,7 @@ public final class ModeApi {
      * 解散群组
      */
     public final static String destroyGroup = "group/destroyGroup";
+    public final static String destroyGroupdestroyGroup = "newgroup/destroyGroupdestroyGroup";
     /**
      * 获取群信息
      */

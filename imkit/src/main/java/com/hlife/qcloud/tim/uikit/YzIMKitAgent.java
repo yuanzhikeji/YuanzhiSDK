@@ -3,9 +3,7 @@ package com.hlife.qcloud.tim.uikit;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
-import android.text.TextUtils;
 
-import com.google.gson.Gson;
 import com.hlife.qcloud.tim.uikit.base.IMEventListener;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.business.Constants;
@@ -14,10 +12,10 @@ import com.hlife.qcloud.tim.uikit.business.active.MwWorkActivity;
 import com.hlife.qcloud.tim.uikit.business.active.SelectMessageActivity;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.business.inter.YzStatusListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzWorkAppItemClickListener;
-import com.hlife.qcloud.tim.uikit.business.message.CustomMessage;
 import com.hlife.qcloud.tim.uikit.business.message.MessageNotification;
 import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
 import com.hlife.qcloud.tim.uikit.business.thirdpush.HUAWEIHmsMessageService;
@@ -28,7 +26,7 @@ import com.hlife.qcloud.tim.uikit.modules.chat.C2CChatManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.chat.GroupChatManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationManagerKit;
-import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
+import com.hlife.qcloud.tim.uikit.modules.group.info.GroupInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
 import com.hlife.qcloud.tim.uikit.utils.BrandUtil;
@@ -42,16 +40,22 @@ import com.tencent.smtt.export.external.TbsCoreSettings;
 import com.tencent.smtt.sdk.QbSdk;
 import com.work.api.open.ApiClient;
 import com.work.api.open.Yz;
+import com.work.api.open.model.GroupMemberResp;
+import com.work.api.open.model.CreateGroupReq;
+import com.work.api.open.model.CreateGroupResp;
 import com.work.api.open.model.LoginResp;
 import com.work.api.open.model.SysUserReq;
 import com.work.api.open.model.client.OpenData;
+import com.work.api.open.model.client.OpenGroupMember;
 import com.work.util.AppUtils;
 import com.work.util.SLog;
 import com.work.util.SharedUtils;
 import com.work.util.ToastUtil;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by tangyx
@@ -254,7 +258,10 @@ public final class YzIMKitAgent {
         }else{
             if(chatInfo.isGroup()){
                 GroupChatManagerKit groupChatManagerKit = GroupChatManagerKit.getInstance();
-                groupChatManagerKit.setCurrentChatInfo(chatInfo);
+                GroupInfo groupInfo = new GroupInfo();
+                groupInfo.setId(chatInfo.getId());
+                groupInfo.setGroupName(chatInfo.getChatName());
+                groupChatManagerKit.setCurrentChatInfo(groupInfo);
                 MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
                 groupChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
                     @Override
@@ -316,6 +323,80 @@ public final class YzIMKitAgent {
     }
     public void removeMessageWatcher(YzMessageWatcher watcher){
         ConversationManagerKit.getInstance().removeMessageWatcher(watcher);
+    }
+    /**
+     * 群相关
+     */
+    public void createPublicGroup(String userId, String name, List<String> member, final YzGroupDataListener listener){
+        CreateGroupReq createGroupReq = new CreateGroupReq();
+        createGroupReq.Owner_Account = userId;
+        createGroupReq.Name = name;
+        if(member!=null && member.size()>0){
+            List<OpenGroupMember> members = new ArrayList<>();
+            for (String s:member) {
+                OpenGroupMember openGroupMember = new OpenGroupMember();
+                openGroupMember.Member_Account = s;
+                members.add(openGroupMember);
+            }
+            createGroupReq.MemberList = members;
+        }
+        Yz.getSession().createGroup(createGroupReq, new OnResultDataListener() {
+            @Override
+            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
+                if(listener==null){
+                    return;
+                }
+                if(resp instanceof CreateGroupResp){
+                    listener.onCreate(((CreateGroupResp) resp).getData());
+                }
+            }
+        });
+    }
+    /**
+     * 添加群成员
+     */
+    public void addGroupMember(String groupId,List<String> member,final YzGroupDataListener listener){
+        CreateGroupReq createGroupReq = new CreateGroupReq();
+        createGroupReq.GroupId = groupId;
+        if(member!=null && member.size()>0){
+            List<OpenGroupMember> members = new ArrayList<>();
+            for (String s:member) {
+                OpenGroupMember openGroupMember = new OpenGroupMember();
+                openGroupMember.Member_Account = s;
+                members.add(openGroupMember);
+            }
+            createGroupReq.MemberList = members;
+        }
+        Yz.getSession().addGroupUser(createGroupReq, new OnResultDataListener() {
+            @Override
+            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
+                if(listener==null){
+                    return;
+                }
+                if(resp instanceof GroupMemberResp){
+                    listener.addMember(((GroupMemberResp) resp).getCode(),((GroupMemberResp) resp).getData());
+                }
+            }
+        });
+    }
+    /**
+     * 指定人退出
+     */
+    public void deleteGroupMember(String groupId,List<String> member,final YzGroupDataListener listener){
+        CreateGroupReq createGroupReq = new CreateGroupReq();
+        createGroupReq.GroupId = groupId;
+        createGroupReq.MemberToDel_Account = member;
+        Yz.getSession().deleteGroupUser(createGroupReq, new OnResultDataListener() {
+            @Override
+            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
+                if(listener==null){
+                    return;
+                }
+                if(resp instanceof GroupMemberResp){
+                    listener.deleteMember(((GroupMemberResp) resp).getCode(),((GroupMemberResp) resp).getData());
+                }
+            }
+        });
     }
     /**
      * 注册推送

@@ -1,6 +1,6 @@
 package com.work.api.open.model;
 
-import com.work.api.open.model.client.OpenData;
+import com.work.api.open.model.client.OpenGroupInfo;
 
 /**
  * Created by tangyx
@@ -10,9 +10,9 @@ import com.work.api.open.model.client.OpenData;
 
 public class CreateGroupResp extends BaseResp {
 
-    private OpenData data;
+    private OpenGroupInfo data;
 
-    public OpenData getData() {
+    public OpenGroupInfo getData() {
         return data;
     }
 }

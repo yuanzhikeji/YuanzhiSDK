@@ -60,11 +60,12 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
     private View mOwnerLayout;
     private LineControllerView mTransferGroupView;
     private LineControllerView mMemberAdminView;
+    private GridView memberAdminList;
     private Button mDissolveBtn;
 
     private GroupInfo mGroupInfo;
     private GroupInfoPresenter mPresenter;
-    private ArrayList<String> mJoinTypes = new ArrayList<>();
+    private final ArrayList<String> mJoinTypes = new ArrayList<>();
 
     public GroupInfoLayout(Context context) {
         super(context);
@@ -154,10 +155,9 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
         });
         // 管理员列表
         mMemberAdminView = findViewById(R.id.group_member_admin);
-        GridView memberAdminList = findViewById(R.id.group_members_admin);
+        memberAdminList = findViewById(R.id.group_members_admin);
         mMemberAdminAdapter = new GroupInfoAdminAdapter();
         memberAdminList.setAdapter(mMemberAdminAdapter);
-        memberAdminList.setVisibility(GONE);
         //消息免打扰
         mRevOptView = findViewById(R.id.rev_opt);
         mRevOptView.setCheckListener(new CompoundButton.OnCheckedChangeListener() {
@@ -383,14 +383,17 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
             if (mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_WORK)
                     || mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_PRIVATE)) {
                 mDissolveBtn.setText(R.string.dissolve);
+                mMutedSwitchView.setVisibility(GONE);
+            }else if(mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_PUBLIC)){
+                mMemberAdminView.setVisibility(VISIBLE);
+                memberAdminList.setVisibility(VISIBLE);
+                loadAdmin();
             }
         } else {
             mOwnerLayout.setVisibility(GONE);
 //            mJoinTypeView.setVisibility(GONE);
             mDissolveBtn.setText(R.string.exit_group);
         }
-        mMutedSwitchView.setVisibility(GONE);
-//        loadAdmin();
     }
 
     public void loadAdmin(){

@@ -5,17 +5,25 @@ import android.view.View;
 
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.base.BaseActivity;
+import com.hlife.qcloud.tim.uikit.business.active.GroupListActivity;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.business.inter.YzStatusListener;
+import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
+import com.tencent.imsdk.v2.V2TIMCallback;
+import com.tencent.imsdk.v2.V2TIMManager;
+import com.work.api.open.Yz;
 import com.work.api.open.model.SysUserReq;
+import com.work.api.open.model.client.OpenGroupInfo;
 import com.work.util.SLog;
 import com.work.util.ToastUtil;
 import com.yz.hlife.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,7 +33,6 @@ import java.util.List;
  */
 
 public class DataTestActivity extends BaseActivity implements YzMessageWatcher, View.OnClickListener {
-
     private List<ConversationInfo> conversationInfos;
 
     @Override
@@ -40,6 +47,11 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
         findViewById(R.id.chat_single).setOnClickListener(this);
         findViewById(R.id.start_chat).setOnClickListener(this);
         findViewById(R.id.send_custom).setOnClickListener(this);
+        findViewById(R.id.create_group).setOnClickListener(this);
+        findViewById(R.id.start_auto).setOnClickListener(this);
+        findViewById(R.id.add_group).setOnClickListener(this);
+        findViewById(R.id.delete_group).setOnClickListener(this);
+        findViewById(R.id.join_group).setOnClickListener(this);
         SysUserReq sysUserReq = new SysUserReq();
         sysUserReq.setNickName("试试2233");
         YzIMKitAgent.instance().register(sysUserReq,null);
@@ -147,6 +159,89 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                     chatInfo.setChatName(conversationInfos.get(0).getTitle());
                     YzIMKitAgent.instance().startCustomMessage(chatInfo,"这是自己定义的消息内容");
                 }
+                break;
+            case R.id.create_group:
+                List<String> s = new ArrayList<>();
+                s.add("4624e6e2fd351a0eeaee47490997258e");
+                YzIMKitAgent.instance().createPublicGroup(UserApi.instance().getUserId(), "这是一个公开群",s, new YzGroupDataListener() {
+                    @Override
+                    public void onCreate(OpenGroupInfo info) {
+                        SLog.e("发送一个消息过去。。。");
+                        ChatInfo chatInfo = new ChatInfo();
+                        chatInfo.setId(info.GroupId);
+                        chatInfo.setChatName("这是一个公开群");
+                        chatInfo.setGroup(true);
+                        YzIMKitAgent.instance().startCustomMessage(chatInfo,"这是自己定义的消息内容");
+                    }
+
+                    @Override
+                    public void addMember(int code, String msg) {
+
+                    }
+
+                    @Override
+                    public void deleteMember(int code, String msg) {
+
+                    }
+                });
+            case R.id.add_group:
+                List<String> m = new ArrayList<>();
+                m.add("2d9de88e9cd754abea89736f29132056");
+                YzIMKitAgent.instance().addGroupMember("@TGS#242ILVEH4", m, new YzGroupDataListener() {
+                    @Override
+                    public void onCreate(OpenGroupInfo info) {
+
+                    }
+
+                    @Override
+                    public void addMember(int code, String msg) {
+                        ToastUtil.info(DataTestActivity.this,code+">"+msg);
+                    }
+
+                    @Override
+                    public void deleteMember(int code, String msg) {
+
+                    }
+                });
+                break;
+            case  R.id.delete_group:
+                List<String> mm = new ArrayList<>();
+                mm.add("2d9de88e9cd754abea89736f29132056");
+                YzIMKitAgent.instance().deleteGroupMember("@TGS#242ILVEH4", mm, new YzGroupDataListener() {
+                    @Override
+                    public void onCreate(OpenGroupInfo info) {
+
+                    }
+
+                    @Override
+                    public void addMember(int code, String msg) {
+
+                    }
+
+                    @Override
+                    public void deleteMember(int code, String msg) {
+                        ToastUtil.info(DataTestActivity.this,code+">"+msg);
+                    }
+                });
+                break;
+            case R.id.join_group:
+                V2TIMManager.getInstance().joinGroup("@TGS#242ILVEH4", UserApi.instance().getNickName()+"申请加群", new V2TIMCallback() {
+                    @Override
+                    public void onError(int code, String desc) {
+                        SLog.e("addGroup err code = " + code + ", desc = " + desc);
+                        ToastUtil.error(DataTestActivity.this,"Error code = " + code + ", desc = " + desc);
+                    }
+
+                    @Override
+                    public void onSuccess() {
+                        SLog.i("addGroup success");
+                        ToastUtil.success(DataTestActivity.this,"加群请求已发送");
+                    }
+                });
+                break;
+            case R.id.start_auto:
+                YzIMKitAgent.instance().startAuto();
+//                startActivity(new Intent(this, GroupListActivity.class));
                 break;
         }
     }

@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
+import com.hlife.qcloud.tim.uikit.component.picture.imageEngine.impl.GlideEngine;
 import com.hlife.qcloud.tim.uikit.modules.chat.GroupChatManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.group.info.GroupInfo;
 import com.hlife.qcloud.tim.uikit.modules.group.info.GroupInfoProvider;
@@ -71,21 +72,27 @@ public class GroupApplyAdapter extends BaseAdapter {
                 }
             });
             holder = new MyViewHolder();
-            holder.memberIcon = view.findViewById(R.id.group_apply_member_icon);
-            holder.memberName = view.findViewById(R.id.group_apply_member_name);
-            holder.reason = view.findViewById(R.id.group_apply_reason);
+            holder.memberIcon = view.findViewById(R.id.avatar);
+            holder.memberName = view.findViewById(R.id.name);
+            holder.reason = view.findViewById(R.id.description);
             holder.accept = view.findViewById(R.id.group_apply_accept);
             holder.refuse = view.findViewById(R.id.group_apply_refuse);
             view.setTag(holder);
         } else {
             holder = (MyViewHolder) view.getTag();
         }
-        holder.memberName.setText(info.getGroupApplication().getFromUser());
+        if(TextUtils.isEmpty(info.getGroupApplication().getFromUserFaceUrl())){
+            GlideEngine.loadImage(holder.memberIcon, R.drawable.default_head);
+        }else{
+            GlideEngine.loadCornerAvatar(holder.memberIcon, info.getGroupApplication().getFromUserFaceUrl());
+        }
+        holder.memberName.setText(info.getGroupApplication().getFromUserNickName());
         holder.reason.setText(info.getGroupApplication().getRequestMsg());
         if (info.getStatus() == GroupApplyInfo.UNHANDLED) {
             holder.accept.setVisibility(View.VISIBLE);
             holder.accept.setText(R.string.accept);
-            holder.accept.setBackground(TUIKit.getAppContext().getResources().getDrawable(R.color.bg_positive_btn));
+//            holder.accept.setBackground(TUIKit.getAppContext().getResources().getDrawable(R.color.bg_positive_btn));
+            holder.accept.setBackgroundResource(R.drawable.friend_border_2);
             holder.accept.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -94,7 +101,8 @@ public class GroupApplyAdapter extends BaseAdapter {
             });
             holder.refuse.setVisibility(View.VISIBLE);
             holder.refuse.setText(R.string.refuse);
-            holder.refuse.setBackground(TUIKit.getAppContext().getResources().getDrawable(R.color.bg_negative_btn));
+//            holder.refuse.setBackground(TUIKit.getAppContext().getResources().getDrawable(R.color.bg_negative_btn));
+            holder.refuse.setBackgroundResource(R.color.bg_negative_btn);
             holder.refuse.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -105,13 +113,15 @@ public class GroupApplyAdapter extends BaseAdapter {
             holder.accept.setVisibility(View.VISIBLE);
             holder.accept.setClickable(false);
             holder.accept.setText(R.string.accepted);
-            holder.accept.setBackground(TUIKit.getAppContext().getResources().getDrawable(R.drawable.gray_btn_bg));
+//            holder.accept.setBackground(TUIKit.getAppContext().getResources().getDrawable(R.drawable.gray_btn_bg));
+            holder.accept.setBackgroundResource(R.drawable.gray_btn_bg);
             holder.refuse.setVisibility(View.GONE);
         } else if (info.getStatus() == GroupApplyInfo.REFUSED) {
             holder.refuse.setVisibility(View.VISIBLE);
             holder.refuse.setClickable(false);
             holder.refuse.setText(R.string.refused);
-            holder.refuse.setBackground(TUIKit.getAppContext().getResources().getDrawable(R.drawable.gray_btn_bg));
+//            holder.refuse.setBackground(TUIKit.getAppContext().getResources().getDrawable(R.drawable.gray_btn_bg));
+            holder.refuse.setBackgroundResource(R.drawable.gray_btn_bg);
             holder.accept.setVisibility(View.GONE);
         }
 

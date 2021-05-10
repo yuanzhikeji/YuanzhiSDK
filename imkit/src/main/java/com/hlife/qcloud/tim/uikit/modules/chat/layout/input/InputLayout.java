@@ -21,6 +21,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.amap.api.services.core.PoiItem;
 import com.hlife.liteav.trtcvideocall.ui.TRTCVideoCallSingleActivity;
+import com.hlife.qcloud.tim.uikit.base.BaseActivity;
 import com.hlife.qcloud.tim.uikit.business.active.ListStopMapActivity;
 import com.hlife.qcloud.tim.uikit.modules.chat.interfaces.IChatLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.inputmore.InputMoreFragment;
@@ -409,11 +410,27 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
         mInputMoreFragment.setCallback(new IUIKitCallBack() {
             @Override
             public void onSuccess(Object data) {
-                MessageInfo info = MessageInfoUtil.buildFileMessage((Uri) data);
-                if (mMessageHandler != null) {
-                    mMessageHandler.sendMessage(info);
-                    hideSoftInput();
+                if(getContext() instanceof BaseActivity){
+                    ((BaseActivity) getContext()).showProgressLoading("文件处理中...");
                 }
+                MessageInfoUtil.buildFileMessage((Uri) data, new IUIKitCallBack() {
+                    @Override
+                    public void onSuccess(Object data) {
+                        if(getContext() instanceof BaseActivity){
+                            ((BaseActivity) getContext()).dismissProgress();
+                        }
+                        MessageInfo info = (MessageInfo) data;
+                        if (mMessageHandler != null && info!=null) {
+                            mMessageHandler.sendMessage(info);
+                            hideSoftInput();
+                        }
+                    }
+
+                    @Override
+                    public void onError(String module, int errCode, String errMsg) {
+
+                    }
+                });
             }
 
             @Override

@@ -86,6 +86,8 @@ dependencies {
 //    implementation 'com.huawei.hms:push:5.0.2.300'
     // 扫一扫模块
     implementation "com.google.zxing:core:3.3.2"
+    //上传阿里云OSS
+    implementation 'com.aliyun.dpa:oss-android-sdk:2.9.5'
 
     api project(path: ':base')
     implementation project(path: ':update_app')

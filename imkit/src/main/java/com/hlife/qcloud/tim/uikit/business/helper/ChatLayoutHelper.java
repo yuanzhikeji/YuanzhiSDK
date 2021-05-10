@@ -98,11 +98,7 @@ public class ChatLayoutHelper {
 //        messageLayout.setTipsMessageFontColor(0xFF7E848C);
 //
         // 设置自定义的消息渲染时的回调
-        if(customMessageDrawListener!=null){
-            messageLayout.setOnCustomMessageDrawListener(customMessageDrawListener);
-        }else{
-            messageLayout.setOnCustomMessageDrawListener(new CustomMessageDraw());
-        }
+        messageLayout.setOnCustomMessageDrawListener(new CustomMessageDraw(customMessageDrawListener));
 //
 //        // 新增一个PopMenuAction
 //        PopMenuAction action = new PopMenuAction();
@@ -224,6 +220,12 @@ public class ChatLayoutHelper {
 
     public static class CustomMessageDraw implements YzCustomMessageDrawListener {
 
+        private YzCustomMessageDrawListener customMessageDrawListener;
+
+        public CustomMessageDraw(YzCustomMessageDrawListener customMessageDrawListener){
+            this.customMessageDrawListener = customMessageDrawListener;
+        }
+
         /**
          * 自定义消息渲染时，会调用该方法，本方法实现了自定义消息的创建，以及交互逻辑
          *
@@ -244,13 +246,13 @@ public class ChatLayoutHelper {
             } catch (Exception e) {
                 SLog.w("invalid json: " + new String(elem.getData()) + " " + e.getMessage());
             }
-            if (data == null) {
-                SLog.e( "No Custom Data: " + new String(elem.getData()));
-            } else if (data.version == IMKitConstants.JSON_VERSION_1
-                    || (data.version == IMKitConstants.JSON_VERSION_4 && data.getBusinessID().equals(BUSINESS_ID_CUSTOM_CARD))) {
+            if (data!=null && data.getBusinessID().equals(BUSINESS_ID_CUSTOM_CARD)) {
                 CustomIMUIController.onDraw(parent, data);
             } else {
                 SLog.w("unsupported version: " + data);
+                if(customMessageDrawListener!=null){
+                    customMessageDrawListener.onDraw(parent,info);
+                }
             }
         }
     }

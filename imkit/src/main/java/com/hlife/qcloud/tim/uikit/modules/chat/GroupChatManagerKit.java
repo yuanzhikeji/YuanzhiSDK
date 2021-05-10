@@ -108,7 +108,7 @@ public class GroupChatManagerKit extends ChatManagerKit {
             public void onResult(RequestWork req, ResponseWork resp) {
 
                 if(resp.isSuccess() && resp instanceof CreateGroupResp){
-                    OpenData openData = ((CreateGroupResp) resp).getData();
+                    OpenGroupInfo openData = ((CreateGroupResp) resp).getData();
                     final String groupId = openData.GroupId;
                     chatInfo.setId(groupId);
                     Gson gson = new Gson();

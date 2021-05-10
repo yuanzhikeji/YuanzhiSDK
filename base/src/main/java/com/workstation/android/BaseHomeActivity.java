@@ -7,6 +7,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import androidx.annotation.NonNull;
+
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -152,6 +154,9 @@ public class BaseHomeActivity extends ToolBarActivity
         mProgressLayout = LayoutInflater.from(this).inflate(R.layout.progress, null);
         mProgressLayout.setVisibility(View.GONE);
         mGraduallyTextView = mProgressLayout.findViewById(R.id.loading);
+        if(!TextUtils.isEmpty(tips)){
+            mGraduallyTextView.setText(tips);
+        }
         WindowManager.LayoutParams lp;
         if(!isOperation){//不可点击屏幕其他地方
             lp = new WindowManager.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,

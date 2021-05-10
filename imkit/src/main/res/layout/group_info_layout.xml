@@ -106,15 +106,14 @@
 
                 <com.hlife.qcloud.tim.uikit.component.LineControllerView
                     android:id="@+id/group_member_admin"
+                    app:isTop="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     app:name="@string/group_members_admin" />
                 <com.hlife.qcloud.tim.uikit.component.GridViewInScrollView
                     android:id="@+id/group_members_admin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     android:paddingLeft="@dimen/dp_20"
                     android:paddingRight="@dimen/dp_20"
                     android:paddingBottom="@dimen/dp_10"
@@ -124,7 +123,6 @@
                     android:numColumns="6" />
 
                 <com.hlife.qcloud.tim.uikit.component.LineControllerView
-                    app:isTop="true"
                     android:id="@+id/self_nickname_bar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

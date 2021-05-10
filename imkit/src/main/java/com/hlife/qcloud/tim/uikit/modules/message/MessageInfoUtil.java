@@ -1,15 +1,21 @@
 package com.hlife.qcloud.tim.uikit.modules.message;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
+import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.tencent.imsdk.v2.V2TIMCustomElem;
 import com.tencent.imsdk.v2.V2TIMDownloadCallback;
 import com.tencent.imsdk.v2.V2TIMElem;
@@ -175,43 +181,86 @@ public class MessageInfoUtil {
      * @param fileUri 文件路径
      * @return
      */
-    public static MessageInfo buildFileMessage(Uri fileUri) {
-        String filePath = FileUtil.getPathFromUri(fileUri);
-        File file = new File(filePath);
-        if (file.exists()) {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(filePath,options);
-            if(options.outWidth != -1){//是图片
-                return buildImageMessage(fileUri,true);
-            }
-
-            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(filePath);
-            String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
-            if(mimeType!=null && mimeType.contains("video")){//是视频
-                Bitmap firstFrame = ThumbnailUtils.createVideoThumbnail(filePath, MediaStore.Video.Thumbnails.MINI_KIND);
-                String imagePath = FileUtil.saveBitmap("JCamera", firstFrame);
-                long duration = 0;
-                try {
-                    MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-                    mediaMetadataRetriever.setDataSource(filePath);
-                    duration = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
-                }catch (Exception ignore){}
-                return buildVideoMessage(imagePath,filePath,firstFrame.getWidth(),firstFrame.getHeight(),duration);
-            }
-            MessageInfo info = new MessageInfo();
-            V2TIMMessage v2TIMMessage = V2TIMManager.getMessageManager().createFileMessage(filePath, file.getName());
-
-            info.setDataPath(filePath);
-            info.setSelf(true);
-            info.setTimMessage(v2TIMMessage);
-            info.setExtra("[文件]");
-            info.setMsgTime(System.currentTimeMillis() / 1000);
-            info.setFromUser(V2TIMManager.getInstance().getLoginUser());
-            info.setMsgType(MessageInfo.MSG_TYPE_FILE);
-            return info;
+    private static Handler mFileHandler = null;
+    private static class VideoFile{
+        public String imagePath;
+        public String filePath;
+        public Bitmap firstFrame;
+        public long duration;
+    }
+    public static void buildFileMessage(Uri fileUri, IUIKitCallBack mCallback) {
+        if(mFileHandler==null){
+            mFileHandler = new Handler(){
+                @SuppressLint("HandlerLeak")
+                @Override
+                public void handleMessage(@SuppressLint("HandlerLeak") @NonNull Message msg) {
+                    super.handleMessage(msg);
+                    if(msg.what==1){
+                        buildImageMessage(fileUri,true);
+                    }else if(msg.what==2){
+                        VideoFile videoFile = (VideoFile) msg.obj;
+                        buildVideoMessage(videoFile.imagePath,videoFile.filePath,videoFile.firstFrame.getWidth(),videoFile.firstFrame.getHeight(),videoFile.duration);
+                    }else if(msg.what == 3){
+                        MessageInfo info = (MessageInfo) msg.obj;
+                        mCallback.onSuccess(info);
+                    }
+                }
+            };
         }
-        return null;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String filePath = FileUtil.getPathFromUri(fileUri);
+                File file = new File(filePath);
+                if (file.exists()) {
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inJustDecodeBounds = true;
+                    BitmapFactory.decodeFile(filePath,options);
+                    if(options.outWidth != -1){//是图片
+                        mFileHandler.sendEmptyMessage(1);
+                        return;
+                    }
+
+                    String fileExtension = MimeTypeMap.getFileExtensionFromUrl(filePath);
+                    String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+                    if(mimeType!=null && mimeType.contains("video")){//是视频
+                        Bitmap firstFrame = ThumbnailUtils.createVideoThumbnail(filePath, MediaStore.Video.Thumbnails.MINI_KIND);
+                        String imagePath = FileUtil.saveBitmap("JCamera", firstFrame);
+                        long duration = 0;
+                        try {
+                            MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+                            mediaMetadataRetriever.setDataSource(filePath);
+                            duration = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+                        }catch (Exception ignore){}
+                        Message message = new Message();
+                        message.what = 2;
+                        VideoFile videoFile = new VideoFile();
+                        videoFile.imagePath = imagePath;
+                        videoFile.filePath = filePath;
+                        videoFile.firstFrame = firstFrame;
+                        videoFile.duration = duration;
+                        message.obj = videoFile;
+                        mFileHandler.sendMessage(message);
+                        return;
+                    }
+                    MessageInfo info = new MessageInfo();
+                    V2TIMMessage v2TIMMessage = V2TIMManager.getMessageManager().createFileMessage(filePath, file.getName());
+
+                    info.setDataPath(filePath);
+                    info.setSelf(true);
+                    info.setTimMessage(v2TIMMessage);
+                    info.setExtra("[文件]");
+                    info.setMsgTime(System.currentTimeMillis() / 1000);
+                    info.setFromUser(V2TIMManager.getInstance().getLoginUser());
+                    info.setMsgType(MessageInfo.MSG_TYPE_FILE);
+//                    mCallback.onSuccess(info);
+                    Message message = new Message();
+                    message.what = 3;
+                    message.obj = info;
+                    mFileHandler.sendMessage(message);
+                }
+            }
+        }).start();
     }
     /**
      * 创建定位消息

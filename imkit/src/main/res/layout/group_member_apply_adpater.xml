@@ -1,57 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingLeft="@dimen/page_margin"
-    android:paddingRight="@dimen/page_margin">
+    android:paddingLeft="@dimen/dp_10"
+    android:paddingRight="@dimen/dp_10"
+    android:paddingTop="8dp"
+    android:focusable="true"
+    android:paddingBottom="8dp">
 
-    <com.hlife.qcloud.tim.uikit.component.gatherimage.ShadeImageView
-        android:id="@+id/group_apply_member_icon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/default_user_icon" />
-
+    <ImageView
+        android:id="@+id/avatar"
+        android:layout_width="@dimen/small_image_size"
+        android:layout_height="@dimen/small_image_size"/>
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginStart="10dp"
         android:layout_weight="1"
+        android:gravity="center_vertical"
         android:orientation="vertical">
-
         <TextView
-            android:id="@+id/group_apply_member_name"
+            android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:lines="1"
-            android:textColor="@color/text_color_black" />
-
+            android:textColor="@color/black"
+            android:textSize="16sp" />
         <TextView
-            android:id="@+id/group_apply_reason"
+            android:id="@+id/description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:lines="1"
-            android:textColor="@color/text_color_gray" />
-
+            android:layout_marginTop="3dp"
+            android:maxLines="3"
+            android:textColor="@color/color_999999"
+            android:textSize="@dimen/sp_12" />
     </LinearLayout>
 
     <Button
         android:id="@+id/group_apply_accept"
         android:layout_width="60dp"
-        android:layout_height="40dp"
+        android:layout_height="24dp"
         android:layout_marginRight="10dp"
-        android:background="@color/bg_positive_btn"
+        android:background="@drawable/friend_border_2"
         android:onClick="startConversation"
         android:text="@string/accept"
         android:textColor="#fff" />
-
     <Button
         android:id="@+id/group_apply_refuse"
         android:layout_width="60dp"
-        android:layout_height="40dp"
+        android:layout_height="24dp"
         android:layout_marginRight="10dp"
         android:background="@color/bg_negative_btn"
         android:onClick="startConversation"

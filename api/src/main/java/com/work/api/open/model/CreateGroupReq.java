@@ -13,7 +13,7 @@ import java.util.List;
 public class CreateGroupReq extends BaseReq {
     public String GroupId;
     public String Owner_Account;
-    public String Type="Private";
+    public String Type="Public";
     public String Name;
     public String Introduction;
     public String Notification;
@@ -21,5 +21,6 @@ public class CreateGroupReq extends BaseReq {
     public String MaxMemberCount;
     public String ApplyJoinOption;
     public List<OpenGroupMember> MemberList;
+    public List<String> MemberToDel_Account;
 
 }
