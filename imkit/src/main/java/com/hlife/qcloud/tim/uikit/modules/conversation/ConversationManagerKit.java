@@ -9,9 +9,12 @@ import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.config.TUIKitConfigs;
+import com.hlife.qcloud.tim.uikit.modules.chat.GroupChatManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
+import com.hlife.qcloud.tim.uikit.modules.group.apply.GroupApplyInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageRevokedManager;
@@ -19,12 +22,15 @@ import com.hlife.qcloud.tim.uikit.utils.SharedPreferenceUtils;
 import com.tencent.imsdk.v2.V2TIMCallback;
 import com.tencent.imsdk.v2.V2TIMConversation;
 import com.tencent.imsdk.v2.V2TIMConversationResult;
+import com.tencent.imsdk.v2.V2TIMGroupApplication;
+import com.tencent.imsdk.v2.V2TIMGroupApplicationResult;
 import com.tencent.imsdk.v2.V2TIMGroupAtInfo;
 import com.tencent.imsdk.v2.V2TIMGroupMemberFullInfo;
 import com.tencent.imsdk.v2.V2TIMGroupMemberInfoResult;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.imsdk.v2.V2TIMMessage;
 import com.tencent.imsdk.v2.V2TIMValueCallback;
+import com.work.api.open.model.client.OpenGroupInfo;
 import com.work.util.SLog;
 
 import java.io.File;
@@ -47,6 +53,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
     private LinkedList<ConversationInfo> mTopLinkedList = new LinkedList<>();
     private int mUnreadTotal;
     private YzChatType mType = YzChatType.ALL;
+    private List<String> mApplyGroupID = new ArrayList<>();
 
     private ConversationManagerKit() {
         init();
@@ -58,6 +65,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
 
     private void init() {
         MessageRevokedManager.getInstance().addHandler(this);
+        this.groupApplicationList(null);
     }
 
     public void loadConversation(long nextSeq, final YzChatType type, final YzConversationDataListener callBack) {
@@ -182,7 +190,32 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
             mProvider = new ConversationProvider();
         }
         mUnreadTotal = 0;
-        allConversation(0,new ArrayList<ConversationInfo>(),callBack);
+        this.groupApplicationList(new YzGroupDataListener() {
+            @Override
+            public void onCreate(int code, String groupId, String msg) {
+
+            }
+
+            @Override
+            public void update(int code, String msg) {
+
+            }
+
+            @Override
+            public void addMember(int code, String msg) {
+
+            }
+
+            @Override
+            public void deleteMember(int code, String msg) {
+
+            }
+
+            @Override
+            public void joinMember(List<GroupApplyInfo> applies) {
+                allConversation(0, new ArrayList<>(),callBack);
+            }
+        });
     }
 
     private void allConversation(long nextSeq,final ArrayList<ConversationInfo> dataArray,final IUIKitCallBack callBack){
@@ -330,23 +363,23 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         if (list != null && list.size() > 0) {
             info.setLastMessage(list.get(list.size() - 1));
         }
-
+        StringBuilder atInfo = new StringBuilder();
+        if(isGroup && mApplyGroupID.contains(conversation.getGroupID())){
+            atInfo.append(TUIKit.getAppContext().getString(R.string.ui_group_apply));
+        }
         int atInfoType = getAtInfoType(conversation);
         switch (atInfoType){
             case V2TIMGroupAtInfo.TIM_AT_ME:
-                info.setAtInfoText(TUIKit.getAppContext().getString(R.string.ui_at_me));
+                atInfo.append(TUIKit.getAppContext().getString(R.string.ui_at_me));
                 break;
             case V2TIMGroupAtInfo.TIM_AT_ALL:
-                info.setAtInfoText(TUIKit.getAppContext().getString(R.string.ui_at_all));
+                atInfo.append(TUIKit.getAppContext().getString(R.string.ui_at_all));
                 break;
             case V2TIMGroupAtInfo.TIM_AT_ALL_AT_ME:
-                info.setAtInfoText(TUIKit.getAppContext().getString(R.string.ui_at_all_me));
+                atInfo.append(TUIKit.getAppContext().getString(R.string.ui_at_all_me));
                 break;
-            default:
-                info.setAtInfoText("");
-                break;
-
         }
+        info.setAtInfoText(atInfo.toString());
         info.setTitle(conversation.getShowName());
         if (isGroup) {
             fillConversationUrlForGroup(conversation, info);
@@ -407,6 +440,82 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         }
 
         return atInfoType;
+    }
+
+    public void refreshApply(GroupChatManagerKit.GroupNotifyHandler listener){
+        this.groupApplicationList(new YzGroupDataListener() {
+            @Override
+            public void onCreate(int code, String groupId, String msg) {
+
+            }
+
+            @Override
+            public void update(int code, String msg) {
+
+            }
+
+            @Override
+            public void addMember(int code, String msg) {
+
+            }
+
+            @Override
+            public void deleteMember(int code, String msg) {
+
+            }
+
+            @Override
+            public void joinMember(List<GroupApplyInfo> applies) {
+                if(mProvider!=null){
+                    List<ConversationInfo> data = mProvider.getDataSource();
+                    String applyStr = TUIKit.getAppContext().getString(R.string.ui_group_apply);
+                    for (ConversationInfo info:data) {
+                        String at = info.getAtInfoText();
+                        if(!TextUtils.isEmpty(at) && at.contains(applyStr) && !mApplyGroupID.contains(info.getId())){
+                            at = at.replace(applyStr,"");
+                            info.setAtInfoText(at);
+                        }
+                    }
+                    mProvider.updateAdapter();
+                    if(listener!=null){
+                        listener.onApplied(mApplyGroupID.size());
+                    }
+                }
+            }
+        });
+    }
+
+    public void groupApplicationList(YzGroupDataListener listener){
+        V2TIMManager.getGroupManager().getGroupApplicationList(new V2TIMValueCallback<V2TIMGroupApplicationResult>() {
+            @Override
+            public void onError(int code, String desc) {
+                SLog.e(code+">"+desc);
+                if(listener==null){
+                    return;
+                }
+                listener.joinMember(new ArrayList<>());
+
+            }
+
+            @Override
+            public void onSuccess(V2TIMGroupApplicationResult v2TIMGroupApplicationResult) {
+                List<V2TIMGroupApplication> v2TIMGroupApplications = v2TIMGroupApplicationResult.getGroupApplicationList();
+                List<GroupApplyInfo> applies = new ArrayList<>();
+                mApplyGroupID = new ArrayList<>();
+                for (int i = 0; i < v2TIMGroupApplications.size(); i++) {
+                    GroupApplyInfo info = new GroupApplyInfo(v2TIMGroupApplications.get(i));
+                    info.setStatus(0);
+                    applies.add(info);
+                    if(info.getGroupApplication().getHandleStatus() == V2TIMGroupApplication.V2TIM_GROUP_APPLICATION_HANDLE_STATUS_UNHANDLED){
+                        mApplyGroupID.add(info.getGroupApplication().getGroupID());
+                    }
+                }
+                if(listener==null){
+                    return;
+                }
+                listener.joinMember(applies);
+            }
+        });
     }
 
     private void fillConversationUrlForGroup(final V2TIMConversation conversation, final ConversationInfo info) {
@@ -733,9 +842,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         if (mProvider != null) {
             mProvider.attachAdapter(null);
         }
-        if (mUnreadWatchers != null) {
-            mUnreadWatchers.clear();
-        }
+        mUnreadWatchers.clear();
     }
 
     public void destroyConversationSearch(){
@@ -778,5 +885,13 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
             mUnreadWatchers.get(i).updateConversion();
         }
     }
-
+    /**
+     * 群组申请的变化
+     */
+    public void updateJoinGroup(){
+        for (int i = 0; i < mUnreadWatchers.size(); i++) {
+            mUnreadWatchers.get(i).updateJoinGroup();
+        }
+        loadConversation(null);
+    }
 }

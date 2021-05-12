@@ -119,6 +119,7 @@
     <string name="tips_empty_group_type" translatable="false">请选择加群方式</string>
     <string name="no_friend_apply" translatable="false">暂无好友申请</string>
     <string name="group_remind" translatable="false">选择提醒的人</string>
+    <string name="group_apply_un_handler" translatable="false">有未处理的群申请</string>
 
     // 新朋友
     <string name="request_agree" translatable="false">同意</string>
@@ -174,6 +175,7 @@
     <string name="accept" translatable="false">同意</string>
     <string name="refuse" translatable="false">拒绝</string>
     <string name="group_apply_members" translatable="false">群申请</string>
+    <string name="group_apply_members_all" translatable="false">全部群申请</string>
     <string name="accepted" translatable="false">已同意</string>
     <string name="refused" translatable="false">已拒绝</string>
     <string name="group_apply_tips" translatable="false">%1$d 条入群申请</string>
@@ -232,6 +234,8 @@
     <string name="toast_save_fail" translatable="false">保存失败，请稍后尝试！</string>
     <string name="toast_conversation_permission" translatable="false">未开通聊天功能</string>
     <string name="toast_sys_contacts_error" translatable="false">未找到通讯录联系人</string>
+    <string name="toast_upload_file" translatable="false">文件处理中...</string>
+    <string name="toast_upload_file_progress" translatable="false">正在上传%1$d%%...</string>
 
     <string name="label_update_app_title" translatable="false">版本更新</string>
     <string name="label_update_app_next" translatable="false">稍后提醒</string>
@@ -254,6 +258,7 @@
     <string name="ui_at_all" translatable="false">[@所有人]</string>
     <string name="ui_at_me" translatable="false">[有人@我]</string>
     <string name="ui_at_all_me" translatable="false">[@所有人][有人@我]</string>
+    <string name="ui_group_apply" translatable="false">[加群申请]</string>
 
     <string name="date_yesterday" translatable="false">昨天</string>
     <string name="date_tommorow" translatable="false">明天</string>
@@ -282,4 +287,9 @@
     <string name="common_network_check" translatable="false">请检查网络设置</string>
 
     <string name="toast_file_error" translatable="false">文件错误或者不存在</string>
+    <string name="oss_file_title_upload" translatable="false">上传文件</string>
+    <string name="oss_file_title_download" translatable="false">下载文件</string>
+    <string name="oss_file_upload_error" translatable="false">文件上传失败</string>
+    <string name="oss_file_download_error" translatable="false">文件下载链接不存在</string>
+    <string name="open_file" translatable="false">查看文件</string>
 </resources>

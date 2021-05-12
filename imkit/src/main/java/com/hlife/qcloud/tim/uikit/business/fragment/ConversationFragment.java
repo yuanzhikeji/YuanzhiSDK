@@ -1,6 +1,5 @@
 package com.hlife.qcloud.tim.uikit.business.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,19 +10,18 @@ import android.widget.PopupWindow;
 
 import androidx.annotation.Nullable;
 
-import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.base.BaseFragment;
-import com.hlife.qcloud.tim.uikit.business.Constants;
-import com.hlife.qcloud.tim.uikit.business.active.ChatActivity;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
+import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.component.action.PopActionClickListener;
 import com.hlife.qcloud.tim.uikit.component.action.PopDialogAdapter;
 import com.hlife.qcloud.tim.uikit.component.action.PopMenuAction;
-import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
+import com.hlife.qcloud.tim.uikit.modules.chat.GroupChatManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationLayout;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationListLayout;
+import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
 import com.hlife.qcloud.tim.uikit.utils.PopWindowUtil;
 import com.tencent.imsdk.v2.V2TIMConversation;
@@ -33,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ConversationFragment extends BaseFragment {
+public class ConversationFragment extends BaseFragment implements GroupChatManagerKit.GroupNotifyHandler, YzMessageWatcher {
 
     private View mBaseView;
     private ConversationLayout mConversationLayout;
@@ -42,7 +40,7 @@ public class ConversationFragment extends BaseFragment {
     private ConversationListLayout.OnItemClickListener mOnItemClickListener;
     private YzChatType mType = YzChatType.ALL;
 
-    private ConversationFragment(){
+    public ConversationFragment(){
 
     }
     @Nullable
@@ -54,6 +52,7 @@ public class ConversationFragment extends BaseFragment {
     }
 
     private void initView() {
+        ConversationManagerKit.getInstance().addMessageWatcher(this);
         // 从布局文件中获取会话列表面板
         mConversationLayout = mBaseView.findViewById(R.id.conversation_layout);
         // 会话列表面板的默认UI和交互初始化
@@ -194,5 +193,52 @@ public class ConversationFragment extends BaseFragment {
         ConversationFragment fragment = new ConversationFragment();
         fragment.setType(type);
         return fragment;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ConversationManagerKit.getInstance().refreshApply(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ConversationManagerKit.getInstance().removeMessageWatcher(this);
+    }
+
+    @Override
+    public void onGroupForceExit() {
+
+    }
+
+    @Override
+    public void onGroupNameChanged(String newName) {
+
+    }
+
+    @Override
+    public void onApplied(int size) {
+        mConversationLayout.updateNotice(size);
+    }
+
+    @Override
+    public void updateUnread(int count) {
+
+    }
+
+    @Override
+    public void updateContacts() {
+
+    }
+
+    @Override
+    public void updateConversion() {
+
+    }
+
+    @Override
+    public void updateJoinGroup() {
+        ConversationManagerKit.getInstance().refreshApply(this);
     }
 }

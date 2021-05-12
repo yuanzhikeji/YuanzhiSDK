@@ -401,6 +401,7 @@ public class GroupInfoProvider {
             public void onSuccess(V2TIMGroupApplicationResult v2TIMGroupApplicationResult) {
                 List<V2TIMGroupApplication> v2TIMGroupApplicationList = v2TIMGroupApplicationResult.getGroupApplicationList();
                 for (int i = 0; i < v2TIMGroupApplicationList.size(); i++) {
+
                     GroupApplyInfo info = new GroupApplyInfo(v2TIMGroupApplicationList.get(i));
                     info.setStatus(0);
                     applies.add(info);
@@ -422,6 +423,7 @@ public class GroupInfoProvider {
             public void onSuccess() {
                 item.setStatus(GroupApplyInfo.APPLIED);
                 callBack.onSuccess(null);
+                ConversationManagerKit.getInstance().updateJoinGroup();
             }
         });
     }
@@ -438,6 +440,7 @@ public class GroupInfoProvider {
             public void onSuccess() {
                 item.setStatus(GroupApplyInfo.REFUSED);
                 callBack.onSuccess(null);
+                ConversationManagerKit.getInstance().updateJoinGroup();
             }
         });
     }

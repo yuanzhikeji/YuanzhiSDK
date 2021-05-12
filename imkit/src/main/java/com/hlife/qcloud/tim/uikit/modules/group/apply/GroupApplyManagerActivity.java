@@ -7,8 +7,13 @@ import androidx.annotation.Nullable;
 
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.base.BaseActivity;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
+import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.group.info.GroupInfo;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
+import com.work.api.open.model.client.OpenGroupInfo;
+
+import java.util.List;
 
 public class GroupApplyManagerActivity extends BaseActivity {
 
@@ -17,20 +22,45 @@ public class GroupApplyManagerActivity extends BaseActivity {
     @Override
     public void onInitView() throws Exception {
         super.onInitView();
-        if (getIntent().getExtras() == null) {
-            finish();
-            return;
-        }
         mManagerLayout = findViewById(R.id.group_apply_manager_layout);
-
-        GroupInfo mGroupInfo = (GroupInfo) getIntent().getExtras().getSerializable(IMKitConstants.Group.GROUP_INFO);
-        mManagerLayout.setDataSource(mGroupInfo);
     }
 
     @Override
     public void onInitValue() throws Exception {
         super.onInitValue();
-        setTitleName(R.string.group_apply_members);
+        if (getIntent().getExtras() == null) {
+            setTitleName(R.string.group_apply_members_all);
+            ConversationManagerKit.getInstance().groupApplicationList(new YzGroupDataListener() {
+                @Override
+                public void onCreate(int code, String groupId, String msg) {
+
+                }
+
+                @Override
+                public void update(int code, String msg) {
+
+                }
+
+                @Override
+                public void addMember(int code, String msg) {
+
+                }
+
+                @Override
+                public void deleteMember(int code, String msg) {
+
+                }
+
+                @Override
+                public void joinMember(List<GroupApplyInfo> applies) {
+                    mManagerLayout.setDataSource(applies);
+                }
+            });
+        }else{
+            GroupInfo mGroupInfo = (GroupInfo) getIntent().getExtras().getSerializable(IMKitConstants.Group.GROUP_INFO);
+            mManagerLayout.setDataSource(mGroupInfo);
+            setTitleName(R.string.group_apply_members);
+        }
     }
 
     @Override

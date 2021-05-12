@@ -1,5 +1,6 @@
 package com.hlife.qcloud.tim.uikit.modules.group.apply;
 
+import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,8 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
 
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.TUIKit;
@@ -27,6 +30,7 @@ public class GroupApplyAdapter extends BaseAdapter {
     private List<GroupApplyInfo> mGroupMembers = new ArrayList<>();
     private GroupInfoProvider mProvider;
     private OnItemClickListener mOnItemClickListener;
+    private boolean isAll;
 
     public GroupApplyAdapter() {
 
@@ -77,6 +81,10 @@ public class GroupApplyAdapter extends BaseAdapter {
             holder.reason = view.findViewById(R.id.description);
             holder.accept = view.findViewById(R.id.group_apply_accept);
             holder.refuse = view.findViewById(R.id.group_apply_refuse);
+            if(isAll){
+                holder.accept.setVisibility(View.GONE);
+                holder.refuse.setVisibility(View.GONE);
+            }
             view.setTag(holder);
         } else {
             holder = (MyViewHolder) view.getTag();
@@ -88,43 +96,46 @@ public class GroupApplyAdapter extends BaseAdapter {
         }
         holder.memberName.setText(info.getGroupApplication().getFromUserNickName());
         holder.reason.setText(info.getGroupApplication().getRequestMsg());
-        if (info.getStatus() == GroupApplyInfo.UNHANDLED) {
-            holder.accept.setVisibility(View.VISIBLE);
-            holder.accept.setText(R.string.accept);
+        if(!isAll){
+            if (info.getStatus() == GroupApplyInfo.UNHANDLED) {
+                holder.accept.setVisibility(View.VISIBLE);
+                holder.accept.setTextColor(ContextCompat.getColor(TUIKit.getAppContext(),R.color.white));
+                holder.accept.setText(R.string.accept);
 //            holder.accept.setBackground(TUIKit.getAppContext().getResources().getDrawable(R.color.bg_positive_btn));
-            holder.accept.setBackgroundResource(R.drawable.friend_border_2);
-            holder.accept.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    acceptApply(i, info);
-                }
-            });
-            holder.refuse.setVisibility(View.VISIBLE);
-            holder.refuse.setText(R.string.refuse);
+                holder.accept.setBackgroundResource(R.drawable.friend_border_2);
+                holder.accept.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        acceptApply(i, info);
+                    }
+                });
+                holder.refuse.setVisibility(View.VISIBLE);
+                holder.refuse.setText(R.string.refuse);
 //            holder.refuse.setBackground(TUIKit.getAppContext().getResources().getDrawable(R.color.bg_negative_btn));
-            holder.refuse.setBackgroundResource(R.color.bg_negative_btn);
-            holder.refuse.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    refuseApply(i, info);
-                }
-            });
-        } else if (info.getStatus() == GroupApplyInfo.APPLIED) {
-            holder.accept.setVisibility(View.VISIBLE);
-            holder.accept.setClickable(false);
-            holder.accept.setText(R.string.accepted);
+                holder.refuse.setBackgroundResource(R.color.bg_negative_btn);
+                holder.refuse.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        refuseApply(i, info);
+                    }
+                });
+            } else if (info.getStatus() == GroupApplyInfo.APPLIED) {
+                holder.accept.setVisibility(View.VISIBLE);
+                holder.accept.setClickable(false);
+                holder.accept.setText(R.string.accepted);
+                holder.accept.setTextColor(ContextCompat.getColor(TUIKit.getAppContext(),R.color.color_2da0f0));
 //            holder.accept.setBackground(TUIKit.getAppContext().getResources().getDrawable(R.drawable.gray_btn_bg));
-            holder.accept.setBackgroundResource(R.drawable.gray_btn_bg);
-            holder.refuse.setVisibility(View.GONE);
-        } else if (info.getStatus() == GroupApplyInfo.REFUSED) {
-            holder.refuse.setVisibility(View.VISIBLE);
-            holder.refuse.setClickable(false);
-            holder.refuse.setText(R.string.refused);
+                holder.accept.setBackgroundColor(Color.TRANSPARENT);
+                holder.refuse.setVisibility(View.GONE);
+            } else if (info.getStatus() == GroupApplyInfo.REFUSED) {
+                holder.refuse.setVisibility(View.VISIBLE);
+                holder.refuse.setClickable(false);
+                holder.refuse.setText(R.string.refused);
 //            holder.refuse.setBackground(TUIKit.getAppContext().getResources().getDrawable(R.drawable.gray_btn_bg));
-            holder.refuse.setBackgroundResource(R.drawable.gray_btn_bg);
-            holder.accept.setVisibility(View.GONE);
+                holder.refuse.setBackgroundColor(Color.TRANSPARENT);
+                holder.accept.setVisibility(View.GONE);
+            }
         }
-
         return view;
     }
 
@@ -147,6 +158,10 @@ public class GroupApplyAdapter extends BaseAdapter {
         mGroupMembers = mProvider.getApplyList();
     }
 
+    public void setDataSource(List<GroupApplyInfo> groupApplyInfo){
+        mGroupMembers = groupApplyInfo;
+        isAll = true;
+    }
 
     public void acceptApply(final int position, final GroupApplyInfo item) {
         mProvider.acceptApply(item, new IUIKitCallBack() {
@@ -181,7 +196,7 @@ public class GroupApplyAdapter extends BaseAdapter {
         void onItemClick(GroupApplyInfo info);
     }
 
-    private class MyViewHolder {
+    private static class MyViewHolder {
         private ImageView memberIcon;
         private TextView memberName, reason;
         private Button accept, refuse;

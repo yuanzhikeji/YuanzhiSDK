@@ -316,7 +316,7 @@ public class TUIKitImpl {
 
             @Override
             public void onReceiveJoinApplication(String groupID, V2TIMGroupMemberInfo member, String opReason) {
-
+                ConversationManagerKit.getInstance().updateJoinGroup();
             }
 
             @Override

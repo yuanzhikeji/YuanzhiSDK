@@ -77,6 +77,12 @@
             android:layout_marginTop="@dimen/dp_40"
             android:text="创建一个公开群"/>
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/update_group_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
+            android:text="更新一个群的昵称"/>
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/add_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -94,6 +100,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_20"
             android:text="申请加入一个群"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/send_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
+            android:text="发送一个指定消息"/>
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/start_auto"
             android:layout_width="wrap_content"

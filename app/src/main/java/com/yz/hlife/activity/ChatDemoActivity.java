@@ -2,13 +2,11 @@ package com.yz.hlife.activity;
 
 
 import android.content.Intent;
-import android.view.LayoutInflater;
 import android.view.View;
 
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.gson.Gson;
-import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.base.BaseActivity;
 import com.hlife.qcloud.tim.uikit.business.fragment.ChatFragment;
@@ -19,11 +17,8 @@ import com.hlife.qcloud.tim.uikit.business.inter.YzMessageClickListener;
 import com.hlife.qcloud.tim.uikit.business.message.CustomMessage;
 import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
-import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageViewGroup;
-import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageDrawListener;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationListLayout;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
-import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 import com.tencent.imsdk.v2.V2TIMCustomElem;
 import com.tencent.imsdk.v2.V2TIMMessage;
@@ -88,7 +83,7 @@ public class ChatDemoActivity extends BaseActivity implements ConversationListLa
                     SLog.e( "No Custom Data: " + new String(elem.getData()));
                 } else if (data.version == IMKitConstants.JSON_VERSION_1
                         || (data.version == IMKitConstants.JSON_VERSION_4 && data.getBusinessID().equals(BUSINESS_ID_CUSTOM_CARD))) {
-                    CustomIMUIController.onDraw(parent, data);
+                    CustomIMUIController.onDrawCard(parent, data);
                 } else {
                     SLog.w("unsupported version: " + data);
                 }

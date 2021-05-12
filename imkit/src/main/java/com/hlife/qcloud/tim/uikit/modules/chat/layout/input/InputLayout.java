@@ -21,13 +21,16 @@ import androidx.fragment.app.FragmentManager;
 
 import com.amap.api.services.core.PoiItem;
 import com.hlife.liteav.trtcvideocall.ui.TRTCVideoCallSingleActivity;
-import com.hlife.qcloud.tim.uikit.base.BaseActivity;
 import com.hlife.qcloud.tim.uikit.business.active.ListStopMapActivity;
+import com.hlife.qcloud.tim.uikit.business.active.OSSFileActivity;
+import com.hlife.qcloud.tim.uikit.business.message.CustomFileMessage;
+import com.hlife.qcloud.tim.uikit.business.modal.VideoFile;
 import com.hlife.qcloud.tim.uikit.modules.chat.interfaces.IChatLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.inputmore.InputMoreFragment;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
 import com.hlife.qcloud.tim.uikit.utils.FileUtil;
+import com.http.network.task.ObjectMapperFactory;
 import com.tencent.imsdk.v2.V2TIMConversation;
 import com.hlife.liteav.SelectContactActivity;
 import com.hlife.liteav.login.UserModel;
@@ -53,6 +56,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.hlife.qcloud.tim.uikit.modules.chat.layout.inputmore.InputMoreFragment.REQUEST_CODE_OSS_UPLOAD;
 
 /**
  * 聊天界面，底部发送图片、拍照、摄像、文件面板
@@ -80,7 +85,7 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
 
     private onStartActivityListener mStartActivityListener;
 
-    private Map<String, String> atUserInfoMap = new HashMap<>();
+    private final Map<String, String> atUserInfoMap = new HashMap<>();
     private String displayInputString;
 
     public InputLayout(Context context) {
@@ -410,32 +415,77 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
         mInputMoreFragment.setCallback(new IUIKitCallBack() {
             @Override
             public void onSuccess(Object data) {
-                if(getContext() instanceof BaseActivity){
-                    ((BaseActivity) getContext()).showProgressLoading("文件处理中...");
-                }
-                MessageInfoUtil.buildFileMessage((Uri) data, new IUIKitCallBack() {
-                    @Override
-                    public void onSuccess(Object data) {
-                        if(getContext() instanceof BaseActivity){
-                            ((BaseActivity) getContext()).dismissProgress();
-                        }
-                        MessageInfo info = (MessageInfo) data;
-                        if (mMessageHandler != null && info!=null) {
-                            mMessageHandler.sendMessage(info);
-                            hideSoftInput();
-                        }
-                    }
-
-                    @Override
-                    public void onError(String module, int errCode, String errMsg) {
-
-                    }
-                });
+                OSSFileActivity.uploadFile(mInputMoreFragment,(Uri)data,REQUEST_CODE_OSS_UPLOAD);
+//                if(getContext() instanceof BaseActivity){
+//                    ((BaseActivity) getContext()).showProgressLoading(R.string.toast_upload_file);
+//                }
+//                MessageInfoUtil.buildFileMessage((Uri) data, new IUIKitCallBack() {
+//                    @Override
+//                    public void onSuccess(Object data) {
+//                        MessageInfo info = (MessageInfo) data;
+//                        String path = info.getDataPath();
+//                        OSSHelper ossHelper = new OSSHelper((BaseActivity) getContext());
+//                        ossHelper.setOnOSSUploadFileListener(new OSSHelper.OnOSSUploadFileListener() {
+//                            @Override
+//                            public void onSuccess(String fileUrl, String filePath) {
+//                            }
+//
+//                            @Override
+//                            public void onProgress(int progress) {
+//                            }
+//
+//                            @Override
+//                            public void onError() {
+//                            }
+//                        });
+//                        ossHelper.asyncPut(path);
+////                        if (mMessageHandler != null && info!=null) {
+////                            mMessageHandler.sendMessage(info);
+////                            hideSoftInput();
+////                        }
+//                    }
+//
+//                    @Override
+//                    public void onError(String module, int errCode, String errMsg) {
+//
+//                    }
+//                });
             }
 
             @Override
             public void onError(String module, int errCode, String errMsg) {
                 ToastUtil.error(getContext(),errMsg);
+            }
+        });
+        mInputMoreFragment.setOSSCallback(new IUIKitCallBack() {
+            @Override
+            public void onSuccess(Object data) {
+                if(data instanceof Uri){
+                    MessageInfo imgInfo = MessageInfoUtil.buildImageMessage((Uri) data,true);
+                    if (mMessageHandler != null) {
+                        mMessageHandler.sendMessage(imgInfo);
+                        hideSoftInput();
+                    }
+                }else if(data instanceof VideoFile){
+                    VideoFile videoFile = (VideoFile) data;
+                    MessageInfo videoInfo = MessageInfoUtil.buildVideoMessage(videoFile.imagePath,videoFile.filePath,videoFile.firstFrame.getWidth(),videoFile.firstFrame.getHeight(),videoFile.duration);
+                    if (mMessageHandler != null) {
+                        mMessageHandler.sendMessage(videoInfo);
+                        hideSoftInput();
+                    }
+                }else if(data instanceof CustomFileMessage){
+                    String custom = ObjectMapperFactory.getObjectMapper().model2JsonStr(data);
+                    MessageInfo customInfo = MessageInfoUtil.buildCustomMessage(custom);
+                    if (mMessageHandler != null) {
+                        mMessageHandler.sendMessage(customInfo);
+                        hideSoftInput();
+                    }
+                }
+            }
+
+            @Override
+            public void onError(String module, int errCode, String errMsg) {
+
             }
         });
         mInputMoreFragment.startActivityForResult(intent, InputMoreFragment.REQUEST_CODE_FILE);

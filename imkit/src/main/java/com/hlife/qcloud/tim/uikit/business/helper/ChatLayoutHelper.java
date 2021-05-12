@@ -11,6 +11,7 @@ import android.widget.Button;
 import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
+import com.hlife.qcloud.tim.uikit.business.message.CustomFileMessage;
 import com.hlife.qcloud.tim.uikit.business.message.CustomMessage;
 import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.modules.chat.ChatLayout;
@@ -21,14 +22,15 @@ import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMes
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageDrawListener;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
-import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 import com.hlife.qcloud.tim.uikit.utils.ToastUtil;
+import com.http.network.task.ObjectMapperFactory;
 import com.tencent.imsdk.v2.V2TIMCustomElem;
 import com.tencent.imsdk.v2.V2TIMMessage;
 import com.hlife.qcloud.tim.uikit.R;
 import com.work.util.SLog;
 
 import static com.hlife.qcloud.tim.uikit.utils.IMKitConstants.BUSINESS_ID_CUSTOM_CARD;
+import static com.hlife.qcloud.tim.uikit.utils.IMKitConstants.BUSINESS_ID_CUSTOM_FILE;
 
 public class ChatLayoutHelper {
 
@@ -239,17 +241,25 @@ public class ChatLayoutHelper {
                 return;
             }
             V2TIMCustomElem elem = info.getTimMessage().getCustomElem();
+            String elemStr = new String(elem.getData());
             // 自定义的json数据，需要解析成bean实例
             CustomMessage data = null;
             try {
-                data = new Gson().fromJson(new String(elem.getData()), CustomMessage.class);
+                data = ObjectMapperFactory.getObjectMapper().json2Model(elemStr,CustomMessage.class);
             } catch (Exception e) {
                 SLog.w("invalid json: " + new String(elem.getData()) + " " + e.getMessage());
             }
-            if (data!=null && data.getBusinessID().equals(BUSINESS_ID_CUSTOM_CARD)) {
-                CustomIMUIController.onDraw(parent, data);
+            if (data!=null) {
+                if(data.getBusinessID().equals(BUSINESS_ID_CUSTOM_CARD)){
+                    CustomIMUIController.onDrawCard(parent, data);
+                }else if(data.getBusinessID().equals(BUSINESS_ID_CUSTOM_FILE)){
+                    try{
+                        SLog.e("elemStr>"+elemStr);
+                        CustomFileMessage customFileMessage = ObjectMapperFactory.getObjectMapper().json2Model(elemStr,CustomFileMessage.class);
+                        CustomIMUIController.onDrawFile(parent,customFileMessage);
+                    }catch (Exception ignore){}
+                }
             } else {
-                SLog.w("unsupported version: " + data);
                 if(customMessageDrawListener!=null){
                     customMessageDrawListener.onDraw(parent,info);
                 }

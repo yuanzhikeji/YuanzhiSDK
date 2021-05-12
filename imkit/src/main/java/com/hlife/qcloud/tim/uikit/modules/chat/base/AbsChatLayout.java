@@ -35,7 +35,7 @@ public abstract class AbsChatLayout extends ChatLayoutUI implements IChatLayout 
 
     private AnimationDrawable mVolumeAnim;
     private Runnable mTypingRunnable = null;
-    private ChatProvider.TypingListener mTypingListener = new ChatProvider.TypingListener() {
+    private final ChatProvider.TypingListener mTypingListener = new ChatProvider.TypingListener() {
         @Override
         public void onTyping() {
             final String oldTitle = getTitleBar().getMiddleTitle().getText().toString();

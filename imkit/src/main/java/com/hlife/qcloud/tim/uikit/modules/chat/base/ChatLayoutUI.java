@@ -4,12 +4,15 @@ import android.content.Context;
 
 import androidx.annotation.Nullable;
 
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
+import com.hlife.qcloud.tim.uikit.modules.chat.GroupChatManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.chat.interfaces.IChatLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.input.InputLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.MessageLayout;
@@ -17,6 +20,9 @@ import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.component.NoticeLayout;
 import com.hlife.qcloud.tim.uikit.component.TitleBarLayout;
+import com.tencent.imsdk.v2.V2TIMConversation;
+import com.tencent.imsdk.v2.V2TIMGroupInfoResult;
+import com.work.util.SLog;
 
 public abstract class ChatLayoutUI extends LinearLayout implements IChatLayout {
 
@@ -100,7 +106,25 @@ public abstract class ChatLayoutUI extends LinearLayout implements IChatLayout {
             return;
         }
         String chatTitle = chatInfo.getChatName();
-        getTitleBar().setTitle(chatTitle, TitleBarLayout.POSITION.MIDDLE);
+        if(TextUtils.isEmpty(chatTitle)){
+            if(chatInfo.getType() == V2TIMConversation.V2TIM_GROUP){
+                GroupChatManagerKit.getInstance().loadGroupInfo(mChatInfo.getId(), new IUIKitCallBack() {
+                    @Override
+                    public void onSuccess(Object data) {
+                        SLog.e(data.toString());
+                        V2TIMGroupInfoResult result = (V2TIMGroupInfoResult) data;
+                        getTitleBar().setTitle(result.getGroupInfo().getGroupName(), TitleBarLayout.POSITION.MIDDLE);
+                    }
+
+                    @Override
+                    public void onError(String module, int errCode, String errMsg) {
+
+                    }
+                });
+            }
+        }else{
+            getTitleBar().setTitle(chatTitle, TitleBarLayout.POSITION.MIDDLE);
+        }
     }
 
     @Override

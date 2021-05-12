@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
+import com.hlife.qcloud.tim.uikit.business.active.OSSFileActivity;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.BaseInputFragment;
 
 import java.util.ArrayList;
@@ -21,9 +22,11 @@ public class InputMoreFragment extends BaseInputFragment {
 
     public static final int REQUEST_CODE_FILE = 1011;
     public static final int REQUEST_CODE_PHOTO = 1012;
+    public static final int REQUEST_CODE_OSS_UPLOAD = 1013;
 
     private List<InputMoreActionUnit> mInputMoreList = new ArrayList<>();
     private IUIKitCallBack mCallback;
+    private IUIKitCallBack mOSSCallback;
 
     @Nullable
     @Override
@@ -42,6 +45,10 @@ public class InputMoreFragment extends BaseInputFragment {
         mCallback = callback;
     }
 
+    public void setOSSCallback(IUIKitCallBack callback){
+        mOSSCallback = callback;
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_FILE
@@ -52,6 +59,14 @@ public class InputMoreFragment extends BaseInputFragment {
             Uri uri = data.getData();//得到uri，后面就是将uri转化成file的过程。
             if (mCallback != null) {
                 mCallback.onSuccess(uri);
+            }
+        }else if(requestCode == REQUEST_CODE_OSS_UPLOAD){
+            if(data==null){
+                return;
+            }
+            Object o = data.getExtras().get(OSSFileActivity.class.getSimpleName());
+            if(mOSSCallback!=null){
+                mOSSCallback.onSuccess(o);
             }
         }
     }

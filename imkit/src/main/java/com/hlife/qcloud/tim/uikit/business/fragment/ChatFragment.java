@@ -17,6 +17,7 @@ import com.hlife.qcloud.tim.uikit.business.Constants;
 import com.hlife.qcloud.tim.uikit.business.active.FriendProfileActivity;
 import com.hlife.qcloud.tim.uikit.business.helper.ChatLayoutHelper;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageClickListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.component.AudioPlayer;
 import com.hlife.qcloud.tim.uikit.component.TitleBarLayout;
 import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
@@ -25,6 +26,7 @@ import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.input.InputLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.MessageLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageDrawListener;
+import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.group.info.GroupInfo;
 import com.hlife.qcloud.tim.uikit.modules.group.info.StartGroupMemberSelectActivity;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
@@ -44,7 +46,7 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 
-public class ChatFragment extends BaseFragment {
+public class ChatFragment extends BaseFragment implements YzMessageWatcher {
     public static String[] PERMISSIONS = new String[]{
             Manifest.permission.RECORD_AUDIO,
             Manifest.permission.CAMERA};
@@ -67,6 +69,7 @@ public class ChatFragment extends BaseFragment {
         if(!PermissionsManager.getInstance().hasAllPermissions(getContext(),PERMISSIONS)){
             PermissionsManager.getInstance().requestPermissionsIfNecessaryForResult(this, PERMISSIONS, null);
         }
+        ConversationManagerKit.getInstance().addMessageWatcher(this);
         final Bundle bundle = getArguments();
         if(mChatInfo==null){
             mChatInfo = (ChatInfo) bundle.getSerializable(Constants.CHAT_INFO);
@@ -319,6 +322,9 @@ public class ChatFragment extends BaseFragment {
             mConfig = new ChatViewConfig();
         }
         helper.customizeChatLayout(mChatLayout,mConfig,mYzCustomMessageDrawListener);
+        if(mChatLayout!=null){
+            mChatLayout.loadApplyList();
+        }
     }
 
     @Override
@@ -333,6 +339,28 @@ public class ChatFragment extends BaseFragment {
         if (mChatLayout != null) {
             mChatLayout.exitChat();
         }
+        ConversationManagerKit.getInstance().removeMessageWatcher(this);
     }
 
+    @Override
+    public void updateUnread(int count) {
+
+    }
+
+    @Override
+    public void updateContacts() {
+
+    }
+
+    @Override
+    public void updateConversion() {
+
+    }
+
+    @Override
+    public void updateJoinGroup() {
+        if(mChatLayout!=null){
+            mChatLayout.loadApplyList();
+        }
+    }
 }

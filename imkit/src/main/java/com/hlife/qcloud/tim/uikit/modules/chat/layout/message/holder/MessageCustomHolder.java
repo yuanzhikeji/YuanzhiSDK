@@ -1,5 +1,6 @@
 package com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder;
 
+import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,6 +55,7 @@ public class MessageCustomHolder extends MessageContentHolder implements YzCusto
                 msgBodyText.setText(msg.getExtra().toString());
             }
         }
+        msgContentFrame.setBackgroundColor(Color.TRANSPARENT);
         if (properties.getChatContextFontSize() != 0) {
             msgBodyText.setTextSize(properties.getChatContextFontSize());
         }

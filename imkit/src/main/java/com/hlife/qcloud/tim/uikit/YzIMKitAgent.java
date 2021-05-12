@@ -26,6 +26,7 @@ import com.hlife.qcloud.tim.uikit.modules.chat.C2CChatManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.chat.GroupChatManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationManagerKit;
+import com.hlife.qcloud.tim.uikit.modules.group.apply.GroupApplyInfo;
 import com.hlife.qcloud.tim.uikit.modules.group.info.GroupInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
@@ -34,8 +35,11 @@ import com.http.network.listener.OnResultDataListener;
 import com.http.network.model.RequestWork;
 import com.http.network.model.ResponseWork;
 import com.tencent.imsdk.v2.V2TIMCallback;
+import com.tencent.imsdk.v2.V2TIMGroupApplication;
+import com.tencent.imsdk.v2.V2TIMGroupApplicationResult;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.imsdk.v2.V2TIMMessage;
+import com.tencent.imsdk.v2.V2TIMValueCallback;
 import com.tencent.smtt.export.external.TbsCoreSettings;
 import com.tencent.smtt.sdk.QbSdk;
 import com.work.api.open.ApiClient;
@@ -46,6 +50,7 @@ import com.work.api.open.model.CreateGroupResp;
 import com.work.api.open.model.LoginResp;
 import com.work.api.open.model.SysUserReq;
 import com.work.api.open.model.client.OpenData;
+import com.work.api.open.model.client.OpenGroupInfo;
 import com.work.api.open.model.client.OpenGroupMember;
 import com.work.util.AppUtils;
 import com.work.util.SLog;
@@ -87,6 +92,11 @@ public final class YzIMKitAgent {
 
         @Override
         public void updateConversion() {
+
+        }
+
+        @Override
+        public void updateJoinGroup() {
 
         }
     };
@@ -347,7 +357,31 @@ public final class YzIMKitAgent {
                     return;
                 }
                 if(resp instanceof CreateGroupResp){
-                    listener.onCreate(((CreateGroupResp) resp).getData());
+                    OpenGroupInfo info = ((CreateGroupResp) resp).getData();
+                    if(((CreateGroupResp) resp).getCode()==200){
+                        listener.onCreate(((CreateGroupResp) resp).getCode(),info.GroupId,resp.getMessage());
+                    }else{
+                        listener.onCreate(((CreateGroupResp) resp).getCode(),null,resp.getMessage());
+                    }
+                }
+            }
+        });
+    }
+    /**
+     * 更改群信息
+     */
+    public void updateGroup(String groupId,String name,final YzGroupDataListener listener){
+        CreateGroupReq createGroupReq = new CreateGroupReq();
+        createGroupReq.Name = name;
+        createGroupReq.GroupId = groupId;
+        Yz.getSession().updateGroupName(createGroupReq, new OnResultDataListener() {
+            @Override
+            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
+                if(listener==null){
+                    return;
+                }
+                if(resp instanceof CreateGroupResp){
+                    listener.update(((CreateGroupResp) resp).getCode(),resp.getMessage());
                 }
             }
         });
@@ -395,6 +429,35 @@ public final class YzIMKitAgent {
                 if(resp instanceof GroupMemberResp){
                     listener.deleteMember(((GroupMemberResp) resp).getCode(),((GroupMemberResp) resp).getData());
                 }
+            }
+        });
+    }
+    /**
+     * 获取群申请信息
+     */
+    public void groupApplicationList(YzGroupDataListener listener){
+        V2TIMManager.getGroupManager().getGroupApplicationList(new V2TIMValueCallback<V2TIMGroupApplicationResult>() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener==null){
+                    return;
+                }
+                listener.joinMember(new ArrayList<>());
+            }
+
+            @Override
+            public void onSuccess(V2TIMGroupApplicationResult v2TIMGroupApplicationResult) {
+                if(listener==null){
+                    return;
+                }
+                List<V2TIMGroupApplication> v2TIMGroupApplications = v2TIMGroupApplicationResult.getGroupApplicationList();
+                List<GroupApplyInfo> applies = new ArrayList<>();
+                for (int i = 0; i < v2TIMGroupApplications.size(); i++) {
+                    GroupApplyInfo info = new GroupApplyInfo(v2TIMGroupApplications.get(i));
+                    info.setStatus(0);
+                    applies.add(info);
+                }
+                listener.joinMember(applies);
             }
         });
     }

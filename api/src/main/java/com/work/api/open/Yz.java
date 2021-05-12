@@ -6,6 +6,7 @@ import com.http.network.listener.OnResultDataListener;
 import com.http.network.task.ConnectDataTask;
 import com.work.api.open.contacts.ModeApi;
 import com.work.api.open.model.AddApplyStaticsReq;
+import com.work.api.open.model.GetImageConfigResp;
 import com.work.api.open.model.GroupMemberResp;
 import com.work.api.open.model.BaseReq;
 import com.work.api.open.model.BaseResp;
@@ -31,6 +32,7 @@ import com.work.api.open.model.InviteUserReq;
 import com.work.api.open.model.LoginReq;
 import com.work.api.open.model.LoginResp;
 import com.work.api.open.model.RegisterReq;
+import com.work.api.open.model.SendMessageReq;
 import com.work.api.open.model.SendSmsReq;
 import com.work.api.open.model.SysUserReq;
 import com.work.api.open.model.UpdateMobileReq;
@@ -124,6 +126,12 @@ public class Yz extends ApiClient {
         requestPost(ModeApi.createGroup,createGroupReq,new CreateGroupResp(),onResultDataListener);
     }
     /**
+     * 更改群昵称
+     */
+    public void updateGroupName(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
+        requestPost(ModeApi.updateGroupName,createGroupReq,new CreateGroupResp(),onResultDataListener);
+    }
+    /**
      * 加入一个群
      */
     public void addGroupUser(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
@@ -206,6 +214,18 @@ public class Yz extends ApiClient {
      */
     public void getCityList(OnResultDataListener onResultDataListener){
         requestPost(ModeApi.getCityList,new BaseReq(),new GetCityListResp(),onResultDataListener);
+    }
+    /**
+     * 获取oss配置
+     */
+    public void getImageConfig(OnResultDataListener onResultDataListener,Object... objects){
+        requestPost(ModeApi.getStsToken,new BaseReq(),new GetImageConfigResp(),onResultDataListener,objects);
+    }
+    /**
+     * 发送指定消息
+     */
+    public void sendMessage(SendMessageReq sendMessageReq,OnResultDataListener onResultDataListener){
+        requestPost(ModeApi.sendMessage,sendMessageReq,new BaseResp(),onResultDataListener);
     }
     /**
      * 获取打车链接

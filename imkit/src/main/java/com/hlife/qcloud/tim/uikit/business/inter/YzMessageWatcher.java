@@ -10,4 +10,5 @@ public interface YzMessageWatcher {
     void updateUnread(int count);
     void updateContacts();
     void updateConversion();
+    void updateJoinGroup();
 }

@@ -63,7 +63,6 @@ public class ChatLayout extends AbsChatLayout implements GroupChatManagerKit.Gro
             mGroupChatManager.setCurrentChatInfo(groupInfo);
             mGroupInfo = groupInfo;
             loadChatMessages(null);
-            loadApplyList();
             getTitleBar().getRightIcon().setImageResource(R.drawable.icon_more);
             getTitleBar().setOnRightClickListener(new View.OnClickListener() {
                 @Override
@@ -104,7 +103,10 @@ public class ChatLayout extends AbsChatLayout implements GroupChatManagerKit.Gro
         }
     }
 
-    private void loadApplyList() {
+    public void loadApplyList() {
+        if(mGroupChatManager==null || !isGroup){
+            return;
+        }
         mGroupChatManager.getProvider().loadGroupApplies(new IUIKitCallBack() {
             @Override
             public void onSuccess(Object data) {
@@ -112,6 +114,8 @@ public class ChatLayout extends AbsChatLayout implements GroupChatManagerKit.Gro
                 if (applies != null && applies.size() > 0) {
                     mGroupApplyLayout.getContent().setText(getContext().getString(R.string.group_apply_tips, applies.size()));
                     mGroupApplyLayout.setVisibility(View.VISIBLE);
+                }else{
+                    mGroupApplyLayout.setVisibility(View.GONE);
                 }
             }
 

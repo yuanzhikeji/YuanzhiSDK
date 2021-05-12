@@ -301,6 +301,11 @@ public class MwWorkActivity extends IMBaseActivity implements
     }
 
     @Override
+    public void updateJoinGroup() {
+
+    }
+
+    @Override
     public boolean isShowTitleBar() {
         return false;
     }

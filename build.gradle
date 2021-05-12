@@ -18,7 +18,6 @@ allprojects {
     repositories {
         maven {
             url "https://jitpack.io"
-            credentials { username 'jp_eo6d6ch8isk7v09au8cmsg28l3' }
         }
         maven { url "https://mirrors.tencent.com/repository/maven/tencent_public"}
         maven { url "https://mirrors.tencent.com/repository/maven/liteavsdk" }

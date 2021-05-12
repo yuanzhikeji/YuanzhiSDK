@@ -59,6 +59,10 @@ public final class ModeApi {
      */
     public final static String createGroup="newgroup/createGroup";
     /**
+     * 更改群昵称
+     */
+    public final static String updateGroupName = "newgroup/updateGroupName";
+    /**
      * 加入一个群
      */
     public final static String addGroupUser = "newgroup/addGroupUser";
@@ -115,6 +119,14 @@ public final class ModeApi {
      * 获取城市列表
      */
     public final static String getCityList="api/getCityList";
+    /**
+     * 获取oss配置
+     */
+    public final static String getStsToken = "api/getStsToken";
+    /**
+     * 发一个指定消息
+     */
+    public final static String sendMessage = "message/sendMessage";
     /**
      * 退出登录
      */

@@ -44,8 +44,8 @@ public class GroupChatManagerKit extends ChatManagerKit {
 
     private static GroupChatManagerKit mKit;
     private GroupInfo mCurrentChatInfo;
-    private List<GroupApplyInfo> mCurrentApplies = new ArrayList<>();
-    private List<GroupMemberInfo> mCurrentGroupMembers = new ArrayList<>();
+    private final List<GroupApplyInfo> mCurrentApplies = new ArrayList<>();
+    private final List<GroupMemberInfo> mCurrentGroupMembers = new ArrayList<>();
     private GroupNotifyHandler mGroupHandler;
     private GroupInfoProvider mGroupInfoProvider;
 
@@ -375,6 +375,10 @@ public class GroupChatManagerKit extends ChatManagerKit {
             onGroupForceExit();
         }
         ConversationManagerKit.getInstance().deleteConversation(groupID, true);
+    }
+
+    public void loadGroupInfo(String groupID,IUIKitCallBack callBack){
+        mGroupInfoProvider.loadGroupPublicInfo(groupID,false, callBack);
     }
 
     public void notifyGroupRESTCustomSystemData(String groupID, byte[] customData) {

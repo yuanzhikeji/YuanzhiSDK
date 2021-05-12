@@ -10,22 +10,22 @@ import com.http.network.model.ClientModel;
 public class OpenImageConfig extends ClientModel {
 
     /**
+     * expiration : 2021-05-11T07:31:27Z
+     * accessKeyId : STS.NUNLRkUQT4KBme2qsQ5VGsc8J
+     * accessKeySecret : Bu6TrBcpeZh3usiFKH8q8M7fFvDLYBr82xXia9nc8dm
+     * securityToken : CAIS8AF1q6Ft5B2yfSjIr5b7B+jfuI51g4mpb0ODlXMEOdlrnKaTqDz2IHtKfHhoBewesfgznW1Z7vYblqFiW5ZdREXcdZOwfiXtDETzDbDasumZsJYm6vT8a0XxZjf/2MjNGZabKPrWZvaqbX3diyZ32sGUXD6+XlujQ/br4NwdGbZxZASjaidcD9p7PxZrrNRgVUHcLvGwKBXn8AGyZQhKwlMk0zwluf3kk5PBsECH0ALAp7VL99irEP+NdNJxOZpzadCx0dFte7DJuCwqsEMUrPYu0PAcpmub54zMWwkI+XScOu/T6cZ0MBRprXm3xi/lLZEagAEtCI1QR6Z+pbRPB3R6WC6FpzpKbI3+huRT5FX7adqXkidfScKMv0IHXvn8n2kmfm+GP6MWPXZ+/9sVW7CIpK4sNz3qQQAJvMZiN2R+VGRf9yls4sCzfqjVNvZioB8RMLr+LPuvmZ73RDbrAWWZLGzIDh7BclsUTTYJHnE6v8gWNg==
+     * requestId : 1AFF03EA-AEDE-400E-804C-37B218186A07
      * bucket : cheoa
      * endPoint : https://oss.cheoa.cn/
-     * keyId : STS.NKL3Qxm4R6UH9tsdAP8nkp4cG
-     * expiration : 2019-04-24T05:38:36Z
-     * keySecret : 8AUb8h9c174a9qSCKY9B4pBmEgHPkW4s7cbPnfLR6DSV
-     * region : cn-hangzhou
-     * token : CAISkwJ1q6Ft5B2yfSjIr4j5eOvMgOtzgZejO1LCgEEFNOFHn/HIpTz2IHpFeXJgBukXsvQylGhR6PoclqB4S5JCTAmcNZIoPU7Wd8/kMeT7oMWQweEuuv/MQBquaXPS2MvVfJ+OLrf0ceusbFbpjzJ6xaCAGxypQ12iN+/m6/Ngdc9FHHP7D1x8CcxROxFppeIDKHLVLozNCBPxhXfKB0ca3WgZgGhku6Ok2Z/euFiMzn+Ck7BN/dSseMb4P5Y9ZscuDe3YhrImKvDztwdL8AVP+atMi6hJxCzKpNn1ASMKuUTbaLqLq4wzfFIpPvFkR/Be3/H4lOxlvOvIjJjwyBtLMuxTXj7WWIe62szAFfMBuE/o2UkQUBqAAZekl9iC9EHe3FVktYOAjCAlR0D5mEWMitWW6fUCmgyoq1bw5xlUzvgGXtgVZ6EVkuI3MDx8dmCUz94nLlEbmbXDGijLY7seypf/LYqL5mG9xsHG1QVNhn1TsCUQnBEn3B53xWP6B49K7K5+A8DBcIlOCymyF1i2yObcJCgILReA
      */
 
+    private String expiration;
+    private String accessKeyId;
+    private String accessKeySecret;
+    private String securityToken;
+    private String requestId;
     private String bucket;
     private String endPoint;
-    private String keyId;
-    private String expiration;
-    private String keySecret;
-    private String region;
-    private String token;
 
     public String getBucket() {
         return bucket;
@@ -43,14 +43,6 @@ public class OpenImageConfig extends ClientModel {
         this.endPoint = endPoint;
     }
 
-    public String getKeyId() {
-        return keyId;
-    }
-
-    public void setKeyId(String keyId) {
-        this.keyId = keyId;
-    }
-
     public String getExpiration() {
         return expiration;
     }
@@ -59,27 +51,35 @@ public class OpenImageConfig extends ClientModel {
         this.expiration = expiration;
     }
 
-    public String getKeySecret() {
-        return keySecret;
+    public String getAccessKeyId() {
+        return accessKeyId;
     }
 
-    public void setKeySecret(String keySecret) {
-        this.keySecret = keySecret;
+    public void setAccessKeyId(String accessKeyId) {
+        this.accessKeyId = accessKeyId;
     }
 
-    public String getRegion() {
-        return region;
+    public String getAccessKeySecret() {
+        return accessKeySecret;
     }
 
-    public void setRegion(String region) {
-        this.region = region;
+    public void setAccessKeySecret(String accessKeySecret) {
+        this.accessKeySecret = accessKeySecret;
     }
 
-    public String getToken() {
-        return token;
+    public String getSecurityToken() {
+        return securityToken;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setSecurityToken(String securityToken) {
+        this.securityToken = securityToken;
+    }
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 }

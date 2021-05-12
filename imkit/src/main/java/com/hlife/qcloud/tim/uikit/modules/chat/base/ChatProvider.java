@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ChatProvider implements IChatProvider {
 
-    private ArrayList<MessageInfo> mDataSource = new ArrayList();
+    private final ArrayList<MessageInfo> mDataSource = new ArrayList();
 
     private MessageListAdapter mAdapter;
     private TypingListener mTypingListener;

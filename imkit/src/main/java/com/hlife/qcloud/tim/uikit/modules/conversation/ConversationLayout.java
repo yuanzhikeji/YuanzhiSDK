@@ -15,13 +15,16 @@ import com.hlife.qcloud.tim.uikit.business.active.ScanIMQRCodeActivity;
 import com.hlife.qcloud.tim.uikit.business.active.SearchAddMoreActivity;
 import com.hlife.qcloud.tim.uikit.business.active.StartGroupChatActivity;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
+import com.hlife.qcloud.tim.uikit.component.NoticeLayout;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
 import com.hlife.qcloud.tim.uikit.modules.conversation.interfaces.IConversationAdapter;
 import com.hlife.qcloud.tim.uikit.modules.conversation.interfaces.IConversationLayout;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.component.TitleBarLayout;
+import com.hlife.qcloud.tim.uikit.modules.group.apply.GroupApplyManagerActivity;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
+import com.work.util.SLog;
 import com.work.util.ToastUtil;
 
 import java.util.ArrayList;
@@ -30,6 +33,7 @@ import java.util.List;
 public class ConversationLayout extends RelativeLayout implements IConversationLayout {
 
     private ConversationListLayout mConversationList;
+    private NoticeLayout mNoticeLayout;
     private MorePopWindow mMenu;
 
     public ConversationLayout(Context context) {
@@ -60,6 +64,13 @@ public class ConversationLayout extends RelativeLayout implements IConversationL
             }
         });
         mConversationList = findViewById(R.id.conversation_list);
+        mNoticeLayout = findViewById(R.id.chat_group_apply_layout);
+        mNoticeLayout.setOnNoticeClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getContext().startActivity(new Intent(getContext(), GroupApplyManagerActivity.class));
+            }
+        });
     }
     private IConversationAdapter adapter;
     public void initDefault(YzChatType type) {
@@ -117,6 +128,18 @@ public class ConversationLayout extends RelativeLayout implements IConversationL
                 ToastUtil.error(TUIKit.getAppContext(),"加载消息失败");
             }
         });
+    }
+
+    public void updateNotice(int count){
+        if(mNoticeLayout==null){
+            return;
+        }
+        if(count==0){
+            mNoticeLayout.setVisibility(GONE);
+        }else{
+            mNoticeLayout.setVisibility(VISIBLE);
+            mNoticeLayout.getContent().setText(R.string.group_apply_un_handler);
+        }
     }
 
     public TitleBarLayout getTitleBar() {
