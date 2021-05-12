@@ -16,6 +16,8 @@ import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
+import com.hlife.qcloud.tim.uikit.business.message.CustomFileMessage;
+import com.http.network.task.ObjectMapperFactory;
 import com.tencent.imsdk.v2.V2TIMCustomElem;
 import com.tencent.imsdk.v2.V2TIMDownloadCallback;
 import com.tencent.imsdk.v2.V2TIMElem;
@@ -45,6 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.hlife.qcloud.tim.uikit.utils.IMKitConstants.BUSINESS_ID_CUSTOM_CARD;
+import static com.hlife.qcloud.tim.uikit.utils.IMKitConstants.BUSINESS_ID_CUSTOM_FILE;
 import static com.hlife.qcloud.tim.uikit.utils.IMKitConstants.BUSINESS_ID_CUSTOM_LOCATION;
 
 public class MessageInfoUtil {
@@ -386,7 +389,10 @@ public class MessageInfoUtil {
                         msgInfo.setExtra(message);
                     } else if(!TextUtils.isEmpty(businessId) && messageCustom.businessID.equals(BUSINESS_ID_CUSTOM_CARD)){
                         msgInfo.setExtra("[链接]");
-                    }if(!TextUtils.isEmpty(businessId) && messageCustom.businessID.equals(BUSINESS_ID_CUSTOM_LOCATION)){//来自小程序自己发送的位置消息
+                    } else if(!TextUtils.isEmpty(businessId) && messageCustom.businessID.equals(BUSINESS_ID_CUSTOM_FILE)){
+                        CustomFileMessage message = ObjectMapperFactory.getObjectMapper().json2Model(data,CustomFileMessage.class);
+                        msgInfo.setExtra("[文件]"+message.getFileName());
+                    }else if(!TextUtils.isEmpty(businessId) && messageCustom.businessID.equals(BUSINESS_ID_CUSTOM_LOCATION)){//来自小程序自己发送的位置消息
                         msgInfo.setExtra("[位置]");
                         msgInfo.setMsgType(MessageInfo.MSG_TYPE_LOCATION);
                     } else {

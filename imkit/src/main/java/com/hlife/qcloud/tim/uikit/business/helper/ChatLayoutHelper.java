@@ -254,7 +254,6 @@ public class ChatLayoutHelper {
                     CustomIMUIController.onDrawCard(parent, data);
                 }else if(data.getBusinessID().equals(BUSINESS_ID_CUSTOM_FILE)){
                     try{
-                        SLog.e("elemStr>"+elemStr);
                         CustomFileMessage customFileMessage = ObjectMapperFactory.getObjectMapper().json2Model(elemStr,CustomFileMessage.class);
                         CustomIMUIController.onDrawFile(parent,customFileMessage);
                     }catch (Exception ignore){}
