@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment;
 
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.base.BaseActivity;
+import com.hlife.qcloud.tim.uikit.business.dialog.ConfirmDialog;
 import com.hlife.qcloud.tim.uikit.business.message.CustomFileMessage;
 import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
 import com.hlife.qcloud.tim.uikit.business.modal.VideoFile;
@@ -40,6 +41,8 @@ public class OSSFileActivity extends BaseActivity {
     private ProgressBar mProgress;
     private Button mOpenBtn;
     private OSSHelper mOSS;
+    private boolean isTips;
+    private boolean isUpload;
 
     @Override
     public void onInitView() throws Exception {
@@ -54,8 +57,9 @@ public class OSSFileActivity extends BaseActivity {
     @Override
     public void onInitValue() throws Exception {
         super.onInitValue();
-        boolean isUpload = getIntent().getBooleanExtra(UPLOAD_FILE,true);
+        isUpload = getIntent().getBooleanExtra(UPLOAD_FILE,true);
         setTitleName(isUpload?R.string.oss_file_title_upload:R.string.oss_file_title_download);
+        isTips = true;
         if(isUpload){
             Uri mUri = getIntent().getParcelableExtra(OSSFileActivity.class.getSimpleName());
             if(mUri ==null){
@@ -76,6 +80,7 @@ public class OSSFileActivity extends BaseActivity {
             mOSS.setOnOSSUploadFileListener(new OSSHelper.OnOSSUploadFileListener() {
                 @Override
                 public void onSuccess(String fileUrl, String filePath) {
+                    isTips = false;
                     mOpenBtn.setVisibility(View.VISIBLE);
                     mProgress.setVisibility(View.GONE);
                     mOpenBtn.setOnClickListener(new View.OnClickListener() {
@@ -93,7 +98,11 @@ public class OSSFileActivity extends BaseActivity {
 
                 @Override
                 public void onError() {
-
+                    isTips = false;
+                    if(!isFinishing()){
+                        ToastUtil.error(OSSFileActivity.this,R.string.toast_download_error);
+                        finish();
+                    }
                 }
             });
             mOSS.asynGet(customFileMessage);
@@ -105,6 +114,20 @@ public class OSSFileActivity extends BaseActivity {
         super.onDestroy();
         if(mOSS!=null){
             mOSS.cancel();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(isTips){
+            new ConfirmDialog().setContent(isUpload?R.string.dialog_uploading_cancel:R.string.dialog_download_cancel).setOnConfirmListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    finish();
+                }
+            }).show(getSupportFragmentManager(),"oss_cancel");
+        }else{
+            super.onBackPressed();
         }
     }
 
@@ -205,7 +228,10 @@ public class OSSFileActivity extends BaseActivity {
 
                         @Override
                         public void onError() {
-                            ToastUtil.error(OSSFileActivity.this,R.string.oss_file_upload_error);
+                            if(!isFinishing()){
+                                ToastUtil.error(OSSFileActivity.this,R.string.oss_file_upload_error);
+                                finish();
+                            }
                         }
                     });
                     mOSS.asyncPut(customFileMessage.getFilePath());

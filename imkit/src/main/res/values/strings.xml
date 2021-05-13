@@ -236,6 +236,9 @@
     <string name="toast_sys_contacts_error" translatable="false">未找到通讯录联系人</string>
     <string name="toast_upload_file" translatable="false">文件处理中...</string>
     <string name="toast_upload_file_progress" translatable="false">正在上传%1$d%%...</string>
+    <string name="toast_download_error" translatable="false">文件下载失败，请稍后尝试</string>
+    <string name="dialog_uploading_cancel" translatable="false">确认取消文件上传吗？</string>
+    <string name="dialog_download_cancel" translatable="false">确认取消文件下载吗？</string>
 
     <string name="label_update_app_title" translatable="false">版本更新</string>
     <string name="label_update_app_next" translatable="false">稍后提醒</string>

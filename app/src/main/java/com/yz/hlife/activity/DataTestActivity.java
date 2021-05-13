@@ -16,6 +16,7 @@ import com.hlife.qcloud.tim.uikit.modules.group.apply.GroupApplyInfo;
 import com.tencent.imsdk.v2.V2TIMCallback;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.work.api.open.Yz;
+import com.work.api.open.model.GetTenantGroupListReq;
 import com.work.api.open.model.SendMessageReq;
 import com.work.api.open.model.SysUserReq;
 import com.work.api.open.model.client.OpenGroupInfo;
@@ -58,6 +59,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
         sysUserReq.setNickName("试试2233");
         YzIMKitAgent.instance().register(sysUserReq,null);
         this.groupApplicationList();
+        Yz.getSession().getTenantGroupList(new GetTenantGroupListReq(),this);
     }
 
     private void groupApplicationList(){
@@ -343,9 +345,9 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 break;
             case R.id.send_message:
                 SendMessageReq sendMessageReq = new SendMessageReq();
-                sendMessageReq.From_Account=UserApi.instance().getUserId();
-                sendMessageReq.To_Account = "@TGS#242ILVEH4";
-                sendMessageReq.Content = "这是一个指定发的消息";
+                sendMessageReq.setFromUserId(UserApi.instance().getUserId());
+                sendMessageReq.setToUserId("2d9de88e9cd754abea89736f29132056");
+                sendMessageReq.setTextContent("这是一个指定发的消息");
                 Yz.getSession().sendMessage(sendMessageReq,null);
                 break;
         }

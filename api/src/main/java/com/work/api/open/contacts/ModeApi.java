@@ -124,9 +124,13 @@ public final class ModeApi {
      */
     public final static String getStsToken = "api/getStsToken";
     /**
-     * 发一个指定消息
+     * 获取全部的群组
      */
-    public final static String sendMessage = "message/sendMessage";
+    public final static String getTenantGroupList = "newgroup/getTenantGroupList";
+    /**
+     * 用户a给b发消息
+     */
+    public final static String sendTextFormToMsg = "api/sendTextFormToMsg";
     /**
      * 退出登录
      */

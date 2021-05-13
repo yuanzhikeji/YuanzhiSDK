@@ -7,6 +7,7 @@ import com.http.network.task.ConnectDataTask;
 import com.work.api.open.contacts.ModeApi;
 import com.work.api.open.model.AddApplyStaticsReq;
 import com.work.api.open.model.GetImageConfigResp;
+import com.work.api.open.model.GetTenantGroupListReq;
 import com.work.api.open.model.GroupMemberResp;
 import com.work.api.open.model.BaseReq;
 import com.work.api.open.model.BaseResp;
@@ -225,7 +226,13 @@ public class Yz extends ApiClient {
      * 发送指定消息
      */
     public void sendMessage(SendMessageReq sendMessageReq,OnResultDataListener onResultDataListener){
-        requestPost(ModeApi.sendMessage,sendMessageReq,new BaseResp(),onResultDataListener);
+        requestPost(ModeApi.sendTextFormToMsg,sendMessageReq,new BaseResp(),onResultDataListener);
+    }
+    /**
+     * 全部群组
+     */
+    public void getTenantGroupList(GetTenantGroupListReq getTenantGroupListReq,OnResultDataListener onResultDataListener){
+        requestPost(ModeApi.getTenantGroupList,getTenantGroupListReq,new BaseResp(),onResultDataListener);
     }
     /**
      * 获取打车链接
