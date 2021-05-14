@@ -337,101 +337,101 @@ public final class YzIMKitAgent {
     /**
      * 群相关
      */
-    public void createPublicGroup(String userId, String name, List<String> member, final YzGroupDataListener listener){
-        CreateGroupReq createGroupReq = new CreateGroupReq();
-        createGroupReq.Owner_Account = userId;
-        createGroupReq.Name = name;
-        if(member!=null && member.size()>0){
-            List<OpenGroupMember> members = new ArrayList<>();
-            for (String s:member) {
-                OpenGroupMember openGroupMember = new OpenGroupMember();
-                openGroupMember.Member_Account = s;
-                members.add(openGroupMember);
-            }
-            createGroupReq.MemberList = members;
-        }
-        Yz.getSession().createGroup(createGroupReq, new OnResultDataListener() {
-            @Override
-            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
-                if(listener==null){
-                    return;
-                }
-                if(resp instanceof CreateGroupResp){
-                    OpenGroupInfo info = ((CreateGroupResp) resp).getData();
-                    if(((CreateGroupResp) resp).getCode()==200){
-                        listener.onCreate(((CreateGroupResp) resp).getCode(),info.GroupId,resp.getMessage());
-                    }else{
-                        listener.onCreate(((CreateGroupResp) resp).getCode(),null,resp.getMessage());
-                    }
-                }
-            }
-        });
-    }
+//    public void createPublicGroup(String userId, String name, List<String> member, final YzGroupDataListener listener){
+//        CreateGroupReq createGroupReq = new CreateGroupReq();
+//        createGroupReq.Owner_Account = userId;
+//        createGroupReq.Name = name;
+//        if(member!=null && member.size()>0){
+//            List<OpenGroupMember> members = new ArrayList<>();
+//            for (String s:member) {
+//                OpenGroupMember openGroupMember = new OpenGroupMember();
+//                openGroupMember.Member_Account = s;
+//                members.add(openGroupMember);
+//            }
+//            createGroupReq.MemberList = members;
+//        }
+//        Yz.getSession().createGroup(createGroupReq, new OnResultDataListener() {
+//            @Override
+//            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
+//                if(listener==null){
+//                    return;
+//                }
+//                if(resp instanceof CreateGroupResp){
+//                    OpenGroupInfo info = ((CreateGroupResp) resp).getData();
+//                    if(((CreateGroupResp) resp).getCode()==200){
+//                        listener.onCreate(((CreateGroupResp) resp).getCode(),info.GroupId,resp.getMessage());
+//                    }else{
+//                        listener.onCreate(((CreateGroupResp) resp).getCode(),null,resp.getMessage());
+//                    }
+//                }
+//            }
+//        });
+//    }
     /**
      * 更改群信息
      */
-    public void updateGroup(String groupId,String name,final YzGroupDataListener listener){
-        CreateGroupReq createGroupReq = new CreateGroupReq();
-        createGroupReq.Name = name;
-        createGroupReq.GroupId = groupId;
-        Yz.getSession().updateGroupName(createGroupReq, new OnResultDataListener() {
-            @Override
-            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
-                if(listener==null){
-                    return;
-                }
-                if(resp instanceof CreateGroupResp){
-                    listener.update(((CreateGroupResp) resp).getCode(),resp.getMessage());
-                }
-            }
-        });
-    }
+//    public void updateGroup(String groupId,String name,final YzGroupDataListener listener){
+//        CreateGroupReq createGroupReq = new CreateGroupReq();
+//        createGroupReq.Name = name;
+//        createGroupReq.GroupId = groupId;
+//        Yz.getSession().updateGroupName(createGroupReq, new OnResultDataListener() {
+//            @Override
+//            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
+//                if(listener==null){
+//                    return;
+//                }
+//                if(resp instanceof CreateGroupResp){
+//                    listener.update(((CreateGroupResp) resp).getCode(),resp.getMessage());
+//                }
+//            }
+//        });
+//    }
     /**
      * 添加群成员
      */
-    public void addGroupMember(String groupId,List<String> member,final YzGroupDataListener listener){
-        CreateGroupReq createGroupReq = new CreateGroupReq();
-        createGroupReq.GroupId = groupId;
-        if(member!=null && member.size()>0){
-            List<OpenGroupMember> members = new ArrayList<>();
-            for (String s:member) {
-                OpenGroupMember openGroupMember = new OpenGroupMember();
-                openGroupMember.Member_Account = s;
-                members.add(openGroupMember);
-            }
-            createGroupReq.MemberList = members;
-        }
-        Yz.getSession().addGroupUser(createGroupReq, new OnResultDataListener() {
-            @Override
-            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
-                if(listener==null){
-                    return;
-                }
-                if(resp instanceof GroupMemberResp){
-                    listener.addMember(((GroupMemberResp) resp).getCode(),((GroupMemberResp) resp).getData());
-                }
-            }
-        });
-    }
+//    public void addGroupMember(String groupId,List<String> member,final YzGroupDataListener listener){
+//        CreateGroupReq createGroupReq = new CreateGroupReq();
+//        createGroupReq.GroupId = groupId;
+//        if(member!=null && member.size()>0){
+//            List<OpenGroupMember> members = new ArrayList<>();
+//            for (String s:member) {
+//                OpenGroupMember openGroupMember = new OpenGroupMember();
+//                openGroupMember.Member_Account = s;
+//                members.add(openGroupMember);
+//            }
+//            createGroupReq.MemberList = members;
+//        }
+//        Yz.getSession().addGroupUser(createGroupReq, new OnResultDataListener() {
+//            @Override
+//            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
+//                if(listener==null){
+//                    return;
+//                }
+//                if(resp instanceof GroupMemberResp){
+//                    listener.addMember(((GroupMemberResp) resp).getCode(),((GroupMemberResp) resp).getData());
+//                }
+//            }
+//        });
+//    }
     /**
      * 指定人退出
      */
-    public void deleteGroupMember(String groupId,List<String> member,final YzGroupDataListener listener){
-        CreateGroupReq createGroupReq = new CreateGroupReq();
-        createGroupReq.GroupId = groupId;
-        createGroupReq.MemberToDel_Account = member;
-        Yz.getSession().deleteGroupUser(createGroupReq, new OnResultDataListener() {
-            @Override
-            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
-                if(listener==null){
-                    return;
-                }
-                if(resp instanceof GroupMemberResp){
-                    listener.deleteMember(((GroupMemberResp) resp).getCode(),((GroupMemberResp) resp).getData());
-                }
-            }
-        });
-    }
+//    public void deleteGroupMember(String groupId,List<String> member,final YzGroupDataListener listener){
+//        CreateGroupReq createGroupReq = new CreateGroupReq();
+//        createGroupReq.GroupId = groupId;
+//        createGroupReq.MemberToDel_Account = member;
+//        Yz.getSession().deleteGroupUser(createGroupReq, new OnResultDataListener() {
+//            @Override
+//            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
+//                if(listener==null){
+//                    return;
+//                }
+//                if(resp instanceof GroupMemberResp){
+//                    listener.deleteMember(((GroupMemberResp) resp).getCode(),((GroupMemberResp) resp).getData());
+//                }
+//            }
+//        });
+//    }
     /**
      * 获取群申请信息
      */

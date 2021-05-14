@@ -129,21 +129,21 @@ public class Yz extends ApiClient {
     /**
      * 更改群昵称
      */
-    public void updateGroupName(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
-        requestPost(ModeApi.updateGroupName,createGroupReq,new CreateGroupResp(),onResultDataListener);
-    }
+//    public void updateGroupName(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
+//        requestPost(ModeApi.updateGroupName,createGroupReq,new CreateGroupResp(),onResultDataListener);
+//    }
     /**
      * 加入一个群
      */
-    public void addGroupUser(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
-        requestPost(ModeApi.addGroupUser,createGroupReq,new GroupMemberResp(),onResultDataListener);
-    }
+//    public void addGroupUser(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
+//        requestPost(ModeApi.addGroupUser,createGroupReq,new GroupMemberResp(),onResultDataListener);
+//    }
     /**
      * 移除群组的人员
      */
-    public void deleteGroupUser(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
-        requestPost(ModeApi.deleteGroupUser,createGroupReq,new GroupMemberResp(),onResultDataListener);
-    }
+//    public void deleteGroupUser(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
+//        requestPost(ModeApi.deleteGroupUser,createGroupReq,new GroupMemberResp(),onResultDataListener);
+//    }
     /**
      * 解散群组
      */
@@ -225,9 +225,9 @@ public class Yz extends ApiClient {
     /**
      * 发送指定消息
      */
-    public void sendMessage(SendMessageReq sendMessageReq,OnResultDataListener onResultDataListener){
-        requestPost(ModeApi.sendTextFormToMsg,sendMessageReq,new BaseResp(),onResultDataListener);
-    }
+//    public void sendMessage(SendMessageReq sendMessageReq,OnResultDataListener onResultDataListener){
+//        requestPost(ModeApi.sendTextFormToMsg,sendMessageReq,new BaseResp(),onResultDataListener);
+//    }
     /**
      * 全部群组
      */
