@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
-import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.mm.BaseQuickAdapter;
 import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.business.MorePopWindow;
@@ -24,7 +24,6 @@ import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.component.TitleBarLayout;
 import com.hlife.qcloud.tim.uikit.modules.group.apply.GroupApplyManagerActivity;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
-import com.work.util.SLog;
 import com.work.util.ToastUtil;
 
 import java.util.ArrayList;

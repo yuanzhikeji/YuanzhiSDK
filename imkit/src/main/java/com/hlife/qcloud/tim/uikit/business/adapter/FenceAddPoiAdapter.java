@@ -3,8 +3,8 @@ package com.hlife.qcloud.tim.uikit.business.adapter;
 import androidx.annotation.Nullable;
 
 import com.amap.api.services.help.Tip;
-import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.BaseViewHolder;
+import com.chad.library.adapter.mm.BaseQuickAdapter;
+import com.chad.library.adapter.mm.BaseViewHolder;
 import com.hlife.qcloud.tim.uikit.R;
 
 import java.util.List;

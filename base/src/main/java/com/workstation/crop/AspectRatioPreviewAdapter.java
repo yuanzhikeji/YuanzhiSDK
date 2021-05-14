@@ -2,8 +2,8 @@ package com.workstation.crop;
 
 import androidx.annotation.Nullable;
 
-import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.BaseViewHolder;
+import com.chad.library.adapter.mm.BaseQuickAdapter;
+import com.chad.library.adapter.mm.BaseViewHolder;
 import com.workstation.android.R;
 
 import java.util.List;

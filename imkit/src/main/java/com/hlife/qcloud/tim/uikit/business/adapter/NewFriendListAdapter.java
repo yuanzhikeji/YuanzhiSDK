@@ -10,8 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
-import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.BaseViewHolder;
+import com.chad.library.adapter.mm.BaseQuickAdapter;
+import com.chad.library.adapter.mm.BaseViewHolder;
 import com.hlife.qcloud.tim.uikit.component.picture.imageEngine.impl.GlideEngine;
 import com.tencent.imsdk.v2.V2TIMFriendApplication;
 import com.tencent.imsdk.v2.V2TIMFriendOperationResult;

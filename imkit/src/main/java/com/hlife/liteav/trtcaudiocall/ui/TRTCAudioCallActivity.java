@@ -22,7 +22,7 @@ import androidx.constraintlayout.widget.Group;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.chad.library.adapter.base.divider.HorizontalDividerItemDecoration;
+import com.chad.library.adapter.mm.divider.HorizontalDividerItemDecoration;
 import com.hlife.liteav.model.IntentParams;
 import com.hlife.liteav.trtcaudiocall.ui.audiolayout.TRTCAudioCallAdapter;
 import com.hlife.qcloud.tim.uikit.R;

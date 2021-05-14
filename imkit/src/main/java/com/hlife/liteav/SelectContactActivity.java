@@ -21,7 +21,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.chad.library.adapter.base.divider.HorizontalDividerItemDecoration;
+import com.chad.library.adapter.mm.divider.HorizontalDividerItemDecoration;
 import com.google.android.flexbox.FlexboxItemDecoration;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.hlife.liteav.login.ProfileManager;

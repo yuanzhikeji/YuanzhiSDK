@@ -7,8 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.PopupWindow;
 
-import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.divider.HorizontalDividerItemDecoration;
+import com.chad.library.adapter.mm.BaseQuickAdapter;
+import com.chad.library.adapter.mm.divider.HorizontalDividerItemDecoration;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.business.adapter.MorePopWindowAdapter;
 import com.work.util.SizeUtils;
