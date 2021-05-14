@@ -12,8 +12,8 @@ import android.widget.EditText;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.chad.library.adapter.mm.BaseQuickAdapter;
-import com.chad.library.adapter.mm.divider.HorizontalDividerItemDecoration;
+import com.yzcm.library.adapter.mm.BaseQuickAdapter;
+import com.yzcm.library.adapter.mm.divider.HorizontalDividerItemDecoration;
 import com.http.network.model.RequestWork;
 import com.http.network.model.ResponseWork;
 import com.hlife.qcloud.tim.uikit.R;

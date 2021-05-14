@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
-import com.chad.library.adapter.mm.BaseQuickAdapter;
+import com.yzcm.library.adapter.mm.BaseQuickAdapter;
 import com.jaeger.library.StatusBarUtil;
 import com.work.util.ToastUtil;
 import com.workstation.android.BaseHomeActivity;

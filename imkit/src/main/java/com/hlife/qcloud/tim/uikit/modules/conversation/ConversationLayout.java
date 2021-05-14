@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
-import com.chad.library.adapter.mm.BaseQuickAdapter;
+import com.yzcm.library.adapter.mm.BaseQuickAdapter;
 import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.business.MorePopWindow;

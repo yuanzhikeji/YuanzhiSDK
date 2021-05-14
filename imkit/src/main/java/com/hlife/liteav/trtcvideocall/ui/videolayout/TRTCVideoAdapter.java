@@ -6,8 +6,8 @@ import android.widget.FrameLayout;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 
-import com.chad.library.adapter.mm.BaseQuickAdapter;
-import com.chad.library.adapter.mm.BaseViewHolder;
+import com.yzcm.library.adapter.mm.BaseQuickAdapter;
+import com.yzcm.library.adapter.mm.BaseViewHolder;
 import com.hlife.liteav.login.UserModel;
 import com.hlife.liteav.model.ITRTCAVCall;
 import com.hlife.qcloud.tim.uikit.R;
