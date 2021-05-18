@@ -8,7 +8,6 @@ import com.work.api.open.contacts.ModeApi;
 import com.work.api.open.model.AddApplyStaticsReq;
 import com.work.api.open.model.GetImageConfigResp;
 import com.work.api.open.model.GetTenantGroupListReq;
-import com.work.api.open.model.GroupMemberResp;
 import com.work.api.open.model.BaseReq;
 import com.work.api.open.model.BaseResp;
 import com.work.api.open.model.CheckToolTokenReq;

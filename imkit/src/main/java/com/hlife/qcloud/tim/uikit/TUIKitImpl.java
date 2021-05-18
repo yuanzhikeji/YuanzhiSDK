@@ -216,7 +216,6 @@ public class TUIKitImpl {
 
             @Override
             public void onConversationChanged(List<V2TIMConversation> conversationList) {
-                SLog.e("impl onConversationChanged");
                 ConversationManagerKit.getInstance().onRefreshConversation(conversationList);
                 for (IMEventListener listener : sIMEventListeners) {
                     listener.onRefreshConversation(conversationList);

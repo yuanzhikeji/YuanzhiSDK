@@ -36,7 +36,7 @@ public class MwClientApplication extends MultiDexApplication {
         onChannel();
         MultiDex.install(this);
 
-        YzIMKitAgent.init(this,"de241446a50499bb77a8684cf610fd04");
+        YzIMKitAgent.init(this,"39edb4277058450f0eb6c8b1bddfbd00");
         //账号被踢出，或者失效
         YzIMKitAgent.instance().addStatusListener(new YzStatusListener() {
             @Override

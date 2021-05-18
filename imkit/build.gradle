@@ -60,7 +60,7 @@ dependencies {
 //    implementation 'com.tencent.liteav:LiteAVSDK_TRTC:8.2.9809'
     api 'com.tencent.liteav:LiteAVSDK_Professional:8.3.9882'
     //im
-    api 'com.tencent.imsdk:imsdk:5.1.10'
+    api 'com.tencent.imsdk:imsdk:5.1.56'
 
     //底部菜单选项
     implementation 'com.ashokvarma.android:bottom-navigation-bar:2.2.0'

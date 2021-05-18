@@ -9,6 +9,7 @@ import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
+import com.hlife.qcloud.tim.uikit.business.inter.YzStatusListener;
 import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
@@ -56,9 +57,15 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
         findViewById(R.id.join_group).setOnClickListener(this);
         findViewById(R.id.send_message).setOnClickListener(this);
         SysUserReq sysUserReq = new SysUserReq();
-        sysUserReq.setNickName("试试2233");
-        YzIMKitAgent.instance().register(sysUserReq,null);
-        this.groupApplicationList();
+        sysUserReq.setUserId(UserApi.instance().getUserId());
+        sysUserReq.setNickName(UserApi.instance().getNickName());
+        YzIMKitAgent.instance().register(sysUserReq, new YzStatusListener() {
+            @Override
+            public void loginSuccess(Object data) {
+                super.loginSuccess(data);
+                groupApplicationList();
+            }
+        });
         Yz.getSession().getTenantGroupList(new GetTenantGroupListReq(),this);
     }
 
@@ -156,7 +163,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
 
     @Override
     public void updateJoinGroup() {
-        this.groupApplicationList();
+//        this.groupApplicationList();
     }
 
     @Override
@@ -202,39 +209,39 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
             case R.id.create_group:
                 List<String> s = new ArrayList<>();
                 s.add("4624e6e2fd351a0eeaee47490997258e");
-//                YzIMKitAgent.instance().createPublicGroup(UserApi.instance().getUserId(), "这是一个公开群",s, new YzGroupDataListener() {
-//                    @Override
-//                    public void onCreate(int code, String groupId, String msg) {
-//                        if(code==200){
-//                            SLog.e("发送一个消息过去。。。");
-//                            ChatInfo chatInfo = new ChatInfo();
-//                            chatInfo.setId(groupId);
-//                            chatInfo.setChatName("这是一个公开群");
-//                            chatInfo.setGroup(true);
-//                            YzIMKitAgent.instance().startCustomMessage(chatInfo,"这是自己定义的消息内容");
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void update(int code, String msg) {
-//
-//                    }
-//
-//                    @Override
-//                    public void addMember(int code, String msg) {
-//
-//                    }
-//
-//                    @Override
-//                    public void deleteMember(int code, String msg) {
-//
-//                    }
-//
-//                    @Override
-//                    public void joinMember(List<GroupApplyInfo> applies) {
-//
-//                    }
-//                });
+                YzIMKitAgent.instance().createPublicGroup(UserApi.instance().getUserId(), "这是一个公开群",s, new YzGroupDataListener() {
+                    @Override
+                    public void onCreate(int code, String groupId, String msg) {
+                        if(code==200){
+                            SLog.e("发送一个消息过去。。。");
+                            ChatInfo chatInfo = new ChatInfo();
+                            chatInfo.setId(groupId);
+                            chatInfo.setChatName("这是一个公开群");
+                            chatInfo.setGroup(true);
+                            YzIMKitAgent.instance().startCustomMessage(chatInfo,"这是自己定义的消息内容");
+                        }
+                    }
+
+                    @Override
+                    public void update(int code, String msg) {
+
+                    }
+
+                    @Override
+                    public void addMember(int code, String msg) {
+
+                    }
+
+                    @Override
+                    public void deleteMember(int code, String msg) {
+
+                    }
+
+                    @Override
+                    public void joinMember(List<GroupApplyInfo> applies) {
+
+                    }
+                });
                 break;
             case R.id.update_group_name:
 //                YzIMKitAgent.instance().updateGroup("@TGS#242ILVEH4", "我改群名字", new YzGroupDataListener() {

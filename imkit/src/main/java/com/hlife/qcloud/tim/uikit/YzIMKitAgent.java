@@ -337,36 +337,36 @@ public final class YzIMKitAgent {
     /**
      * 群相关
      */
-//    public void createPublicGroup(String userId, String name, List<String> member, final YzGroupDataListener listener){
-//        CreateGroupReq createGroupReq = new CreateGroupReq();
-//        createGroupReq.Owner_Account = userId;
-//        createGroupReq.Name = name;
-//        if(member!=null && member.size()>0){
-//            List<OpenGroupMember> members = new ArrayList<>();
-//            for (String s:member) {
-//                OpenGroupMember openGroupMember = new OpenGroupMember();
-//                openGroupMember.Member_Account = s;
-//                members.add(openGroupMember);
-//            }
-//            createGroupReq.MemberList = members;
-//        }
-//        Yz.getSession().createGroup(createGroupReq, new OnResultDataListener() {
-//            @Override
-//            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
-//                if(listener==null){
-//                    return;
-//                }
-//                if(resp instanceof CreateGroupResp){
-//                    OpenGroupInfo info = ((CreateGroupResp) resp).getData();
-//                    if(((CreateGroupResp) resp).getCode()==200){
-//                        listener.onCreate(((CreateGroupResp) resp).getCode(),info.GroupId,resp.getMessage());
-//                    }else{
-//                        listener.onCreate(((CreateGroupResp) resp).getCode(),null,resp.getMessage());
-//                    }
-//                }
-//            }
-//        });
-//    }
+    public void createPublicGroup(String userId, String name, List<String> member, final YzGroupDataListener listener){
+        CreateGroupReq createGroupReq = new CreateGroupReq();
+        createGroupReq.Owner_Account = userId;
+        createGroupReq.Name = name;
+        if(member!=null && member.size()>0){
+            List<OpenGroupMember> members = new ArrayList<>();
+            for (String s:member) {
+                OpenGroupMember openGroupMember = new OpenGroupMember();
+                openGroupMember.Member_Account = s;
+                members.add(openGroupMember);
+            }
+            createGroupReq.MemberList = members;
+        }
+        Yz.getSession().createGroup(createGroupReq, new OnResultDataListener() {
+            @Override
+            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
+                if(listener==null){
+                    return;
+                }
+                if(resp instanceof CreateGroupResp){
+                    OpenGroupInfo info = ((CreateGroupResp) resp).getData();
+                    if(((CreateGroupResp) resp).getCode()==200){
+                        listener.onCreate(((CreateGroupResp) resp).getCode(),info.GroupId,resp.getMessage());
+                    }else{
+                        listener.onCreate(((CreateGroupResp) resp).getCode(),null,resp.getMessage());
+                    }
+                }
+            }
+        });
+    }
     /**
      * 更改群信息
      */

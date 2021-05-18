@@ -12,6 +12,15 @@ public class ChatViewConfig implements Serializable {
     private boolean disableVideoCall = true;//禁用发实时视频
     private boolean disableChatInput;//禁用聊天面板全部功能
     private boolean isCustomAtGroupMember;//是否开启自定义消息类型
+    private boolean isShowTitle = true;//是否显示聊天的title
+
+    public void setShowTitle(boolean showTitle) {
+        isShowTitle = showTitle;
+    }
+
+    public boolean isShowTitle() {
+        return isShowTitle;
+    }
 
     public void setCustomAtGroupMember(boolean customAtGroupMember) {
         isCustomAtGroupMember = customAtGroupMember;

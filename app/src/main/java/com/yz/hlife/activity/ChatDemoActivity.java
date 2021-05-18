@@ -47,6 +47,7 @@ public class ChatDemoActivity extends BaseActivity implements ConversationListLa
             chatViewConfig.setDisableVideoCall(false);
             chatViewConfig.setDisableAudioCall(false);
             chatViewConfig.setCustomAtGroupMember(true);
+            chatViewConfig.setShowTitle(false);
             View sendCustom = findViewById(R.id.send_custom);
             sendCustom.setVisibility(View.VISIBLE);
             sendCustom.setOnClickListener(new View.OnClickListener() {

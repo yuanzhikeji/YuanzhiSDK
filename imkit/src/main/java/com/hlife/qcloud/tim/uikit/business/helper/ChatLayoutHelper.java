@@ -180,6 +180,7 @@ public class ChatLayoutHelper {
 //            }
 //        });
 //        inputLayout.addAction(unit);
+        layout.getTitleBar().setVisibility(config.isShowTitle()?View.VISIBLE:View.GONE);
     }
 
     public static class CustomInputFragment extends BaseInputFragment {

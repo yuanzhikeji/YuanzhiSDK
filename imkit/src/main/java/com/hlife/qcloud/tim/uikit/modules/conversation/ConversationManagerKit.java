@@ -65,7 +65,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
 
     private void init() {
         MessageRevokedManager.getInstance().addHandler(this);
-        this.groupApplicationList(null);
+//        this.groupApplicationList(null);
     }
 
     public void loadConversation(long nextSeq, final YzChatType type, final YzConversationDataListener callBack) {
@@ -190,32 +190,33 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
             mProvider = new ConversationProvider();
         }
         mUnreadTotal = 0;
-        this.groupApplicationList(new YzGroupDataListener() {
-            @Override
-            public void onCreate(int code, String groupId, String msg) {
-
-            }
-
-            @Override
-            public void update(int code, String msg) {
-
-            }
-
-            @Override
-            public void addMember(int code, String msg) {
-
-            }
-
-            @Override
-            public void deleteMember(int code, String msg) {
-
-            }
-
-            @Override
-            public void joinMember(List<GroupApplyInfo> applies) {
-                allConversation(0, new ArrayList<>(),callBack);
-            }
-        });
+        allConversation(0, new ArrayList<>(),callBack);
+//        this.groupApplicationList(new YzGroupDataListener() {
+//            @Override
+//            public void onCreate(int code, String groupId, String msg) {
+//
+//            }
+//
+//            @Override
+//            public void update(int code, String msg) {
+//
+//            }
+//
+//            @Override
+//            public void addMember(int code, String msg) {
+//
+//            }
+//
+//            @Override
+//            public void deleteMember(int code, String msg) {
+//
+//            }
+//
+//            @Override
+//            public void joinMember(List<GroupApplyInfo> applies) {
+//                allConversation(0, new ArrayList<>(),callBack);
+//            }
+//        });
     }
 
     private void allConversation(long nextSeq,final ArrayList<ConversationInfo> dataArray,final IUIKitCallBack callBack){
@@ -291,7 +292,6 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         ArrayList<ConversationInfo> infos = new ArrayList<>();
         for (int i = 0; i < v2TIMConversationList.size(); i++) {
             V2TIMConversation v2TIMConversation = v2TIMConversationList.get(i);
-            SLog.v( "refreshConversation v2TIMConversation " + v2TIMConversation.getShowName());
             ConversationInfo conversationInfo = TIMConversation2ConversationInfo(v2TIMConversation);
             if (conversationInfo != null && !V2TIMManager.GROUP_TYPE_AVCHATROOM.equals(v2TIMConversation.getGroupType())) {
                 infos.add(conversationInfo);
@@ -485,6 +485,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         });
     }
 
+
     public void groupApplicationList(YzGroupDataListener listener){
         V2TIMManager.getGroupManager().getGroupApplicationList(new V2TIMValueCallback<V2TIMGroupApplicationResult>() {
             @Override
@@ -494,7 +495,6 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
                     return;
                 }
                 listener.joinMember(new ArrayList<>());
-
             }
 
             @Override
