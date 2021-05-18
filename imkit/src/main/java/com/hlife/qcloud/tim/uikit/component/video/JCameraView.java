@@ -28,7 +28,6 @@ import com.hlife.qcloud.tim.uikit.component.video.listener.TypeListener;
 import com.hlife.qcloud.tim.uikit.component.video.state.CameraMachine;
 import com.hlife.qcloud.tim.uikit.utils.FileUtil;
 import com.hlife.qcloud.tim.uikit.utils.ScreenUtil;
-import com.hlife.qcloud.tim.uikit.utils.TUIKitLog;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.component.video.view.CameraView;
 
@@ -128,7 +127,6 @@ public class JCameraView extends FrameLayout implements CameraInterface.CameraOp
         layout_width = ScreenUtil.getScreenWidth(mContext);
         //缩放梯度
         zoomGradient = (int) (layout_width / 16f);
-        TUIKitLog.i(TAG, "zoom = " + zoomGradient);
         machine = new CameraMachine(getContext(), this, this);
     }
 
@@ -186,7 +184,6 @@ public class JCameraView extends FrameLayout implements CameraInterface.CameraOp
 
             @Override
             public void recordZoom(float zoom) {
-                TUIKitLog.i(TAG, "recordZoom");
                 machine.zoom(zoom, CameraInterface.TYPE_RECORDER);
             }
 
@@ -253,7 +250,6 @@ public class JCameraView extends FrameLayout implements CameraInterface.CameraOp
 
     //生命周期onResume
     public void onResume() {
-        TUIKitLog.i(TAG, "JCameraView onResume");
         resetState(TYPE_DEFAULT); //重置状态
         CameraInterface.getInstance().registerSensorManager(mContext);
         machine.start(mVideoView.getHolder(), screenProp);
@@ -261,7 +257,6 @@ public class JCameraView extends FrameLayout implements CameraInterface.CameraOp
 
     //生命周期onPause
     public void onPause() {
-        TUIKitLog.i(TAG, "JCameraView onPause");
         stopVideo();
         resetState(TYPE_PICTURE);
         CameraInterface.getInstance().isPreview(false);
@@ -272,7 +267,6 @@ public class JCameraView extends FrameLayout implements CameraInterface.CameraOp
     //SurfaceView生命周期
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        TUIKitLog.i(TAG, "JCameraView SurfaceCreated");
         new Thread() {
             @Override
             public void run() {
@@ -287,7 +281,6 @@ public class JCameraView extends FrameLayout implements CameraInterface.CameraOp
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        TUIKitLog.i(TAG, "JCameraView SurfaceDestroyed");
         CameraInterface.getInstance().doDestroyCamera();
     }
 
@@ -300,7 +293,6 @@ public class JCameraView extends FrameLayout implements CameraInterface.CameraOp
                     setFocusViewWidthAnimation(event.getX(), event.getY());
                 }
                 if (event.getPointerCount() == 2) {
-                    TUIKitLog.i(TAG, "ACTION_DOWN = " + 2);
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -491,7 +483,6 @@ public class JCameraView extends FrameLayout implements CameraInterface.CameraOp
 
     @Override
     public void startPreviewCallback() {
-        TUIKitLog.i(TAG, "startPreviewCallback");
         handlerFoucs(mFoucsView.getWidth() / 2, mFoucsView.getHeight() / 2);
     }
 

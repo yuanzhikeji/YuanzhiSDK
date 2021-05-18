@@ -2,7 +2,6 @@ package com.hlife.liteav.login;
 
 import android.text.TextUtils;
 
-import com.hlife.qcloud.tim.uikit.utils.TUIKitLog;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.imsdk.v2.V2TIMUserFullInfo;
 import com.tencent.imsdk.v2.V2TIMValueCallback;
@@ -81,7 +80,6 @@ public class ProfileManager {
             @Override
             public void onSuccess(List<V2TIMUserFullInfo> v2TIMUserFullInfos) {
                 if (v2TIMUserFullInfos == null || v2TIMUserFullInfos.size() == 0) {
-                    TUIKitLog.e(TAG, "getUserInfoByUserId failed, v2TIMUserFullInfos is empty");
                     return;
                 }
                 V2TIMUserFullInfo userFullInfo = v2TIMUserFullInfos.get(0);
@@ -112,7 +110,6 @@ public class ProfileManager {
             @Override
             public void onSuccess(List<V2TIMUserFullInfo> v2TIMUserFullInfos) {
                 if (v2TIMUserFullInfos == null || v2TIMUserFullInfos.size() == 0) {
-                    TUIKitLog.e(TAG, "getUserInfoBatch failed, v2TIMUserFullInfos is empty");
                     return;
                 }
                 List<UserModel> userModelList = new ArrayList<>();

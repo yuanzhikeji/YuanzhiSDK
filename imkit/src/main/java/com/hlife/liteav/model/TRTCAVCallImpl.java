@@ -12,7 +12,6 @@ import com.hlife.qcloud.tim.uikit.modules.chat.base.OfflineMessageContainerBean;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageCustom;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 import com.tencent.imsdk.BaseConstants;
-import com.tencent.imsdk.TIMManager;
 import com.tencent.imsdk.v2.V2TIMCallback;
 import com.tencent.imsdk.v2.V2TIMConversation;
 import com.tencent.imsdk.v2.V2TIMManager;
@@ -491,12 +490,12 @@ public class TRTCAVCallImpl implements ITRTCAVCall {
         }
         mSdkAppId = sdkAppId;
         //1. 未初始化 IM 先初始化 IM
-        if (!TIMManager.getInstance().isInited()) {
-            if (callback != null) {
-                callback.onError(BaseConstants.ERR_SDK_NOT_INITIALIZED,"not init im");
-            }
-            return;
-        }
+//        if (!TIMManager.getInstance().isInited()) {
+//            if (callback != null) {
+//                callback.onError(BaseConstants.ERR_SDK_NOT_INITIALIZED,"not init im");
+//            }
+//            return;
+//        }
         //2. 需要将监听器添加到IM上
         V2TIMManager.getSignalingManager().addSignalingListener(mTIMSignallingListener);
 

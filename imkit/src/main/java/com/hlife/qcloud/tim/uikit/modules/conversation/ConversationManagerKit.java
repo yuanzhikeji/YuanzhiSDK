@@ -190,33 +190,32 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
             mProvider = new ConversationProvider();
         }
         mUnreadTotal = 0;
-        allConversation(0, new ArrayList<>(),callBack);
-//        this.groupApplicationList(new YzGroupDataListener() {
-//            @Override
-//            public void onCreate(int code, String groupId, String msg) {
-//
-//            }
-//
-//            @Override
-//            public void update(int code, String msg) {
-//
-//            }
-//
-//            @Override
-//            public void addMember(int code, String msg) {
-//
-//            }
-//
-//            @Override
-//            public void deleteMember(int code, String msg) {
-//
-//            }
-//
-//            @Override
-//            public void joinMember(List<GroupApplyInfo> applies) {
-//                allConversation(0, new ArrayList<>(),callBack);
-//            }
-//        });
+        this.groupApplicationList(new YzGroupDataListener() {
+            @Override
+            public void onCreate(int code, String groupId, String msg) {
+
+            }
+
+            @Override
+            public void update(int code, String msg) {
+
+            }
+
+            @Override
+            public void addMember(int code, String msg) {
+
+            }
+
+            @Override
+            public void deleteMember(int code, String msg) {
+
+            }
+
+            @Override
+            public void joinMember(List<GroupApplyInfo> applies) {
+                allConversation(0, new ArrayList<>(),callBack);
+            }
+        });
     }
 
     private void allConversation(long nextSeq,final ArrayList<ConversationInfo> dataArray,final IUIKitCallBack callBack){
@@ -485,16 +484,15 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         });
     }
 
-
     public void groupApplicationList(YzGroupDataListener listener){
         V2TIMManager.getGroupManager().getGroupApplicationList(new V2TIMValueCallback<V2TIMGroupApplicationResult>() {
             @Override
             public void onError(int code, String desc) {
                 SLog.e(code+">"+desc);
-                if(listener==null){
-                    return;
-                }
-                listener.joinMember(new ArrayList<>());
+//                if(listener==null){
+//                    return;
+//                }
+//                listener.joinMember(new ArrayList<>());
             }
 
             @Override

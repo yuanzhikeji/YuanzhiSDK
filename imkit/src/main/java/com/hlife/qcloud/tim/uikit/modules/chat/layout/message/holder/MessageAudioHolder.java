@@ -21,7 +21,6 @@ import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.component.AudioPlayer;
 import com.hlife.qcloud.tim.uikit.utils.ScreenUtil;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
-import com.hlife.qcloud.tim.uikit.utils.TUIKitLog;
 import com.hlife.qcloud.tim.uikit.utils.ToastUtil;
 
 import java.io.File;
@@ -154,12 +153,10 @@ public class MessageAudioHolder extends MessageContentHolder {
             soundElemEle.downloadSound(path, new V2TIMDownloadCallback() {
                 @Override
                 public void onProgress(V2TIMElem.V2ProgressInfo progressInfo) {
-                    TUIKitLog.i("downloadSound progress current:", progressInfo.getCurrentSize() + ", total:" + progressInfo.getTotalSize());
                 }
 
                 @Override
                 public void onError(int code, String desc) {
-                    TUIKitLog.e("getSoundToFile failed code = ", code + ", info = " + desc);
                 }
 
                 @Override

@@ -8,7 +8,6 @@ import android.text.TextUtils;
 
 import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
-import com.hlife.qcloud.tim.uikit.utils.TUIKitLog;
 import com.hlife.qcloud.tim.uikit.utils.ToastUtil;
 
 
@@ -60,7 +59,6 @@ public class AudioPlayer {
                 }
             }, TUIKit.getConfigs().getGeneralConfig().getAudioRecordMaxTime() * 1000);
         } catch (Exception e) {
-            TUIKitLog.w(TAG, "startRecord failed", e);
             stopInternalRecord();
             onRecordCompleted(false);
         }
@@ -97,7 +95,6 @@ public class AudioPlayer {
             mPlayer.prepare();
             mPlayer.start();
         } catch (Exception e) {
-            TUIKitLog.w(TAG, "startPlay failed", e);
             ToastUtil.toastLongMessage("语音文件已损坏或不存在");
             stopInternalPlay();
             onPlayCompleted(false);
@@ -161,7 +158,6 @@ public class AudioPlayer {
                 duration = duration + MAGIC_NUMBER;
             }
         } catch (Exception e) {
-            TUIKitLog.w(TAG, "getDuration failed", e);
         }
         if (duration < 0) {
             duration = 0;

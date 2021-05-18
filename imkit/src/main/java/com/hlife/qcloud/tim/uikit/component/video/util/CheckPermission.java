@@ -5,8 +5,6 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 
-import com.hlife.qcloud.tim.uikit.utils.TUIKitLog;
-
 public class CheckPermission {
 
     public static final int STATE_RECORDING = -1;
@@ -43,7 +41,6 @@ public class CheckPermission {
                 audioRecord.stop();
                 audioRecord.release();
                 audioRecord = null;
-                TUIKitLog.i(TAG, "录音机被占用");
             }
             return STATE_RECORDING;
         } else {
@@ -59,7 +56,6 @@ public class CheckPermission {
                     audioRecord = null;
 
                 }
-                TUIKitLog.i(TAG, "录音的结果为空");
                 return STATE_NO_PERMISSION;
 
             } else {

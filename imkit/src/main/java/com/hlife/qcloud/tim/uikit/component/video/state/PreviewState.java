@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
-import com.hlife.qcloud.tim.uikit.utils.TUIKitLog;
 import com.hlife.qcloud.tim.uikit.component.video.CameraInterface;
 import com.hlife.qcloud.tim.uikit.component.video.JCameraView;
 
@@ -33,7 +32,6 @@ class PreviewState implements State {
 
     @Override
     public void foucs(float x, float y, CameraInterface.FocusCallback callback) {
-        TUIKitLog.i(TAG, "preview state foucs");
         if (machine.getView().handlerFoucs(x, y)) {
             CameraInterface.getInstance().handleFocus(machine.getContext(), x, y, callback);
         }
@@ -56,7 +54,6 @@ class PreviewState implements State {
             public void captureResult(Bitmap bitmap, boolean isVertical) {
                 machine.getView().showPicture(bitmap, isVertical);
                 machine.setState(machine.getBorrowPictureState());
-                TUIKitLog.i(TAG, "capture");
             }
         });
     }
@@ -83,17 +80,14 @@ class PreviewState implements State {
 
     @Override
     public void cancle(SurfaceHolder holder, float screenProp) {
-        TUIKitLog.i(TAG, "浏览状态下,没有 cancle 事件");
     }
 
     @Override
     public void confirm() {
-        TUIKitLog.i(TAG, "浏览状态下,没有 confirm 事件");
     }
 
     @Override
     public void zoom(float zoom, int type) {
-        TUIKitLog.i(TAG, "zoom");
         CameraInterface.getInstance().setZoom(zoom, type);
     }
 

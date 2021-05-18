@@ -29,7 +29,6 @@ import com.hlife.qcloud.tim.uikit.component.video.util.DeviceUtil;
 import com.hlife.qcloud.tim.uikit.utils.FileUtil;
 import com.hlife.qcloud.tim.uikit.utils.ScreenUtil;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
-import com.hlife.qcloud.tim.uikit.utils.TUIKitLog;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -255,7 +254,6 @@ public class CameraInterface implements Camera.PreviewCallback {
                     mParams.setZoom(nowScaleRate);
                     mCamera.setParameters(mParams);
                 }
-                TUIKitLog.i(TAG, "setZoom = " + nowScaleRate);
                 break;
         }
 
@@ -315,7 +313,6 @@ public class CameraInterface implements Camera.PreviewCallback {
                 this.mCamera.enableShutterSound(false);
             } catch (Exception e) {
                 e.printStackTrace();
-                TUIKitLog.e(TAG, "enable shutter sound faild");
             }
         }
     }
@@ -327,7 +324,6 @@ public class CameraInterface implements Camera.PreviewCallback {
             SELECTED_CAMERA = CAMERA_POST_POSITION;
         }
         doDestroyCamera();
-        TUIKitLog.i(TAG, "open start");
         openCamera(SELECTED_CAMERA);
 //        mCamera = Camera.open();
         if (Build.VERSION.SDK_INT > 17 && this.mCamera != null) {
@@ -337,7 +333,6 @@ public class CameraInterface implements Camera.PreviewCallback {
                 e.printStackTrace();
             }
         }
-        TUIKitLog.i(TAG, "open end");
         doStartPreview(holder, screenProp);
     }
 
@@ -345,9 +340,6 @@ public class CameraInterface implements Camera.PreviewCallback {
      * doStartPreview
      */
     public void doStartPreview(SurfaceHolder holder, float screenProp) {
-        if (isPreviewing) {
-            TUIKitLog.i(TAG, "doStartPreview isPreviewing");
-        }
         if (this.screenProp < 0) {
             this.screenProp = screenProp;
         }
@@ -387,7 +379,6 @@ public class CameraInterface implements Camera.PreviewCallback {
                 mCamera.setPreviewCallback(this); //每一帧回调
                 mCamera.startPreview();//启动浏览
                 isPreviewing = true;
-                TUIKitLog.i(TAG, "=== Start Preview ===");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -405,7 +396,6 @@ public class CameraInterface implements Camera.PreviewCallback {
                 //这句要在stopPreview后执行，不然会卡顿或者花屏
                 mCamera.setPreviewDisplay(null);
                 isPreviewing = false;
-                TUIKitLog.i(TAG, "=== Stop Preview ===");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -430,12 +420,9 @@ public class CameraInterface implements Camera.PreviewCallback {
                 mCamera.release();
                 mCamera = null;
 //                destroyCameraInterface();
-                TUIKitLog.i(TAG, "=== Destroy Camera ===");
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else {
-            TUIKitLog.i(TAG, "=== Camera  Null===");
         }
     }
 
@@ -452,7 +439,6 @@ public class CameraInterface implements Camera.PreviewCallback {
                 break;
         }
 //
-        TUIKitLog.i(TAG, angle + " = " + cameraAngle + " = " + nowAngle);
         mCamera.takePicture(null, null, new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
@@ -536,7 +522,6 @@ public class CameraInterface implements Camera.PreviewCallback {
             videoSize = CameraParamUtil.getInstance().getPreviewSize(mParams.getSupportedVideoSizes(), 600,
                     screenProp);
         }
-        TUIKitLog.i(TAG, "setVideoSize    width = " + videoSize.width + "height = " + videoSize.height);
         if (videoSize.width == videoSize.height) {
             mediaRecorder.setVideoSize(preview_width, preview_height);
         } else {
@@ -590,18 +575,16 @@ public class CameraInterface implements Camera.PreviewCallback {
             isRecorder = true;
         } catch (IllegalStateException e) {
             e.printStackTrace();
-            TUIKitLog.i(TAG, "startRecord IllegalStateException");
             if (this.errorLisenter != null) {
                 this.errorLisenter.onError();
             }
         } catch (IOException e) {
             e.printStackTrace();
-            TUIKitLog.i(TAG, "startRecord IOException");
             if (this.errorLisenter != null) {
                 this.errorLisenter.onError();
             }
         } catch (RuntimeException e) {
-            TUIKitLog.i(TAG, "startRecord RuntimeException");
+            e.printStackTrace();
         }
     }
 
@@ -667,7 +650,6 @@ public class CameraInterface implements Camera.PreviewCallback {
             focusAreas.add(new Camera.Area(focusRect, 800));
             params.setFocusAreas(focusAreas);
         } else {
-            TUIKitLog.i(TAG, "focus areas not supported");
             callback.focusSuccess();
             return;
         }
@@ -691,7 +673,7 @@ public class CameraInterface implements Camera.PreviewCallback {
                 }
             });
         } catch (Exception e) {
-            TUIKitLog.e(TAG, "autoFocus failer");
+            e.printStackTrace();
         }
     }
 

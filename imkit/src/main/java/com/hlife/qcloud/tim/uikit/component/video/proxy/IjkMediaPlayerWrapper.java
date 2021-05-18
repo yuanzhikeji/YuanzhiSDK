@@ -6,8 +6,6 @@ import android.text.TextUtils;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
-import com.hlife.qcloud.tim.uikit.utils.TUIKitLog;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -24,7 +22,7 @@ public class IjkMediaPlayerWrapper implements IPlayer {
             mMediaPlayerClass = Class.forName("tv.danmaku.ijk.media.player.IjkMediaPlayer");
             mMediaPlayerInstance = mMediaPlayerClass.newInstance();
         } catch (Exception e) {
-            TUIKitLog.i(TAG, "no IjkMediaPlayer: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -130,7 +128,7 @@ public class IjkMediaPlayerWrapper implements IPlayer {
             Object result = methodInstance.invoke(mMediaPlayerInstance, args);
             return result;
         } catch (Exception e) {
-            TUIKitLog.e(TAG, "invoke failed: " + methodName + " error: " + e.getCause());
+            e.printStackTrace();
         }
         return null;
     }
@@ -147,7 +145,7 @@ public class IjkMediaPlayerWrapper implements IPlayer {
             );
             method.invoke(mMediaPlayerInstance, listenerInstance);
         } catch (Exception e) {
-            TUIKitLog.e(TAG, methodName + " failed: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -165,13 +163,8 @@ public class IjkMediaPlayerWrapper implements IPlayer {
                 return false;
             }
             if (mListener instanceof OnInfoListener && TextUtils.equals("onInfo", method.getName())) {
-                if ((int) args[1] == 10001) {
-                    TUIKitLog.i(TAG, "IMediaPlayer.MEDIA_INFO_VIDEO_ROTATION_CHANGED");
-                }
                 ((OnInfoListener) mListener).onInfo(IjkMediaPlayerWrapper.this, (int) args[1], (int) args[2]);
             } else if (mListener instanceof OnVideoSizeChangedListener && TextUtils.equals("onVideoSizeChanged", method.getName())) {
-                TUIKitLog.i(TAG, "width: " + args[1] + " height: " + args[2]
-                        + " sarNum: " + args[3] + " sarDen: " + args[4]);
                 ((OnVideoSizeChangedListener) mListener).onVideoSizeChanged(IjkMediaPlayerWrapper.this, (int) args[1], (int) args[2]);
             } else if (mListener instanceof OnCompletionListener && TextUtils.equals("onCompletion", method.getName())) {
                 ((OnCompletionListener) mListener).onCompletion(IjkMediaPlayerWrapper.this);

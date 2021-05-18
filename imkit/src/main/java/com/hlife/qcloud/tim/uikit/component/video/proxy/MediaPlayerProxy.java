@@ -5,8 +5,6 @@ import android.net.Uri;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
-import com.hlife.qcloud.tim.uikit.utils.TUIKitLog;
-
 import java.io.IOException;
 
 public class MediaPlayerProxy implements IPlayer {
@@ -22,7 +20,6 @@ public class MediaPlayerProxy implements IPlayer {
         } catch (Exception e) {
             mMediaPlayer = new SystemMediaPlayerWrapper();
         }
-        TUIKitLog.i(TAG, "use mMediaPlayer: " + mMediaPlayer);
     }
 
     @Override

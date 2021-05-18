@@ -18,7 +18,6 @@ public class PermissionUtils {
     private static AlertDialog mPermissionDialog;
 
     public static boolean checkPermission(Context context, String permission) {
-        TUIKitLog.i(TAG, "checkPermission permission:" + permission + "|sdk:" + Build.VERSION.SDK_INT);
         boolean flag = true;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int result = ActivityCompat.checkSelfPermission(context, permission);

@@ -176,8 +176,6 @@ public class NetWorkUtils {
             return null;
         }
 
-        TUIKitLog.v(TAG, "cmd result : " + result);
-
         // 对该行数据进行解析
         // 例如：eth0 Link encap:Ethernet HWaddr 00:16:E8:3E:DF:67
         if (result.length() > 0 && result.contains("HWaddr") == true) {

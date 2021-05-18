@@ -1,21 +1,15 @@
 package com.hlife.qcloud.tim.uikit.modules.message;
 
-import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Message;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
-import androidx.annotation.NonNull;
-
 import com.google.gson.Gson;
-import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.business.message.CustomFileMessage;
 import com.http.network.task.ObjectMapperFactory;
 import com.tencent.imsdk.v2.V2TIMCustomElem;
@@ -38,7 +32,6 @@ import com.hlife.qcloud.tim.uikit.utils.DateTimeUtil;
 import com.hlife.qcloud.tim.uikit.utils.FileUtil;
 import com.hlife.qcloud.tim.uikit.utils.ImageUtil;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
-import com.hlife.qcloud.tim.uikit.utils.TUIKitLog;
 import com.work.util.SLog;
 
 import java.io.File;
@@ -595,7 +588,6 @@ public class MessageInfoUtil {
             } else if (type == V2TIMMessage.V2TIM_ELEM_TYPE_FACE) {
                 V2TIMFaceElem faceElem = timMessage.getFaceElem();
                 if (faceElem.getIndex() < 1 || faceElem.getData() == null) {
-                    TUIKitLog.e("MessageInfoUtil", "faceElem data is null or index<1");
                     return null;
                 }
                 msgInfo.setExtra("[自定义表情]");
@@ -621,12 +613,10 @@ public class MessageInfoUtil {
                                 if (progress > 100) {
                                     progress = 100;
                                 }
-                                TUIKitLog.i("MessageInfoUtil getSoundToFile", "progress:" + progress);
                             }
 
                             @Override
                             public void onError(int code, String desc) {
-                                TUIKitLog.e("MessageInfoUtil getSoundToFile", code + ":" + desc);
                             }
 
                             @Override

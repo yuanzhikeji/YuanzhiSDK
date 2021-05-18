@@ -3,7 +3,6 @@ package com.hlife.qcloud.tim.uikit.component.video.state;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
-import com.hlife.qcloud.tim.uikit.utils.TUIKitLog;
 import com.hlife.qcloud.tim.uikit.component.video.CameraInterface;
 import com.hlife.qcloud.tim.uikit.component.video.JCameraView;
 
@@ -72,7 +71,6 @@ public class BorrowVideoState implements State {
 
     @Override
     public void zoom(float zoom, int type) {
-        TUIKitLog.i(TAG, "zoom");
     }
 
     @Override

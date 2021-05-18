@@ -5,8 +5,6 @@ import android.hardware.Camera;
 import android.view.Surface;
 import android.view.WindowManager;
 
-import com.hlife.qcloud.tim.uikit.utils.TUIKitLog;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -35,7 +33,6 @@ public class CameraParamUtil {
         int i = 0;
         for (Camera.Size s : list) {
             if ((s.width > th) && equalRate(s, rate)) {
-                TUIKitLog.i(TAG, "MakeSure Preview :w = " + s.width + " h = " + s.height);
                 break;
             }
             i++;
@@ -52,7 +49,6 @@ public class CameraParamUtil {
         int i = 0;
         for (Camera.Size s : list) {
             if ((s.width > th) && equalRate(s, rate)) {
-                TUIKitLog.i(TAG, "MakeSure Picture :w = " + s.width + " h = " + s.height);
                 break;
             }
             i++;
@@ -87,22 +83,18 @@ public class CameraParamUtil {
     public boolean isSupportedFocusMode(List<String> focusList, String focusMode) {
         for (int i = 0; i < focusList.size(); i++) {
             if (focusMode.equals(focusList.get(i))) {
-                TUIKitLog.i(TAG, "FocusMode supported " + focusMode);
                 return true;
             }
         }
-        TUIKitLog.i(TAG, "FocusMode not supported " + focusMode);
         return false;
     }
 
     public boolean isSupportedPictureFormats(List<Integer> supportedPictureFormats, int jpeg) {
         for (int i = 0; i < supportedPictureFormats.size(); i++) {
             if (jpeg == supportedPictureFormats.get(i)) {
-                TUIKitLog.i(TAG, "Formats supported " + jpeg);
                 return true;
             }
         }
-        TUIKitLog.i(TAG, "Formats not supported " + jpeg);
         return false;
     }
 

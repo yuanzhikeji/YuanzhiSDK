@@ -1,6 +1,5 @@
 package com.hlife.qcloud.tim.uikit.base;
 
-import com.hlife.qcloud.tim.uikit.utils.TUIKitLog;
 import com.tencent.imsdk.v2.V2TIMConversation;
 import com.tencent.imsdk.v2.V2TIMMessage;
 
@@ -11,27 +10,23 @@ import java.util.List;
  */
 
 public abstract class IMEventListener {
-    private final static String TAG = IMEventListener.class.getSimpleName();
 
     /**
      * 被踢下线时回调
      */
     public void onForceOffline() {
-        TUIKitLog.v(TAG, "onForceOffline");
     }
 
     /**
      * 用户票据过期
      */
     public void onUserSigExpired() {
-        TUIKitLog.v(TAG, "onUserSigExpired");
     }
 
     /**
      * 连接建立
      */
     public void onConnected() {
-        TUIKitLog.v(TAG, "onConnected");
     }
 
     /**
@@ -41,7 +36,6 @@ public abstract class IMEventListener {
      * @param desc 错误描述
      */
     public void onDisconnected(int code, String desc) {
-        TUIKitLog.v(TAG, "onDisconnected, code:" + code + "|desc:" + desc);
     }
 
     /**
@@ -50,7 +44,6 @@ public abstract class IMEventListener {
      * @param name wifi名称
      */
     public void onWifiNeedAuth(String name) {
-        TUIKitLog.v(TAG, "onWifiNeedAuth, wifi name:" + name);
     }
 
     /**
@@ -59,7 +52,6 @@ public abstract class IMEventListener {
      * @param conversations 需要刷新的会话列表
      */
     public void onRefreshConversation(List<V2TIMConversation> conversations) {
-        TUIKitLog.v(TAG, "onRefreshConversation, size:" + (conversations != null ? conversations.size() : 0));
     }
 
     /**
@@ -68,6 +60,5 @@ public abstract class IMEventListener {
      * @param v2TIMMessage 收到的新消息
      */
     public void onNewMessage(V2TIMMessage v2TIMMessage) {
-        TUIKitLog.v(TAG, "onNewMessage, msgID:" + (v2TIMMessage != null ? v2TIMMessage.getMsgID() : ""));
     }
 }
