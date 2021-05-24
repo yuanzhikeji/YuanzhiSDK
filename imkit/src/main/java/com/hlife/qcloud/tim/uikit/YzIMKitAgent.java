@@ -13,6 +13,7 @@ import com.hlife.qcloud.tim.uikit.business.active.SelectMessageActivity;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzMessageSendCallback;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.business.inter.YzStatusListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzWorkAppItemClickListener;
@@ -304,15 +305,43 @@ public final class YzIMKitAgent {
             }
         }
     }
-    public void sendCustomMessage(String customMessage){
+    public void sendCustomMessage(String customMessage, YzMessageSendCallback callback){
         MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
         C2CChatManagerKit c2CChatManagerKit = C2CChatManagerKit.getInstance();
         if(c2CChatManagerKit.getCurrentChatInfo()!=null){
-            c2CChatManagerKit.sendMessage(info,false,null);
+            c2CChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
         }else{
             GroupChatManagerKit groupChatManagerKit = GroupChatManagerKit.getInstance();
             if(groupChatManagerKit.getCurrentChatInfo()!=null){
-                groupChatManagerKit.sendMessage(info,false,null);
+                groupChatManagerKit.sendMessage(info,false,new IUIKitCallBack() {
+                    @Override
+                    public void onSuccess(Object data) {
+                        if(callback!=null){
+                            callback.success();
+                        }
+                    }
+
+                    @Override
+                    public void onError(String module, int errCode, String errMsg) {
+                        if(callback!=null){
+                            callback.error(errCode,errMsg);
+                        }
+                    }
+                });
             }
         }
     }

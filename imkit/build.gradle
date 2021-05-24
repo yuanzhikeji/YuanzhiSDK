@@ -60,13 +60,14 @@ dependencies {
 //    implementation 'com.tencent.liteav:LiteAVSDK_TRTC:8.2.9809'
     implementation 'com.tencent.liteav:LiteAVSDK_Professional:8.3.9882'
     //im
-    implementation 'com.tencent.imsdk:imsdk-smart:5.1.138'
+    api 'com.tencent.imsdk:imsdk-smart:5.1.138'
 
     //底部菜单选项
-    implementation 'com.ashokvarma.android:bottom-navigation-bar:2.2.0'
+    api 'com.ashokvarma.android:bottom-navigation-bar:2.2.0'
     //按钮
 //    api 'com.github.dmytrodanylyk.android-process-button:library:1.0.4'
     //x5 内核
+    implementation 'com.tencent.tbs.tbssdk:sdk:43939'
     //地图相关
     api 'com.amap.api:3dmap:7.8.0'
     api 'com.amap.api:location:4.7.2'

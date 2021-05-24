@@ -8,7 +8,7 @@ import java.io.Serializable;
  * 自定义消息的bean实体，用来与json的相互转化
  */
 public class CustomMessage implements Serializable {
-    private String businessID = IMKitConstants.BUSINESS_ID_CUSTOM_CARD;
+    private String businessID = "";
     private String title = "";
     private String desc = "";
     private String link = "";

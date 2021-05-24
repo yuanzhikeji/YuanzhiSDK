@@ -258,6 +258,10 @@ public class ChatLayoutHelper {
                         CustomFileMessage customFileMessage = ObjectMapperFactory.getObjectMapper().json2Model(elemStr,CustomFileMessage.class);
                         CustomIMUIController.onDrawFile(parent,customFileMessage);
                     }catch (Exception ignore){}
+                }else{
+                    if(customMessageDrawListener!=null){
+                        customMessageDrawListener.onDraw(parent,info);
+                    }
                 }
             } else {
                 if(customMessageDrawListener!=null){

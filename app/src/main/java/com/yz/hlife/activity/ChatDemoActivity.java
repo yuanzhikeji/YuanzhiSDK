@@ -14,6 +14,7 @@ import com.hlife.qcloud.tim.uikit.business.fragment.ConversationFragment;
 import com.hlife.qcloud.tim.uikit.business.helper.CustomIMUIController;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageClickListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzMessageSendCallback;
 import com.hlife.qcloud.tim.uikit.business.message.CustomMessage;
 import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
@@ -53,21 +54,36 @@ public class ChatDemoActivity extends BaseActivity implements ConversationListLa
             sendCustom.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    CustomMessage message = new CustomMessage();
-                    message.setBusinessID(IMKitConstants.BUSINESS_ID_CUSTOM_CARD);
-                    message.setLogo("https://yzkj-im.oss-cn-beijing.aliyuncs.com/user/16037885020911603788500745.png");
-                    message.setDesc("欢迎加入元讯大家庭！欢迎加入元讯大家庭！欢迎加入元讯大家庭！欢迎加入元讯大家庭！");
-                    message.setTitle("元讯IM生态工具元讯IM生态工具元讯IM生态工具元讯IM生态工具元讯IM生态工具");
-                    message.setLink("http://yzmsri.com/");
-                    message.setBusinessID(IMKitConstants.BUSINESS_ID_CUSTOM_CARD);
+//                    CustomMessage message = new CustomMessage();
+//                    message.setBusinessID(IMKitConstants.BUSINESS_ID_CUSTOM_CARD);
+//                    message.setLogo("https://yzkj-im.oss-cn-beijing.aliyuncs.com/user/16037885020911603788500745.png");
+//                    message.setDesc("欢迎加入元讯大家庭！欢迎加入元讯大家庭！欢迎加入元讯大家庭！欢迎加入元讯大家庭！");
+//                    message.setTitle("元讯IM生态工具元讯IM生态工具元讯IM生态工具元讯IM生态工具元讯IM生态工具");
+//                    message.setLink("http://yzmsri.com/");
+//                    message.setBusinessID(IMKitConstants.BUSINESS_ID_CUSTOM_CARD);
 
-                    YzIMKitAgent.instance().sendCustomMessage(new Gson().toJson(message));
+//                    String message = "{\"createTimeStr\":\"2021\",\"imgUrl\":\"https://gimg2.baidu.com/image_search/src\\u003dhttp%3A%2F%2Fimage.it168.com%2Fn%2F640x480%2F7%2F7480%2F7480107.jpg\\u0026refer\\u003dhttp%3A%2F%2Fimage.it168.com\\u0026app\\u003d2002\\u0026size\\u003df9999,10000\\u0026q\\u003da80\\u0026n\\u003d0\\u0026g\\u003d0n\\u0026fmt\\u003djpeg?sec\\u003d1624446455\\u0026t\\u003d182cb71002d7ad118b03bf47b63d2e16\",\"link\":\"http://wwww.baidu.com\",\"messageType\":\"0\",\"moneyText\":\"¥50\",\"orderNum\":\"订单号\",\"productName\":\"商品名称\"}";
+                    ProductInfoMessageForYJ productInfoMessageForYJ = new ProductInfoMessageForYJ();
+                    productInfoMessageForYJ.setImgUrl("https://gimg2.baidu.com/image_search/src\\u003dhttp%3A%2F%2Fimage.it168.com%2Fn%2F640x480%2F7%2F7480%2F7480107.jpg\\u0026refer\\u003dhttp%3A%2F%2Fimage.it168.com\\u0026app\\u003d2002\\u0026size\\u003df9999,10000\\u0026q\\u003da80\\u0026n\\u003d0\\u0026g\\u003d0n\\u0026fmt\\u003djpeg?sec\\u003d1624446455\\u0026t\\u003d182cb71002d7ad118b03bf47b63d2e16");
+                    productInfoMessageForYJ.setCreateTimeStr("2021");
+                    productInfoMessageForYJ.setProductName("商品名称");
+                    YzIMKitAgent.instance().sendCustomMessage(new Gson().toJson(productInfoMessageForYJ), new YzMessageSendCallback() {
+                        @Override
+                        public void success() {
+
+                        }
+
+                        @Override
+                        public void error(int code, String desc) {
+
+                        }
+                    });
                 }
             });
             ChatFragment chatFragment = ChatFragment.newChatFragment(chatInfo,chatViewConfig);
             chatFragment.setYzMessageClickListener(this);
             chatFragment.setYzCustomMessageDrawListener((parent, info) -> {
-                ToastUtil.info(ChatDemoActivity.this,"监听到自定义内容："+ info.getTimMessage().getCustomElem());
+                SLog.e("接收到自定义消息："+new String(info.getTimMessage().getCustomElem().getData()));
                 // 获取到自定义消息的json数据
                 if (info.getTimMessage().getElemType() != V2TIMMessage.V2TIM_ELEM_TYPE_CUSTOM) {
                     return;
