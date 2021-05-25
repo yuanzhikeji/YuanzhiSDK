@@ -12,6 +12,7 @@ import com.hlife.qcloud.tim.uikit.base.BaseActivity;
 import com.hlife.qcloud.tim.uikit.business.fragment.ChatFragment;
 import com.hlife.qcloud.tim.uikit.business.fragment.ConversationFragment;
 import com.hlife.qcloud.tim.uikit.business.helper.CustomIMUIController;
+import com.hlife.qcloud.tim.uikit.business.inter.YzChatMessageListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageClickListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageSendCallback;
@@ -82,6 +83,12 @@ public class ChatDemoActivity extends BaseActivity implements ConversationListLa
             });
             ChatFragment chatFragment = ChatFragment.newChatFragment(chatInfo,chatViewConfig);
             chatFragment.setYzMessageClickListener(this);
+            chatFragment.setYzChatMessageListener(new YzChatMessageListener() {
+                @Override
+                public void onChatSendMessageError(int code, String desc) {
+                    SLog.e("send fail>>"+code+">"+desc);
+                }
+            });
             chatFragment.setYzCustomMessageDrawListener((parent, info) -> {
                 SLog.e("接收到自定义消息："+new String(info.getTimMessage().getCustomElem().getData()));
                 // 获取到自定义消息的json数据

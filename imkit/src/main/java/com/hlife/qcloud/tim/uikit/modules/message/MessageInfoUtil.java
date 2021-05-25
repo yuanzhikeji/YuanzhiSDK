@@ -367,7 +367,7 @@ public class MessageInfoUtil {
                     // 忽略正在输入，它不能作为真正的消息展示
                     return null;
                 }
-                SLog.i( "message info util custom data:" + data);
+                if(SLog.debug)SLog.i( "message info util custom data:" + data);
                 String content = "[自定义消息]";
                 msgInfo.setMsgType(MessageInfo.MSG_TYPE_CUSTOM);
                 msgInfo.setExtra(content);

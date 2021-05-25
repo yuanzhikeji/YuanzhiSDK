@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.hlife.qcloud.tim.uikit.TUIKit;
+import com.hlife.qcloud.tim.uikit.business.inter.YzChatMessageListener;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
@@ -37,6 +38,7 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
     private boolean mIsLoading;
 
     private MessageInfo mLastMessageInfo;
+    private YzChatMessageListener mYzChatMessageListener;
 
     protected void init() {
         destroyChat();
@@ -57,6 +59,10 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
         mCurrentProvider = new ChatProvider();
         mIsMore = true;
         mIsLoading = false;
+    }
+
+    public void setYzChatMessageListener(YzChatMessageListener mYzChatMessageListener) {
+        this.mYzChatMessageListener = mYzChatMessageListener;
     }
 
     public void onReadReport(List<V2TIMMessageReceipt> receiptList) {
@@ -293,18 +299,20 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
 
                     @Override
                     public void onError(int code, String desc) {
-                        SLog.v("sendMessage fail:" + code + "=" + desc);
+                        SLog.v("sendMessage fail:" + code + "=" + desc+">>");
                         if (!safetyCall()) {
-                            SLog.w("sendMessage unSafetyCall");
                             return;
                         }
-                        if(code==20009){//不是好友
-                            ToastUtil.error(TUIKit.getAppContext(),"您和对方不是好友，发送失败");
-                        }else if(code == 20003){//userId错误
-                            ToastUtil.error(TUIKit.getAppContext(),"对方ID错误或不存在，发送失败");
-                        }
+//                        if(code==20009){//不是好友
+//                            ToastUtil.error(TUIKit.getAppContext(),"您和对方不是好友，发送失败");
+//                        }else if(code == 20003){//userId错误
+//                            ToastUtil.error(TUIKit.getAppContext(),"对方ID错误或不存在，发送失败");
+//                        }
                         if (callBack != null) {
                             callBack.onError("SLog",code, desc);
+                        }
+                        if(mYzChatMessageListener!=null){
+                            mYzChatMessageListener.onChatSendMessageError(code,desc);
                         }
                         message.setStatus(MessageInfo.MSG_STATUS_SEND_FAIL);
                         mCurrentProvider.updateMessageInfo(message);

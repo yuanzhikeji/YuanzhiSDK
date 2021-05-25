@@ -6,6 +6,7 @@ import android.text.TextUtils;
 
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.TUIKit;
+import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
@@ -286,6 +287,14 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
     public void onRefreshConversation(List<V2TIMConversation> v2TIMConversationList) {
         SLog.v( "onRefreshConversation conversations:" + v2TIMConversationList.size());
         if (mProvider == null) {
+            conversationUnRead(new YzConversationDataListener() {
+                @Override
+                public void onUnReadCount(long singleUnRead, long groupUnRead) {
+                    super.onUnReadCount(singleUnRead, groupUnRead);
+                    mUnreadTotal = (int) (singleUnRead+groupUnRead);
+                    updateUnreadTotal(mUnreadTotal);
+                }
+            });
             return;
         }
         ArrayList<ConversationInfo> infos = new ArrayList<>();

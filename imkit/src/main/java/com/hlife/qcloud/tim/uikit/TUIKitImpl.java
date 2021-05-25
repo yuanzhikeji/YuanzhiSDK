@@ -70,22 +70,18 @@ public class TUIKitImpl {
         sConfigs.getGeneralConfig().setSDKAppId(sdkAppID);
         String dir = sConfigs.getGeneralConfig().getAppCacheDir();
         if (TextUtils.isEmpty(dir)) {
-            SLog.e("appCacheDir is empty, use default dir");
             sConfigs.getGeneralConfig().setAppCacheDir(context.getFilesDir().getPath());
         } else {
             File file = new File(dir);
             if (file.exists()) {
                 if (file.isFile()) {
-                    SLog.e("appCacheDir is a file, use default dir");
                     sConfigs.getGeneralConfig().setAppCacheDir(context.getFilesDir().getPath());
                 } else if (!file.canWrite()) {
-                    SLog.e("appCacheDir can not write, use default dir");
                     sConfigs.getGeneralConfig().setAppCacheDir(context.getFilesDir().getPath());
                 }
             } else {
                 boolean ret = file.mkdirs();
                 if (!ret) {
-                    SLog.e("appCacheDir is invalid, use default dir");
                     sConfigs.getGeneralConfig().setAppCacheDir(context.getFilesDir().getPath());
                 }
             }

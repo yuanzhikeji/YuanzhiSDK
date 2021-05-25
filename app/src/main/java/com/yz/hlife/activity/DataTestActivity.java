@@ -9,14 +9,17 @@ import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
-import com.hlife.qcloud.tim.uikit.business.inter.YzStatusListener;
 import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
 import com.hlife.qcloud.tim.uikit.modules.group.apply.GroupApplyInfo;
+import com.http.network.listener.OnResultDataListener;
+import com.http.network.model.RequestWork;
+import com.http.network.model.ResponseWork;
 import com.tencent.imsdk.v2.V2TIMCallback;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.work.api.open.Yz;
+import com.work.api.open.model.CreateGroupReq;
 import com.work.api.open.model.GetTenantGroupListReq;
 import com.work.api.open.model.SysUserReq;
 import com.work.util.SLog;
@@ -54,16 +57,17 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
         findViewById(R.id.delete_group).setOnClickListener(this);
         findViewById(R.id.join_group).setOnClickListener(this);
         findViewById(R.id.send_message).setOnClickListener(this);
-        SysUserReq sysUserReq = new SysUserReq();
-        sysUserReq.setUserId(UserApi.instance().getUserId());
-        sysUserReq.setNickName(UserApi.instance().getNickName());
-        YzIMKitAgent.instance().register(sysUserReq, new YzStatusListener() {
-            @Override
-            public void loginSuccess(Object data) {
-                super.loginSuccess(data);
-                groupApplicationList();
-            }
-        });
+//        SysUserReq sysUserReq = new SysUserReq();
+//        sysUserReq.setUserId("22222");
+//        sysUserReq.setMobile("22222");
+//        sysUserReq.setNickName(UserApi.instance().getNickName());
+//        YzIMKitAgent.instance().register(sysUserReq, new YzStatusListener() {
+//            @Override
+//            public void loginSuccess(Object data) {
+//                super.loginSuccess(data);
+//                groupApplicationList();
+//            }
+//        });
         Yz.getSession().getTenantGroupList(new GetTenantGroupListReq(),this);
     }
 
@@ -194,6 +198,11 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                     chatInfo.setChatName(conversationInfos.get(0).getTitle());
                     chatInfo.setGroup(conversationInfos.get(0).isGroup());
                     YzIMKitAgent.instance().startChat(chatInfo,null);
+                }else{
+                    ChatInfo chatInfo = new ChatInfo();
+                    chatInfo.setId("22256645525");
+                    chatInfo.setChatName("假数据");
+                    YzIMKitAgent.instance().startChat(chatInfo,null);
                 }
                 break;
             case R.id.send_custom:
@@ -206,38 +215,15 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 break;
             case R.id.create_group:
                 List<String> s = new ArrayList<>();
-                s.add("4624e6e2fd351a0eeaee47490997258e");
-                YzIMKitAgent.instance().createPublicGroup(UserApi.instance().getUserId(), "这是一个公开群",s, new YzGroupDataListener() {
+//                s.add("4624e6e2fd351a0eeaee47490997258e");
+                CreateGroupReq createGroupReq = new CreateGroupReq();
+                createGroupReq.Owner_Account = UserApi.instance().getUserId();
+                createGroupReq.Name = "测试群";
+                createGroupReq.FaceUrl = "https://yzkj-pro.oss-cn-beijing.aliyuncs.com/avatar/lPto9oLiOp.jfif";
+
+                Yz.getSession().createGroup(createGroupReq, new OnResultDataListener() {
                     @Override
-                    public void onCreate(int code, String groupId, String msg) {
-                        if(code==200){
-                            SLog.e("发送一个消息过去。。。");
-                            ChatInfo chatInfo = new ChatInfo();
-                            chatInfo.setId(groupId);
-                            chatInfo.setChatName("这是一个公开群");
-                            chatInfo.setGroup(true);
-                            YzIMKitAgent.instance().startCustomMessage(chatInfo,"这是自己定义的消息内容");
-                        }
-                    }
-
-                    @Override
-                    public void update(int code, String msg) {
-
-                    }
-
-                    @Override
-                    public void addMember(int code, String msg) {
-
-                    }
-
-                    @Override
-                    public void deleteMember(int code, String msg) {
-
-                    }
-
-                    @Override
-                    public void joinMember(List<GroupApplyInfo> applies) {
-
+                    public void onResult(RequestWork req, ResponseWork resp) throws Exception {
                     }
                 });
                 break;
@@ -271,7 +257,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 break;
             case R.id.add_group:
                 List<String> m = new ArrayList<>();
-                m.add("2d9de88e9cd754abea89736f29132056");
+//                m.add("2d9de88e9cd754abea89736f29132056");
 //                YzIMKitAgent.instance().addGroupMember("@TGS#242ILVEH4", m, new YzGroupDataListener() {
 //                    @Override
 //                    public void onCreate(int code, String groupId, String msg) {

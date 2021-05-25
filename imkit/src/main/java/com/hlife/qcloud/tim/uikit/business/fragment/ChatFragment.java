@@ -16,6 +16,7 @@ import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.business.Constants;
 import com.hlife.qcloud.tim.uikit.business.active.FriendProfileActivity;
 import com.hlife.qcloud.tim.uikit.business.helper.ChatLayoutHelper;
+import com.hlife.qcloud.tim.uikit.business.inter.YzChatMessageListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageClickListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.component.AudioPlayer;
@@ -56,7 +57,7 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
     private ChatViewConfig mConfig;
     private YzMessageClickListener mYzMessageClickListener;
     private YzCustomMessageDrawListener mYzCustomMessageDrawListener;
-
+    private YzChatMessageListener mYzChatMessageListener;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -90,7 +91,7 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
          * 需要聊天的基本信息
          */
         mChatLayout.setChatInfo(mChatInfo);
-
+        mChatLayout.getChatManager().setYzChatMessageListener(mYzChatMessageListener);
         //获取单聊面板的标题栏
         TitleBarLayout mTitleBar = mChatLayout.getTitleBar();
 
@@ -302,6 +303,10 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
 
     public void setYzCustomMessageDrawListener(YzCustomMessageDrawListener mYzCustomMessageDrawListener) {
         this.mYzCustomMessageDrawListener = mYzCustomMessageDrawListener;
+    }
+
+    public void setYzChatMessageListener(YzChatMessageListener mYzChatMessageListener) {
+        this.mYzChatMessageListener = mYzChatMessageListener;
     }
 
     public static ChatFragment newChatFragment(ChatInfo chatInfo, ChatViewConfig config){

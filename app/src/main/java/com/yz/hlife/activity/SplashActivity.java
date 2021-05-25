@@ -38,6 +38,7 @@ public class SplashActivity extends BaseActivity {
         setStatusBar(ContextCompat.getColor(this,R.color.background_color));
         mUserInfo = UserApi.instance();
         handleData();
+//        startMain();
     }
     private void handleData() {
         if (mUserInfo != null && !TextUtils.isEmpty(mUserInfo.getToken()) &&!TextUtils.isEmpty(mUserInfo.getUserSign())) {
