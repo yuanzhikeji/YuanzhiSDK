@@ -32,6 +32,7 @@ import com.work.api.open.model.InviteUserReq;
 import com.work.api.open.model.LoginReq;
 import com.work.api.open.model.LoginResp;
 import com.work.api.open.model.RegisterReq;
+import com.work.api.open.model.SendGroupMessageReq;
 import com.work.api.open.model.SendMessageReq;
 import com.work.api.open.model.SendSmsReq;
 import com.work.api.open.model.SysUserReq;
@@ -224,9 +225,15 @@ public class Yz extends ApiClient {
     /**
      * 发送指定消息
      */
-//    public void sendMessage(SendMessageReq sendMessageReq,OnResultDataListener onResultDataListener){
-//        requestPost(ModeApi.sendTextFormToMsg,sendMessageReq,new BaseResp(),onResultDataListener);
-//    }
+    public void sendMessage(SendMessageReq sendMessageReq,OnResultDataListener onResultDataListener){
+        requestPost(ModeApi.sendTextFormToMsg,sendMessageReq,new BaseResp(),onResultDataListener);
+    }
+    /**
+     * 发送指定的群消息
+     */
+    public void sendCustomGroupTextMsg(SendGroupMessageReq sendGroupMessageReq,OnResultDataListener onResultDataListener){
+        requestPost(ModeApi.sendCustomGroupTextMsg,sendGroupMessageReq,new BaseResp(),onResultDataListener);
+    }
     /**
      * 全部群组
      */

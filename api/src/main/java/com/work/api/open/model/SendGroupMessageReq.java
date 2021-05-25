@@ -2,9 +2,9 @@ package com.work.api.open.model;
 
 import com.work.api.open.model.client.OpenTIMElem;
 
-public class SendMessageReq extends BaseReq{
+public class SendGroupMessageReq extends BaseReq{
     private String fromUserId;
-    private String toUserId;
+    private String groupId;
     private String msgType;
     private OpenTIMElem msgContent;
 
@@ -32,11 +32,11 @@ public class SendMessageReq extends BaseReq{
         this.fromUserId = fromUserId;
     }
 
-    public String getToUserId() {
-        return toUserId;
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 
-    public void setToUserId(String toUserId) {
-        this.toUserId = toUserId;
+    public String getGroupId() {
+        return groupId;
     }
 }

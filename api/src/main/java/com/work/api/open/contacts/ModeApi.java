@@ -130,7 +130,11 @@ public final class ModeApi {
     /**
      * 用户a给b发消息
      */
-    public final static String sendTextFormToMsg = "api/sendTextFormToMsg";
+    public final static String sendTextFormToMsg = "api/sendCustomTextFormToMsg";
+    /**
+     * 发送群
+     */
+    public final static String sendCustomGroupTextMsg="api/sendCustomGroupTextMsg";
     /**
      * 退出登录
      */

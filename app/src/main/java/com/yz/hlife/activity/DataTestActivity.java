@@ -21,7 +21,10 @@ import com.tencent.imsdk.v2.V2TIMManager;
 import com.work.api.open.Yz;
 import com.work.api.open.model.CreateGroupReq;
 import com.work.api.open.model.GetTenantGroupListReq;
+import com.work.api.open.model.SendGroupMessageReq;
+import com.work.api.open.model.SendMessageReq;
 import com.work.api.open.model.SysUserReq;
+import com.work.api.open.model.client.OpenTIMElem;
 import com.work.util.SLog;
 import com.work.util.ToastUtil;
 import com.yz.hlife.R;
@@ -57,6 +60,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
         findViewById(R.id.delete_group).setOnClickListener(this);
         findViewById(R.id.join_group).setOnClickListener(this);
         findViewById(R.id.send_message).setOnClickListener(this);
+        findViewById(R.id.send_group_message).setOnClickListener(this);
 //        SysUserReq sysUserReq = new SysUserReq();
 //        sysUserReq.setUserId("22222");
 //        sysUserReq.setMobile("22222");
@@ -224,6 +228,9 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 Yz.getSession().createGroup(createGroupReq, new OnResultDataListener() {
                     @Override
                     public void onResult(RequestWork req, ResponseWork resp) throws Exception {
+                        if(!resp.isSuccess()){
+                            ToastUtil.error(DataTestActivity.this,resp.getMessage());
+                        }
                     }
                 });
                 break;
@@ -335,11 +342,25 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
 //                startActivity(new Intent(this, GroupListActivity.class));
                 break;
             case R.id.send_message:
-//                SendMessageReq sendMessageReq = new SendMessageReq();
-//                sendMessageReq.setFromUserId(UserApi.instance().getUserId());
-//                sendMessageReq.setToUserId("2d9de88e9cd754abea89736f29132056");
-//                sendMessageReq.setTextContent("这是一个指定发的消息");
-//                Yz.getSession().sendMessage(sendMessageReq,null);
+                SendMessageReq sendMessageReq = new SendMessageReq();
+                sendMessageReq.setFromUserId(UserApi.instance().getUserId());
+                sendMessageReq.setToUserId("52ac0e63c55ba493dfb7134cd938fe81");
+                sendMessageReq.setMsgType("TIMCustomElem");
+                OpenTIMElem openTIMElem = new OpenTIMElem();
+//                openTIMElem.Text = "我是api发的文本消息";
+                openTIMElem.Data = "我是api发的自定义消息";
+                sendMessageReq.setMsgContent(openTIMElem);
+                Yz.getSession().sendMessage(sendMessageReq,null);
+                break;
+            case R.id.send_group_message:
+                SendGroupMessageReq sendGroupMessageReq = new SendGroupMessageReq();
+                sendGroupMessageReq.setFromUserId("52ac0e63c55ba493dfb7134cd938fe81");
+                sendGroupMessageReq.setGroupId("@TGS#2XM253EHK");
+                sendGroupMessageReq.setMsgType("TIMTextElem");
+                OpenTIMElem openTIMElem1 = new OpenTIMElem();
+                openTIMElem1.Data = "我是api发的自定义群组消息";
+                sendGroupMessageReq.setMsgContent(openTIMElem1);
+                Yz.getSession().sendCustomGroupTextMsg(sendGroupMessageReq,null);
                 break;
         }
     }

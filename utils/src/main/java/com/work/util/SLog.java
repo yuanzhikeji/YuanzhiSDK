@@ -4,7 +4,7 @@ import android.util.Log;
 
 public class SLog {
 	private final static String TAG=SLog.class.getName();
-	public final static boolean debug = false;
+	public final static boolean debug = true;
 
     /**
 	 * log输出

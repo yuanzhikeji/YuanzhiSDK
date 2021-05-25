@@ -109,6 +109,13 @@
             android:text="发送一个指定消息"/>
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/send_group_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
+            android:text="发送一个指定群消息"/>
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/start_auto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
