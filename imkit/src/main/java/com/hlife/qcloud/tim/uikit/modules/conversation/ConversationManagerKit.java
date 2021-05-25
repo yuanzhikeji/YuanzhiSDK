@@ -6,7 +6,6 @@ import android.text.TextUtils;
 
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.TUIKit;
-import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
