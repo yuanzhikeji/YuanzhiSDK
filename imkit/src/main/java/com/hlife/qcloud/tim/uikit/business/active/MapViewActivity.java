@@ -80,7 +80,7 @@ public abstract class MapViewActivity extends BaseActivity implements AMap.OnMar
 
     @Override
     public int onCustomContentId() {
-        return R.layout.activity_mapview;
+        return R.layout.activity_im_mapview;
     }
 
     @Override

@@ -49,7 +49,7 @@ public class MapLocationActivity extends MapViewActivity {
 
     @Override
     public int onCustomContentId() {
-        return R.layout.activity_map_location;
+        return R.layout.activity_im_map_location;
     }
 
     public static void launcherLocation(Context context, String title, String address, double lat, double lng){
