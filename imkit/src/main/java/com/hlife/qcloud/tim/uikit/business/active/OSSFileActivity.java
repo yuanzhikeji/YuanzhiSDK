@@ -20,7 +20,9 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.hlife.qcloud.tim.uikit.R;
+import com.hlife.qcloud.tim.uikit.TUIKitImpl;
 import com.hlife.qcloud.tim.uikit.base.BaseActivity;
+import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.business.dialog.ConfirmDialog;
 import com.hlife.qcloud.tim.uikit.business.message.CustomFileMessage;
 import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
@@ -35,6 +37,7 @@ import java.io.File;
 public class OSSFileActivity extends BaseActivity {
 
     private final static String UPLOAD_FILE="UPLOAD_FILE";
+    public static IUIKitCallBack mCallback;
     private ImageView fileIconImage;
     private TextView mName;
     private TextView mSize;
@@ -115,6 +118,7 @@ public class OSSFileActivity extends BaseActivity {
         if(mOSS!=null){
             mOSS.cancel();
         }
+        mCallback = null;
     }
 
     @Override
@@ -183,11 +187,17 @@ public class OSSFileActivity extends BaseActivity {
                     bundle.putParcelable(OSSFileActivity.class.getSimpleName(),(Uri)o);
                     intent.putExtras(bundle);
                     setResult(200,intent);
+                    if(mCallback!=null){
+                        mCallback.onSuccess(o);
+                    }
                     finish();
                 }else if(o instanceof VideoFile){
                     bundle.putSerializable(OSSFileActivity.class.getSimpleName(),(VideoFile)o);
                     intent.putExtras(bundle);
                     setResult(200,intent);
+                    if(mCallback!=null){
+                        mCallback.onSuccess(o);
+                    }
                     finish();
                 }else if(o instanceof CustomFileMessage){
                     CustomFileMessage customFileMessage = (CustomFileMessage) o;
@@ -218,6 +228,9 @@ public class OSSFileActivity extends BaseActivity {
                             bundle.putSerializable(OSSFileActivity.class.getSimpleName(),customFileMessage);
                             intent.putExtras(bundle);
                             setResult(200,intent);
+                            if(mCallback!=null){
+                                mCallback.onSuccess(o);
+                            }
                             finish();
                         }
 
@@ -247,6 +260,7 @@ public class OSSFileActivity extends BaseActivity {
         intent.putExtra(UPLOAD_FILE,true);
         intent.putExtra(OSSFileActivity.class.getSimpleName(),uri);
         fragment.startActivityForResult(intent,requestCode);
+        OSSFileActivity.mCallback = null;
     }
     public static void downloadFile(Context context,CustomFileMessage customFileMessage){
         Intent intent = new Intent(context,OSSFileActivity.class);
@@ -254,5 +268,13 @@ public class OSSFileActivity extends BaseActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(OSSFileActivity.class.getSimpleName(),customFileMessage);
         context.startActivity(intent);
+        OSSFileActivity.mCallback = null;
+    }
+    public static void uploadFileSDK(Uri uri, IUIKitCallBack callBack){
+        Intent intent = new Intent(TUIKitImpl.getAppContext(),OSSFileActivity.class);
+        intent.putExtra(UPLOAD_FILE,true);
+        intent.putExtra(OSSFileActivity.class.getSimpleName(),uri);
+        TUIKitImpl.getAppContext().startActivity(intent);
+        OSSFileActivity.mCallback = callBack;
     }
 }

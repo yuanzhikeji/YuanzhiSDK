@@ -5,6 +5,7 @@ import android.view.View;
 
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.base.BaseActivity;
+import com.hlife.qcloud.tim.uikit.business.inter.YzChatHistoryMessageListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
@@ -13,6 +14,7 @@ import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
 import com.hlife.qcloud.tim.uikit.modules.group.apply.GroupApplyInfo;
+import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.http.network.listener.OnResultDataListener;
 import com.http.network.model.RequestWork;
 import com.http.network.model.ResponseWork;
@@ -23,7 +25,6 @@ import com.work.api.open.model.CreateGroupReq;
 import com.work.api.open.model.GetTenantGroupListReq;
 import com.work.api.open.model.SendGroupMessageReq;
 import com.work.api.open.model.SendMessageReq;
-import com.work.api.open.model.SysUserReq;
 import com.work.api.open.model.client.OpenTIMElem;
 import com.work.util.SLog;
 import com.work.util.ToastUtil;
@@ -61,6 +62,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
         findViewById(R.id.join_group).setOnClickListener(this);
         findViewById(R.id.send_message).setOnClickListener(this);
         findViewById(R.id.send_group_message).setOnClickListener(this);
+        findViewById(R.id.chat_history).setOnClickListener(this);
 //        SysUserReq sysUserReq = new SysUserReq();
 //        sysUserReq.setUserId("22222");
 //        sysUserReq.setMobile("22222");
@@ -214,7 +216,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                     ChatInfo chatInfo = new ChatInfo();
                     chatInfo.setId(conversationInfos.get(0).getId());
                     chatInfo.setChatName(conversationInfos.get(0).getTitle());
-                    YzIMKitAgent.instance().startCustomMessage(chatInfo,"这是自己定义的消息内容");
+                    YzIMKitAgent.instance().sendCustomMessage(chatInfo,"这是自己定义的消息内容",null);
                 }
                 break;
             case R.id.create_group:
@@ -361,6 +363,26 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 openTIMElem1.Data = "我是api发的自定义群组消息";
                 sendGroupMessageReq.setMsgContent(openTIMElem1);
                 Yz.getSession().sendCustomGroupTextMsg(sendGroupMessageReq,null);
+                break;
+            case R.id.chat_history:
+                if(conversationInfos.size()==0){
+                    return;
+                }
+                ChatInfo chatInfo = new ChatInfo();
+                chatInfo.setId(conversationInfos.get(0).getId());
+                chatInfo.setChatName(conversationInfos.get(0).getTitle());
+                chatInfo.setGroup(conversationInfos.get(0).isGroup());
+                YzIMKitAgent.instance().getHistoryMessage(chatInfo, 20, null, new YzChatHistoryMessageListener() {
+                    @Override
+                    public void onChatMessageHistory(List<MessageInfo> messageInfos) {
+                        SLog.e("messageInfos>>>>>"+messageInfos.size());
+                    }
+
+                    @Override
+                    public void onError(int code, String desc) {
+                        ToastUtil.error(DataTestActivity.this,code+">>>"+desc);
+                    }
+                });
                 break;
         }
     }

@@ -2,6 +2,7 @@ package com.hlife.qcloud.tim.uikit;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
 
 import com.hlife.qcloud.tim.uikit.base.IMEventListener;
@@ -9,7 +10,10 @@ import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.business.Constants;
 import com.hlife.qcloud.tim.uikit.business.active.ChatActivity;
 import com.hlife.qcloud.tim.uikit.business.active.MwWorkActivity;
+import com.hlife.qcloud.tim.uikit.business.active.OSSFileActivity;
 import com.hlife.qcloud.tim.uikit.business.active.SelectMessageActivity;
+import com.hlife.qcloud.tim.uikit.business.inter.YzChatHistoryMessageListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzChatMessageListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
@@ -17,8 +21,10 @@ import com.hlife.qcloud.tim.uikit.business.inter.YzMessageSendCallback;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.business.inter.YzStatusListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzWorkAppItemClickListener;
+import com.hlife.qcloud.tim.uikit.business.message.CustomFileMessage;
 import com.hlife.qcloud.tim.uikit.business.message.MessageNotification;
 import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
+import com.hlife.qcloud.tim.uikit.business.modal.VideoFile;
 import com.hlife.qcloud.tim.uikit.business.thirdpush.HUAWEIHmsMessageService;
 import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.config.GeneralConfig;
@@ -35,6 +41,7 @@ import com.hlife.qcloud.tim.uikit.utils.BrandUtil;
 import com.http.network.listener.OnResultDataListener;
 import com.http.network.model.RequestWork;
 import com.http.network.model.ResponseWork;
+import com.http.network.task.ObjectMapperFactory;
 import com.tencent.imsdk.v2.V2TIMCallback;
 import com.tencent.imsdk.v2.V2TIMGroupApplication;
 import com.tencent.imsdk.v2.V2TIMGroupApplicationResult;
@@ -55,8 +62,11 @@ import com.work.util.ToastUtil;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.hlife.qcloud.tim.uikit.modules.chat.layout.inputmore.InputMoreFragment.REQUEST_CODE_OSS_UPLOAD;
 
 /**
  * Created by tangyx
@@ -252,51 +262,44 @@ public final class YzIMKitAgent {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         TUIKit.getAppContext().startActivity(intent);
     }
-    /**
-     * 分享卡片消息
-     */
-    public void startCustomMessage(String customMessage){
-        startCustomMessage(null,customMessage);
-    }
-    public void startCustomMessage(final ChatInfo chatInfo, String customMessage){
+    public void sendCustomMessage(final ChatInfo chatInfo, String customMessage,YzMessageSendCallback callback){
         if(chatInfo==null){
-            SelectMessageActivity.sendCustomMessage(mContext,customMessage);
+            return;
+        }
+        if(chatInfo.isGroup()){
+            MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
+            groupChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
         }else{
-            if(chatInfo.isGroup()){
-                GroupChatManagerKit groupChatManagerKit = GroupChatManagerKit.getInstance();
-                GroupInfo groupInfo = new GroupInfo();
-                groupInfo.setId(chatInfo.getId());
-                groupInfo.setGroupName(chatInfo.getChatName());
-                groupChatManagerKit.setCurrentChatInfo(groupInfo);
-                MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
-                groupChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
-                    @Override
-                    public void onSuccess(Object data) {
-                        YzIMKitAgent.instance().startChat(chatInfo,null);
+            MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
+            c2CChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
                     }
+                }
 
-                    @Override
-                    public void onError(String module, int errCode, String errMsg) {
-                        ToastUtil.warning(mContext,errCode+">"+errMsg);
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
                     }
-                });
-            }else{
-                C2CChatManagerKit c2CChatManagerKit = C2CChatManagerKit.getInstance();
-                c2CChatManagerKit.setCurrentChatInfo(chatInfo);
-                MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
-                c2CChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
-                    @Override
-                    public void onSuccess(Object data) {
-                        SLog.e("custom message send success:"+data);
-                        YzIMKitAgent.instance().startChat(chatInfo,null);
-                    }
-
-                    @Override
-                    public void onError(String module, int errCode, String errMsg) {
-                        ToastUtil.warning(mContext,errCode+">"+errMsg);
-                    }
-                });
-            }
+                }
+            });
         }
     }
     public void sendCustomMessage(String customMessage, YzMessageSendCallback callback){
@@ -340,6 +343,266 @@ public final class YzIMKitAgent {
         }
     }
     /**
+     * 文本消息
+     */
+    public void sendTextMessage(ChatInfo chatInfo,String message,YzMessageSendCallback callback){
+        if(chatInfo==null){
+            return;
+        }
+        MessageInfo info = MessageInfoUtil.buildTextMessage(message);
+        if(chatInfo.isGroup()){
+            groupChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+        else{
+            c2CChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+    }
+    /**
+     * 图片消息
+     */
+    public void sendImageMessage(ChatInfo chatInfo,final Uri uri,YzMessageSendCallback callback){
+        if(chatInfo==null){
+            return;
+        }
+        MessageInfo info = MessageInfoUtil.buildImageMessage(uri,true);
+        if(chatInfo.isGroup()){
+            groupChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+        else{
+            c2CChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+    }
+    /**
+     * 视频消息
+     */
+    public void sendVideoMessage(ChatInfo chatInfo,String imgPath, String videoPath, int width, int height, long duration,YzMessageSendCallback callback){
+        if(chatInfo==null){
+            return;
+        }
+        MessageInfo info = MessageInfoUtil.buildVideoMessage(imgPath,videoPath,width,height,duration);
+        if(chatInfo.isGroup()){
+            groupChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+        else{
+            c2CChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+    }
+    /**
+     * 语音消息
+     */
+    public void sendAudioMessage(ChatInfo chatInfo,String recordPath, int duration,YzMessageSendCallback callback){
+        if(chatInfo==null){
+            return;
+        }
+        MessageInfo info = MessageInfoUtil.buildAudioMessage(recordPath,duration);
+        if(chatInfo.isGroup()){
+            groupChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+        else{
+            c2CChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+    }
+    /**
+     * 发送文件
+     */
+    public void sendFile(ChatInfo chatInfo,Uri uri,YzMessageSendCallback callback){
+        if(chatInfo==null){
+            return;
+        }
+        OSSFileActivity.uploadFileSDK(uri, new IUIKitCallBack() {
+            @Override
+            public void onSuccess(Object data) {
+                if(data instanceof Uri){
+                    sendImageMessage(chatInfo,(Uri) data,callback);
+                }else if(data instanceof VideoFile){
+                    VideoFile videoFile = (VideoFile) data;
+                    sendVideoMessage(chatInfo,videoFile.imagePath,videoFile.filePath,videoFile.firstFrame.getWidth(),videoFile.firstFrame.getHeight(),videoFile.duration,callback);
+                }else if(data instanceof CustomFileMessage){
+                    String custom = ObjectMapperFactory.getObjectMapper().model2JsonStr(data);
+                    sendCustomMessage(chatInfo,custom,callback);
+                }
+            }
+
+            @Override
+            public void onError(String module, int errCode, String errMsg) {
+                if(callback!=null){
+                    callback.error(errCode,errMsg);
+                }
+            }
+        });
+    }
+    /**
+     * 定位
+     */
+    public void sendLocationMessage(ChatInfo chatInfo,String data,double longitude,double latitude,YzMessageSendCallback callback){
+        if(chatInfo==null){
+            return;
+        }
+        MessageInfo info = MessageInfoUtil.buildLocationMessage(data,longitude,latitude);
+        if(chatInfo.isGroup()){
+            groupChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+        else{
+            c2CChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+    }
+    /**
+     * 封装发送体
+     */
+    private GroupChatManagerKit groupChatManagerKit(ChatInfo chatInfo){
+        GroupChatManagerKit groupChatManagerKit = GroupChatManagerKit.getInstance();
+        GroupInfo groupInfo = new GroupInfo();
+        groupInfo.setId(chatInfo.getId());
+        groupInfo.setGroupName(chatInfo.getChatName());
+        groupChatManagerKit.setCurrentChatInfo(groupInfo);
+        return groupChatManagerKit;
+    }
+    private C2CChatManagerKit c2CChatManagerKit(ChatInfo chatInfo){
+        C2CChatManagerKit c2CChatManagerKit = C2CChatManagerKit.getInstance();
+        c2CChatManagerKit.setCurrentChatInfo(chatInfo);
+        return c2CChatManagerKit;
+    }
+    /**
      * 获取所有的聊天会话
      */
     public void loadConversation(int nextSeq, YzChatType type, final YzConversationDataListener callBack){
@@ -358,70 +621,52 @@ public final class YzIMKitAgent {
         ConversationManagerKit.getInstance().removeMessageWatcher(watcher);
     }
     /**
-     * 更改群信息
+     * 获取历史会话记录
      */
-//    public void updateGroup(String groupId,String name,final YzGroupDataListener listener){
-//        CreateGroupReq createGroupReq = new CreateGroupReq();
-//        createGroupReq.Name = name;
-//        createGroupReq.GroupId = groupId;
-//        Yz.getSession().updateGroupName(createGroupReq, new OnResultDataListener() {
-//            @Override
-//            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
-//                if(listener==null){
-//                    return;
-//                }
-//                if(resp instanceof CreateGroupResp){
-//                    listener.update(((CreateGroupResp) resp).getCode(),resp.getMessage());
-//                }
-//            }
-//        });
-//    }
-    /**
-     * 添加群成员
-     */
-//    public void addGroupMember(String groupId,List<String> member,final YzGroupDataListener listener){
-//        CreateGroupReq createGroupReq = new CreateGroupReq();
-//        createGroupReq.GroupId = groupId;
-//        if(member!=null && member.size()>0){
-//            List<OpenGroupMember> members = new ArrayList<>();
-//            for (String s:member) {
-//                OpenGroupMember openGroupMember = new OpenGroupMember();
-//                openGroupMember.Member_Account = s;
-//                members.add(openGroupMember);
-//            }
-//            createGroupReq.MemberList = members;
-//        }
-//        Yz.getSession().addGroupUser(createGroupReq, new OnResultDataListener() {
-//            @Override
-//            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
-//                if(listener==null){
-//                    return;
-//                }
-//                if(resp instanceof GroupMemberResp){
-//                    listener.addMember(((GroupMemberResp) resp).getCode(),((GroupMemberResp) resp).getData());
-//                }
-//            }
-//        });
-//    }
-    /**
-     * 指定人退出
-     */
-//    public void deleteGroupMember(String groupId,List<String> member,final YzGroupDataListener listener){
-//        CreateGroupReq createGroupReq = new CreateGroupReq();
-//        createGroupReq.GroupId = groupId;
-//        createGroupReq.MemberToDel_Account = member;
-//        Yz.getSession().deleteGroupUser(createGroupReq, new OnResultDataListener() {
-//            @Override
-//            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
-//                if(listener==null){
-//                    return;
-//                }
-//                if(resp instanceof GroupMemberResp){
-//                    listener.deleteMember(((GroupMemberResp) resp).getCode(),((GroupMemberResp) resp).getData());
-//                }
-//            }
-//        });
-//    }
+    public void getHistoryMessage(ChatInfo chatInfo,int pageSize,MessageInfo lastMessageInfo, YzChatHistoryMessageListener listener){
+        V2TIMMessage v2TIMMessage = null;
+        if(lastMessageInfo!=null){
+            v2TIMMessage = lastMessageInfo.getTimMessage();
+        }
+        if(chatInfo.isGroup()){
+            V2TIMManager.getMessageManager().getGroupHistoryMessageList(chatInfo.getId(), pageSize, v2TIMMessage, new V2TIMValueCallback<List<V2TIMMessage>>() {
+                @Override
+                public void onError(int code, String desc) {
+                    if(listener!=null){
+                        listener.onError(code,desc);
+                    }
+                }
+
+                @Override
+                public void onSuccess(List<V2TIMMessage> v2TIMMessages) {
+                    processHistoryMsgs(v2TIMMessages, chatInfo, listener);
+                }
+            });
+        }
+        else{
+            V2TIMManager.getMessageManager().getC2CHistoryMessageList(chatInfo.getId(), pageSize, v2TIMMessage, new V2TIMValueCallback<List<V2TIMMessage>>() {
+                @Override
+                public void onError(int code, String desc) {
+                    if(listener!=null){
+                        listener.onError(code,desc);
+                    }
+                }
+
+                @Override
+                public void onSuccess(List<V2TIMMessage> v2TIMMessages) {
+                    processHistoryMsgs(v2TIMMessages, chatInfo, listener);
+                }
+            });
+        }
+    }
+    private void processHistoryMsgs(List<V2TIMMessage> v2TIMMessages, ChatInfo chatInfo, YzChatHistoryMessageListener listener) {
+        ArrayList<V2TIMMessage> messages = new ArrayList<>(v2TIMMessages);
+        Collections.reverse(messages);
+        List<MessageInfo> msgInfos = MessageInfoUtil.TIMMessages2MessageInfos(v2TIMMessages, chatInfo.isGroup());
+        if(listener!=null){
+            listener.onChatMessageHistory(msgInfos);
+        }
+    }
     /**
      * 获取群申请信息
      */
