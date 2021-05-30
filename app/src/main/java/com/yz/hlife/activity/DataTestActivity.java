@@ -176,10 +176,12 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.get_c2c:
-                loadConversation(YzChatType.C2C);
+                //loadConversation(YzChatType.C2C);
+                startActivity(new Intent(this,ConversationListActivity.class).putExtra(ConversationListActivity.ConversationType,1));
                 break;
             case R.id.get_group:
-                loadConversation(YzChatType.GROUP);
+                //loadConversation(YzChatType.GROUP);
+                startActivity(new Intent(this,ConversationListActivity.class).putExtra(ConversationListActivity.ConversationType,2));
                 break;
             case R.id.get_conversation:
                 if(conversationInfos!=null && conversationInfos.size()>0){

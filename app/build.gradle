@@ -1,5 +1,17 @@
 apply plugin: 'com.android.application'
 
+def copyChannelApk(apkArray) {
+    def intoFile = rootDir.parentFile.getAbsolutePath() + File.separator + "XiaozhenApks"
+    println "开始复制APK文件到一个目录：" + intoFile
+    apkArray.forEach { file ->
+        copy {
+            from file
+            into intoFile
+        }
+    }
+    println "复制APK文件结束。"
+}
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
