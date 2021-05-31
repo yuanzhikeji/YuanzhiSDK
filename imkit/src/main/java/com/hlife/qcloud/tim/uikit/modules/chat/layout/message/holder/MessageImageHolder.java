@@ -281,7 +281,7 @@ public class MessageImageHolder extends MessageContentHolder {
                 mClicking = true;
                 //以下代码为zanhanding修改，用于fix点击发送失败视频后无法播放，并且红色感叹号消失的问题
                 final File videoFile = new File(videoPath);
-                SLog.e(videoFile+">"+videoFile.exists());
+//                SLog.e(videoFile+">"+videoFile.exists());
                 if (videoFile.exists()) {//若存在本地文件则优先获取本地文件
                     mAdapter.notifyItemChanged(position);
                     mClicking = false;
