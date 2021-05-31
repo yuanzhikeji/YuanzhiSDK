@@ -163,6 +163,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                         startActivity(new Intent(LoginActivity.this,DataTestActivity.class));
                         finish();
                     }
+
+                    @Override
+                    public void loginFail(String module, int errCode, String errMsg) {
+                        super.loginFail(module, errCode, errMsg);
+                        SLog.e(errCode+">>"+errMsg);
+                    }
                 });
                 break;
         }

@@ -118,7 +118,7 @@ public final class YzIMKitAgent {
         UserApi userApi = UserApi.instance();
         userApi.setStore("im sdk");
         //配置网络相关
-        ApiClient.setApiConfig(new ApiClient.ApiConfig().setHostName("https://imapi.yzmetax.com/").setParamObj(userApi));
+        ApiClient.setApiConfig(new ApiClient.ApiConfig().setHostName("https://dev1-imapi.yzmetax.com/").setParamObj(userApi));
     }
 
     public static void init(Context context,String appId){
@@ -146,7 +146,7 @@ public final class YzIMKitAgent {
     private void loadConfig(){
         SharedUtils.init(mContext);
         //初始化im
-        TUIKit.init(mContext,1400432221,getConfigs());
+        TUIKit.init(mContext,1400433756,getConfigs());
         //加载腾讯x5的浏览器引擎
         HashMap<String,Object> map = new HashMap<>();
         map.put(TbsCoreSettings.TBS_SETTINGS_USE_SPEEDY_CLASSLOADER, true);
