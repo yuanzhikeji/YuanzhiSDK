@@ -108,6 +108,7 @@ public final class YzIMKitAgent {
     private YzStatusListener mIMKitStatusListener;
     private YzWorkAppItemClickListener mWorkAppItemClickListener;
     private int functionPrem;
+    private static boolean isDev;
 
     private YzIMKitAgent(Context context, String mYzAppId) {
         this.mContext = context;
@@ -116,10 +117,15 @@ public final class YzIMKitAgent {
         UserApi userApi = UserApi.instance();
         userApi.setStore("im sdk");
         //配置网络相关
-        ApiClient.setApiConfig(new ApiClient.ApiConfig().setHostName("https://imapi.yzmetax.com/").setParamObj(userApi));
+        ApiClient.setApiConfig(new ApiClient.ApiConfig().setHostName(isDev?"https://dev1-imapi.yzmetax.com/":"https://imapi.yzmetax.com/").setParamObj(userApi));
     }
 
     public static void init(Context context,String appId){
+        init(context,appId,false);
+    }
+
+    public static void init(Context context,String appId,boolean dev){
+        isDev = dev;
         if(singleton==null){
             singleton = new YzIMKitAgent(context,appId);
         }
@@ -144,7 +150,7 @@ public final class YzIMKitAgent {
     private void loadConfig(){
         SharedUtils.init(mContext);
         //初始化im
-        TUIKit.init(mContext,1400432221,getConfigs());
+        TUIKit.init(mContext,isDev?1400433756:1400432221,getConfigs());
         //加载腾讯x5的浏览器引擎
         HashMap<String,Object> map = new HashMap<>();
         map.put(TbsCoreSettings.TBS_SETTINGS_USE_SPEEDY_CLASSLOADER, true);

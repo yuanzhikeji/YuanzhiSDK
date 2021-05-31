@@ -167,6 +167,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 startActivity(new Intent(this,ChatDemoActivity.class).putExtra(ChatDemoActivity.class.getSimpleName(),1));
                 break;
             case R.id.start_chat:
+
                 if(conversationInfos!=null && conversationInfos.size()>0){
                     ChatInfo chatInfo = new ChatInfo();
                     chatInfo.setId(conversationInfos.get(0).getId());
