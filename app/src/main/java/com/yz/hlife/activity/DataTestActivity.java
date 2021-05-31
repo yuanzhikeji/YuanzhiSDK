@@ -229,6 +229,8 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                         if(!resp.isSuccess()){
                             ToastUtil.error(DataTestActivity.this,resp.getMessage());
                         }else if(resp instanceof CreateGroupResp){
+                            Yz.getSession().getTenantGroupList(new GetTenantGroupListReq(),this);
+                        }else if(resp instanceof CreateGroupResp){
 //                            ChatInfo chatInfo = new ChatInfo();
 //                            chatInfo.setId(((CreateGroupResp) resp).getData().GroupId);
 //                            chatInfo.setChatName("测试群");
