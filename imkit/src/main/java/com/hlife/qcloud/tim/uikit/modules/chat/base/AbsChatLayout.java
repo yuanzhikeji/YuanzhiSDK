@@ -41,12 +41,7 @@ public abstract class AbsChatLayout extends ChatLayoutUI implements IChatLayout 
             final String oldTitle = getTitleBar().getMiddleTitle().getText().toString();
             getTitleBar().getMiddleTitle().setText(R.string.typing);
             if (mTypingRunnable == null) {
-                mTypingRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        getTitleBar().getMiddleTitle().setText(oldTitle);
-                    }
-                };
+                mTypingRunnable = () -> getTitleBar().getMiddleTitle().setText(oldTitle);
             }
             getTitleBar().getMiddleTitle().removeCallbacks(mTypingRunnable);
             getTitleBar().getMiddleTitle().postDelayed(mTypingRunnable, 3000);

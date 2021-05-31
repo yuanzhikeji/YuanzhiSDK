@@ -3,6 +3,7 @@ package com.hlife.qcloud.tim.uikit.modules.group.info;
 import com.hlife.qcloud.tim.uikit.modules.group.member.GroupMemberInfo;
 import com.tencent.imsdk.v2.V2TIMConversation;
 import com.tencent.imsdk.v2.V2TIMGroupInfoResult;
+import com.tencent.imsdk.v2.V2TIMGroupMemberFullInfo;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.work.util.SLog;
@@ -20,6 +21,7 @@ public class GroupInfo extends ChatInfo {
     private List<GroupMemberInfo> memberAdminDetails;
     private int joinType;
     private String owner;
+    private int role;
     private boolean isMuted;
     private int revOpt;
 
@@ -164,6 +166,14 @@ public class GroupInfo extends ChatInfo {
         this.owner = owner;
     }
 
+    public void setRole(int role) {
+        this.role = role;
+    }
+
+    public boolean isRole(){
+        return this.role == V2TIMGroupMemberFullInfo.V2TIM_GROUP_MEMBER_ROLE_ADMIN;
+    }
+
     public void setMuted(boolean muted) {
         isMuted = muted;
     }
@@ -198,6 +208,7 @@ public class GroupInfo extends ChatInfo {
         setMemberCount(infoResult.getGroupInfo().getMemberCount());
         setGroupType(infoResult.getGroupInfo().getGroupType());
         setOwner(infoResult.getGroupInfo().getOwner());
+        setRole(infoResult.getGroupInfo().getRole());
         setJoinType(infoResult.getGroupInfo().getGroupAddOpt());
         setMuted(infoResult.getGroupInfo().isAllMuted());
         setRevOpt(infoResult.getGroupInfo().getRecvOpt());

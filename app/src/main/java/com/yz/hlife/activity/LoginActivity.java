@@ -29,6 +29,7 @@ import com.work.api.open.model.client.OpenData;
 import com.work.util.AppUtils;
 import com.work.util.KeyboardUtils;
 import com.work.util.SLog;
+import com.work.util.SharedUtils;
 import com.work.util.ToastUtil;
 import com.workstation.permission.PermissionsResultAction;
 import com.yz.hlife.R;
@@ -47,6 +48,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             Manifest.permission.CHANGE_NETWORK_STATE};
     private EditText mPhone;
     private EditText mPassword;
+    private EditText mMobile;
     private Button mSubmit;
 
     @Override
@@ -54,6 +56,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
         super.onInitView();
         mPhone = findViewById(R.id.phone);
         mPassword = findViewById(R.id.password);
+        mMobile = findViewById(R.id.mobile);
         mSubmit = findViewById(R.id.submit);
         TextView mVersion = findViewById(R.id.version);
         AppUtils.AppInfo appInfo = AppUtils.getAppInfo(this);
@@ -63,6 +66,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
         findViewById(R.id.forget).setOnClickListener(this);
         findViewById(R.id.register).setOnClickListener(this);
         findViewById(R.id.submit).setOnClickListener(this);
+//        if(!TextUtils.isEmpty(UserApi.instance().getToken())){
+//            startActivity(new Intent(LoginActivity.this,DataTestActivity.class));
+//            finish();
+//        }
     }
 
     @Override
@@ -108,12 +115,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     @Override
     protected void onResume() {
         super.onResume();
-        if(TextUtils.isEmpty(mPhone.getText())){
-            String phone = UserApi.instance().getMobile();
-            if(!TextUtils.isEmpty(phone)){
-                mPhone.setText(phone);
-            }
-        }
+        mPhone.setText(SharedUtils.getString("userid"));
+//        mPhone.setText("4624e6e2fd351a0eeaee47490997258e");
+        mPassword.setText(SharedUtils.getString("nickname"));
+        mMobile.setText(SharedUtils.getString("mobile"));
     }
 
     @Override
@@ -131,12 +136,34 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                 startActivity(new Intent(this, RegisterActivity.class));
                 break;
             case R.id.submit:
-                LoginReq loginReq = new LoginReq();
-                loginReq.setMobile(mPhone.getText().toString().trim());
-                loginReq.setPassword(mPassword.getText().toString().trim());
-                mSubmit.setEnabled(false);
-                showProgressLoading(false,false);
-                Yz.getSession().login(loginReq,this);
+//                LoginReq loginReq = new LoginReq();
+//                loginReq.setMobile(mPhone.getText().toString().trim());
+//                loginReq.setPassword(mPassword.getText().toString().trim());
+//                mSubmit.setEnabled(false);
+//                showProgressLoading(false,false);
+//                Yz.getSession().login(loginReq,this);
+                String userid = mPhone.getText().toString().trim();
+                String password = mPassword.getText().toString().trim();
+                String mobile = mMobile.getText().toString().trim();
+                if(TextUtils.isEmpty(userid) || TextUtils.isEmpty(password) || TextUtils.isEmpty(mobile)){
+                    return;
+                }
+
+                SysUserReq sysUserReq = new SysUserReq();
+                sysUserReq.setUserId(userid);
+                sysUserReq.setMobile(mobile);
+                sysUserReq.setNickName(password);
+                YzIMKitAgent.instance().register(sysUserReq, new YzStatusListener() {
+                    @Override
+                    public void loginSuccess(Object data) {
+                        super.loginSuccess(data);
+                        SharedUtils.putData("userid",userid);
+                        SharedUtils.putData("mobile",mobile);
+                        SharedUtils.putData("nickname",password);
+                        startActivity(new Intent(LoginActivity.this,DataTestActivity.class));
+                        finish();
+                    }
+                });
                 break;
         }
     }

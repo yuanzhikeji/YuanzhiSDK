@@ -199,6 +199,7 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
                     @Override
                     public void onError(int code, String desc) {
                         SLog.e("全员禁言:" + code + "|desc:" + desc);
+                        ToastUtil.error(getContext(),desc);
                     }
 
                     @Override
@@ -236,6 +237,10 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
                 mMemberPreviewListener.forwardListMember(mGroupInfo);
             }
         } else if (v.getId() == R.id.group_name) {
+            if(!mGroupInfo.isOwner() && !mGroupInfo.isRole()){
+                ToastUtil.info(getContext(),"您没有权限修改");
+                return;
+            }
             Bundle bundle = new Bundle();
             bundle.putString(IMKitConstants.Selection.TITLE, getResources().getString(R.string.modify_group_name));
             bundle.putString(IMKitConstants.Selection.INIT_CONTENT, mGroupNameView.getContent());
@@ -265,7 +270,7 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
                 }
             });
         } else if (v.getId() == R.id.group_notice) {
-            if(!mGroupInfo.isOwner()){
+            if(!mGroupInfo.isOwner() && !mGroupInfo.isRole()){
                 if(!TextUtils.isEmpty(mGroupNotice.getContent())){
                     new ConfirmDialog().setContent(mGroupNotice.getContent())
                             .setHiddenCancel(true)
@@ -378,22 +383,30 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
         mTopSwitchView.setChecked(mGroupInfo.isTopChat());
         mRevOptView.setChecked(mGroupInfo.getRevOpt()==V2TIMGroupInfo.V2TIM_GROUP_NOT_RECEIVE_MESSAGE);
         mDissolveBtn.setText(R.string.dissolve);
-        if (mGroupInfo.isOwner()) {
 //            mJoinTypeView.setVisibility(VISIBLE);
-            if (mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_WORK)
-                    || mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_PRIVATE)) {
-                mDissolveBtn.setText(R.string.dissolve);
-                mMutedSwitchView.setVisibility(GONE);
-            }else if(mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_PUBLIC)){
-                mMemberAdminView.setVisibility(VISIBLE);
-                memberAdminList.setVisibility(VISIBLE);
-                loadAdmin();
+        if (mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_WORK)
+                || mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_PRIVATE)) {
+            mDissolveBtn.setText(R.string.dissolve);
+            mMutedSwitchView.setVisibility(GONE);
+            if(!mGroupInfo.isOwner()){
+                mOwnerLayout.setVisibility(GONE);
+                mDissolveBtn.setText(R.string.exit_group);
             }
-        } else {
-            mOwnerLayout.setVisibility(GONE);
-//            mJoinTypeView.setVisibility(GONE);
-            mDissolveBtn.setText(R.string.exit_group);
+        }else if(mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_PUBLIC)){
+            mMemberAdminView.setVisibility(VISIBLE);
+            memberAdminList.setVisibility(VISIBLE);
+            if(!mGroupInfo.isRole() && !mGroupInfo.isOwner()){
+                mMutedSwitchView.setVisibility(GONE);
+            }
+            if(!mGroupInfo.isOwner()){
+                mOwnerLayout.setVisibility(GONE);
+                mDissolveBtn.setText(R.string.exit_group);
+            }
+            loadAdmin();
         }
+
+//            mJoinTypeView.setVisibility(GONE);
+
     }
 
     public void loadAdmin(){
@@ -479,6 +492,7 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
                             @Override
                             public void onError(int i, String s) {
                                 SLog.e(i+">>"+s);
+                                ToastUtil.error(getContext(),"不能设置群主为管理员或权限不足");
                             }
 
                             @Override

@@ -38,17 +38,20 @@ public class SplashActivity extends BaseActivity {
         setStatusBar(ContextCompat.getColor(this,R.color.background_color));
         mUserInfo = UserApi.instance();
         handleData();
+        startLogin();
 //        startMain();
     }
     private void handleData() {
-        if (mUserInfo != null && !TextUtils.isEmpty(mUserInfo.getToken()) &&!TextUtils.isEmpty(mUserInfo.getUserSign())) {
-            LoginReq loginReq = new LoginReq();
-            loginReq.setUserId(mUserInfo.getUserId());
-            Yz.getSession().getUserByUserId(loginReq,this);
-        } else {
-            View mFlashView = findViewById(R.id.loading_view);
-            mFlashView.postDelayed(this::startLogin, 1000);
-        }
+//        if (mUserInfo != null && !TextUtils.isEmpty(mUserInfo.getToken()) &&!TextUtils.isEmpty(mUserInfo.getUserSign())) {
+//            LoginReq loginReq = new LoginReq();
+//            loginReq.setUserId(mUserInfo.getUserId());
+//            Yz.getSession().getUserByUserId(loginReq,this);
+//        } else {
+//            View mFlashView = findViewById(R.id.loading_view);
+//            mFlashView.postDelayed(this::startLogin, 1000);
+//        }
+//        View mFlashView = findViewById(R.id.loading_view);
+//        mFlashView.postDelayed(this::startLogin, 1000);
     }
     private void login() {
         SysUserReq sysUserReq = new SysUserReq();

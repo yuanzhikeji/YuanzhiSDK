@@ -309,7 +309,6 @@ public class MessageInfoUtil {
             }
             return false;
         } catch (Exception e) {
-            SLog.e("parse json error");
         }
         return false;
     }
@@ -325,7 +324,6 @@ public class MessageInfoUtil {
             }
             return false;
         } catch (Exception e) {
-            SLog.e( "parse json error");
         }
         return false;
     }
@@ -478,6 +476,7 @@ public class MessageInfoUtil {
                 List<V2TIMGroupMemberInfo> v2TIMGroupMemberInfoList = groupTipElem.getMemberList();
                 for (int i = 0; i < v2TIMGroupMemberInfoList.size(); i++) {
                     V2TIMGroupMemberInfo v2TIMGroupMemberInfo = v2TIMGroupMemberInfoList.get(i);
+
                     if (i == 0) {
                         if(!TextUtils.isEmpty(v2TIMGroupMemberInfo.getNameCard())){
                             user.append(v2TIMGroupMemberInfo.getNameCard());

@@ -192,7 +192,7 @@ public class OSSFileActivity extends BaseActivity {
                     }
                     finish();
                 }else if(o instanceof VideoFile){
-                    bundle.putSerializable(OSSFileActivity.class.getSimpleName(),(VideoFile)o);
+                    bundle.putParcelable(OSSFileActivity.class.getSimpleName(),(VideoFile)o);
                     intent.putExtras(bundle);
                     setResult(200,intent);
                     if(mCallback!=null){

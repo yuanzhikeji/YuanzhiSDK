@@ -22,9 +22,11 @@ import com.tencent.imsdk.v2.V2TIMCallback;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.work.api.open.Yz;
 import com.work.api.open.model.CreateGroupReq;
+import com.work.api.open.model.CreateGroupResp;
 import com.work.api.open.model.GetTenantGroupListReq;
 import com.work.api.open.model.SendGroupMessageReq;
 import com.work.api.open.model.SendMessageReq;
+import com.work.api.open.model.client.OpenGroupMember;
 import com.work.api.open.model.client.OpenTIMElem;
 import com.work.util.SLog;
 import com.work.util.ToastUtil;
@@ -63,17 +65,6 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
         findViewById(R.id.send_message).setOnClickListener(this);
         findViewById(R.id.send_group_message).setOnClickListener(this);
         findViewById(R.id.chat_history).setOnClickListener(this);
-//        SysUserReq sysUserReq = new SysUserReq();
-//        sysUserReq.setUserId("22222");
-//        sysUserReq.setMobile("22222");
-//        sysUserReq.setNickName(UserApi.instance().getNickName());
-//        YzIMKitAgent.instance().register(sysUserReq, new YzStatusListener() {
-//            @Override
-//            public void loginSuccess(Object data) {
-//                super.loginSuccess(data);
-//                groupApplicationList();
-//            }
-//        });
         Yz.getSession().getTenantGroupList(new GetTenantGroupListReq(),this);
     }
 
@@ -204,12 +195,13 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                     chatInfo.setChatName(conversationInfos.get(0).getTitle());
                     chatInfo.setGroup(conversationInfos.get(0).isGroup());
                     YzIMKitAgent.instance().startChat(chatInfo,null);
-                }else{
-                    ChatInfo chatInfo = new ChatInfo();
-                    chatInfo.setId("22256645525");
-                    chatInfo.setChatName("假数据");
-                    YzIMKitAgent.instance().startChat(chatInfo,null);
                 }
+//                else{
+//                    ChatInfo chatInfo = new ChatInfo();
+//                    chatInfo.setId("22256645525");
+//                    chatInfo.setChatName("假数据");
+//                    YzIMKitAgent.instance().startChat(chatInfo,null);
+//                }
                 break;
             case R.id.send_custom:
                 if(conversationInfos!=null && conversationInfos.size()>0){
@@ -226,12 +218,22 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 createGroupReq.Owner_Account = UserApi.instance().getUserId();
                 createGroupReq.Name = "测试群";
                 createGroupReq.FaceUrl = "https://yzkj-pro.oss-cn-beijing.aliyuncs.com/avatar/lPto9oLiOp.jfif";
-
+                List<OpenGroupMember> members = new ArrayList<>();
+                OpenGroupMember openGroupMember = new OpenGroupMember();
+                openGroupMember.Member_Account = "4624e6e2fd351a0eeaee47490997258e";
+                members.add(openGroupMember);
+                createGroupReq.MemberList = members;
                 Yz.getSession().createGroup(createGroupReq, new OnResultDataListener() {
                     @Override
                     public void onResult(RequestWork req, ResponseWork resp) throws Exception {
                         if(!resp.isSuccess()){
                             ToastUtil.error(DataTestActivity.this,resp.getMessage());
+                        }else if(resp instanceof CreateGroupResp){
+//                            ChatInfo chatInfo = new ChatInfo();
+//                            chatInfo.setId(((CreateGroupResp) resp).getData().GroupId);
+//                            chatInfo.setChatName("测试群");
+//                            chatInfo.setGroup(true);
+//                            YzIMKitAgent.instance().sendTextMessage(chatInfo,"我假装创建了一个群",null);
                         }
                     }
                 });
