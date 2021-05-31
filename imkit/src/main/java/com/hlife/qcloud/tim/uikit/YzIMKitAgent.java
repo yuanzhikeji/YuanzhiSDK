@@ -15,6 +15,7 @@ import com.hlife.qcloud.tim.uikit.business.inter.YzChatHistoryMessageListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupJoinListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageSendCallback;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.business.inter.YzStatusListener;
@@ -668,6 +669,23 @@ public final class YzIMKitAgent {
     /**
      * 获取群申请信息
      */
+    public void joinGroup(String groupId, String message, YzGroupJoinListener listener){
+        V2TIMManager.getInstance().joinGroup(groupId, message, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+        });
+    }
     public void groupApplicationList(YzGroupDataListener listener){
         V2TIMManager.getGroupManager().getGroupApplicationList(new V2TIMValueCallback<V2TIMGroupApplicationResult>() {
             @Override

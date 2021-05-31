@@ -20,6 +20,7 @@
             android:layout_marginTop="@dimen/dp_20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:text="获取单聊会话列表"/>
 
         <androidx.appcompat.widget.AppCompatButton
@@ -39,6 +40,7 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/get_unread"
             android:layout_marginTop="@dimen/dp_20"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="获取未读消息"/>
@@ -48,6 +50,7 @@
             android:layout_marginTop="@dimen/dp_20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:text="启动单聊页面"/>
 
         <androidx.appcompat.widget.AppCompatButton
@@ -62,6 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_20"
+            android:visibility="gone"
             android:text="指定ID聊天"/>
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/send_custom"
@@ -75,6 +79,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_40"
+            android:visibility="gone"
             android:text="创建一个公开群"/>
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/update_group_name"
@@ -99,7 +104,6 @@
             android:text="指定成员退出公开群"/>
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/join_group"
-            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_20"

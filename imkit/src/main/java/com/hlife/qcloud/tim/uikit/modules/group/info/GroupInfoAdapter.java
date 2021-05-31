@@ -164,7 +164,7 @@ public class GroupInfoAdapter extends BaseAdapter {
                     break;
                 }
             }
-            if (info.isOwner() || (self != null && self.getMemberType() == V2TIMGroupMemberFullInfo.V2TIM_GROUP_MEMBER_ROLE_ADMIN)) {
+            if (info.isOwner() || info.isRole()) {
                 GroupMemberInfo del = new GroupMemberInfo();
                 del.setMemberType(DEL_TYPE);
                 mGroupMembers.add(del);

@@ -20,6 +20,7 @@ import com.work.api.open.model.GetCityListResp;
 import com.work.api.open.model.GetFriendByMobileResp;
 import com.work.api.open.model.GetGroupMsgReq;
 import com.work.api.open.model.GetGroupMsgResp;
+import com.work.api.open.model.GetTenantGroupListResp;
 import com.work.api.open.model.GetToolListByUserIdResp;
 import com.work.api.open.model.GetToolTokenReq;
 import com.work.api.open.model.GetToolTokenResp;
@@ -238,7 +239,7 @@ public class Yz extends ApiClient {
      * 全部群组
      */
     public void getTenantGroupList(GetTenantGroupListReq getTenantGroupListReq,OnResultDataListener onResultDataListener){
-        requestPost(ModeApi.getTenantGroupList,getTenantGroupListReq,new BaseResp(),onResultDataListener);
+        requestPost(ModeApi.getTenantGroupList,getTenantGroupListReq,new GetTenantGroupListResp(),onResultDataListener);
     }
     /**
      * 获取打车链接
