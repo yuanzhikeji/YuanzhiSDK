@@ -65,8 +65,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.hlife.qcloud.tim.uikit.modules.chat.layout.inputmore.InputMoreFragment.REQUEST_CODE_OSS_UPLOAD;
-
 /**
  * Created by tangyx
  * Date 2020/8/15
