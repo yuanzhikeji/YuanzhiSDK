@@ -90,27 +90,27 @@ public class ChatDemoActivity extends BaseActivity implements ConversationListLa
                 }
             });
             chatFragment.setYzCustomMessageDrawListener((parent, info) -> {
-                SLog.e("接收到自定义消息："+new String(info.getTimMessage().getCustomElem().getData()));
-                // 获取到自定义消息的json数据
-                if (info.getTimMessage().getElemType() != V2TIMMessage.V2TIM_ELEM_TYPE_CUSTOM) {
-                    return;
-                }
-                V2TIMCustomElem elem = info.getTimMessage().getCustomElem();
-                // 自定义的json数据，需要解析成bean实例
-                CustomMessage data = null;
-                try {
-                    data = new Gson().fromJson(new String(elem.getData()), CustomMessage.class);
-                } catch (Exception e) {
-                    SLog.w("invalid json: " + new String(elem.getData()) + " " + e.getMessage());
-                }
-                if (data == null) {
-                    SLog.e( "No Custom Data: " + new String(elem.getData()));
-                } else if (data.version == IMKitConstants.JSON_VERSION_1
-                        || (data.version == IMKitConstants.JSON_VERSION_4 && data.getBusinessID().equals(BUSINESS_ID_CUSTOM_CARD))) {
-                    CustomIMUIController.onDrawCard(parent, data);
-                } else {
-                    SLog.w("unsupported version: " + data);
-                }
+//                SLog.e("接收到自定义消息："+new String(info.getTimMessage().getCustomElem().getData()));
+//                // 获取到自定义消息的json数据
+//                if (info.getTimMessage().getElemType() != V2TIMMessage.V2TIM_ELEM_TYPE_CUSTOM) {
+//                    return;
+//                }
+//                V2TIMCustomElem elem = info.getTimMessage().getCustomElem();
+//                // 自定义的json数据，需要解析成bean实例
+//                CustomMessage data = null;
+//                try {
+//                    data = new Gson().fromJson(new String(elem.getData()), CustomMessage.class);
+//                } catch (Exception e) {
+//                    SLog.w("invalid json: " + new String(elem.getData()) + " " + e.getMessage());
+//                }
+//                if (data == null) {
+//                    SLog.e( "No Custom Data: " + new String(elem.getData()));
+//                } else if (data.version == IMKitConstants.JSON_VERSION_1
+//                        || (data.version == IMKitConstants.JSON_VERSION_4 && data.getBusinessID().equals(BUSINESS_ID_CUSTOM_CARD))) {
+//                    CustomIMUIController.onDrawCard(parent, data);
+//                } else {
+//                    SLog.w("unsupported version: " + data);
+//                }
             });
             fragmentTransaction.replace(R.id.container,chatFragment);
             fragmentTransaction.commitAllowingStateLoss();

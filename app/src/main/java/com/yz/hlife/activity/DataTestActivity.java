@@ -380,6 +380,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                     @Override
                     public void onChatMessageHistory(List<MessageInfo> messageInfos) {
                         SLog.e("messageInfos>>>>>"+messageInfos.size());
+                        ToastUtil.success(DataTestActivity.this,"获取到会话内容数量："+messageInfos.size());
                     }
 
                     @Override
