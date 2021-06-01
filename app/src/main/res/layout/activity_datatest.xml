@@ -65,7 +65,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_20"
-            android:visibility="gone"
             android:text="指定ID聊天"/>
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/send_custom"

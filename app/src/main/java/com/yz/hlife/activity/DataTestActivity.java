@@ -171,6 +171,12 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                     chatInfo.setChatName(conversationInfos.get(0).getTitle());
                     chatInfo.setGroup(conversationInfos.get(0).isGroup());
                     YzIMKitAgent.instance().startChat(chatInfo,null);
+                }else{
+                    ChatInfo chatInfo = new ChatInfo();
+                    chatInfo.setId("2124128975129831111");
+                    chatInfo.setChatName("群");
+                    chatInfo.setGroup(true);
+                    YzIMKitAgent.instance().startChat(chatInfo,null);
                 }
                 break;
             case R.id.send_custom:

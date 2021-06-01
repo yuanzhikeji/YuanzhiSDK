@@ -16,6 +16,7 @@ import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupChangeListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupInfoListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupJoinListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupMemberListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageSendCallback;
@@ -48,6 +49,7 @@ import com.tencent.imsdk.v2.V2TIMCallback;
 import com.tencent.imsdk.v2.V2TIMGroupApplication;
 import com.tencent.imsdk.v2.V2TIMGroupApplicationResult;
 import com.tencent.imsdk.v2.V2TIMGroupInfo;
+import com.tencent.imsdk.v2.V2TIMGroupInfoResult;
 import com.tencent.imsdk.v2.V2TIMGroupMemberFullInfo;
 import com.tencent.imsdk.v2.V2TIMGroupMemberInfoResult;
 import com.tencent.imsdk.v2.V2TIMManager;
@@ -878,6 +880,32 @@ public final class YzIMKitAgent {
                 }
                 if(listener!=null){
                     listener.groupMember(members);
+                }
+            }
+        });
+    }
+    /**
+     * 获取群资料
+     */
+    public void getGroupInfo(List<String> groupList, YzGroupInfoListener listener){
+        V2TIMManager.getGroupManager().getGroupsInfo(groupList, new V2TIMValueCallback<List<V2TIMGroupInfoResult>>() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess(List<V2TIMGroupInfoResult> v2TIMGroupInfoResults) {
+                List<GroupInfo> groupInfos = new ArrayList<>();
+                for (V2TIMGroupInfoResult v2TIMGroupInfoResult:v2TIMGroupInfoResults) {
+                    GroupInfo groupInfo = new GroupInfo();
+                    groupInfo.covertTIMGroupDetailInfo(v2TIMGroupInfoResult);
+                    groupInfos.add(groupInfo);
+                }
+                if(listener!=null){
+                    listener.success(groupInfos);
                 }
             }
         });
