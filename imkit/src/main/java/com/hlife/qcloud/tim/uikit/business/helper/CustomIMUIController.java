@@ -9,7 +9,6 @@ import android.widget.TextView;
 import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.business.active.OSSFileActivity;
 import com.hlife.qcloud.tim.uikit.business.active.WebActivity;
-import com.hlife.qcloud.tim.uikit.business.active.X5FileOpenActivity;
 import com.hlife.qcloud.tim.uikit.business.message.CustomFileMessage;
 import com.hlife.qcloud.tim.uikit.business.message.CustomMessage;
 import com.hlife.qcloud.tim.uikit.component.picture.imageEngine.impl.GlideEngine;
