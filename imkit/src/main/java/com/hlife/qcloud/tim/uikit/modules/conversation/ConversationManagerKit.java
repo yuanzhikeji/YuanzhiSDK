@@ -65,7 +65,6 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
 
     private void init() {
         MessageRevokedManager.getInstance().addHandler(this);
-//        this.groupApplicationList(null);
     }
 
     public void loadConversation(long nextSeq, final YzChatType type, final YzConversationDataListener callBack) {
@@ -191,25 +190,6 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         }
         mUnreadTotal = 0;
         this.groupApplicationList(new YzGroupDataListener() {
-            @Override
-            public void onCreate(int code, String groupId, String msg) {
-
-            }
-
-            @Override
-            public void update(int code, String msg) {
-
-            }
-
-            @Override
-            public void addMember(int code, String msg) {
-
-            }
-
-            @Override
-            public void deleteMember(int code, String msg) {
-
-            }
 
             @Override
             public void joinMember(List<GroupApplyInfo> applies) {
@@ -451,25 +431,6 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
 
     public void refreshApply(GroupChatManagerKit.GroupNotifyHandler listener){
         this.groupApplicationList(new YzGroupDataListener() {
-            @Override
-            public void onCreate(int code, String groupId, String msg) {
-
-            }
-
-            @Override
-            public void update(int code, String msg) {
-
-            }
-
-            @Override
-            public void addMember(int code, String msg) {
-
-            }
-
-            @Override
-            public void deleteMember(int code, String msg) {
-
-            }
 
             @Override
             public void joinMember(List<GroupApplyInfo> applies) {
@@ -496,11 +457,10 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         V2TIMManager.getGroupManager().getGroupApplicationList(new V2TIMValueCallback<V2TIMGroupApplicationResult>() {
             @Override
             public void onError(int code, String desc) {
-                SLog.e(code+">"+desc);
-//                if(listener==null){
-//                    return;
-//                }
-//                listener.joinMember(new ArrayList<>());
+                if(listener==null || code == 6015){
+                    return;
+                }
+                listener.joinMember(new ArrayList<>());
             }
 
             @Override
@@ -509,12 +469,14 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
                 List<GroupApplyInfo> applies = new ArrayList<>();
                 mApplyGroupID = new ArrayList<>();
                 for (int i = 0; i < v2TIMGroupApplications.size(); i++) {
-                    GroupApplyInfo info = new GroupApplyInfo(v2TIMGroupApplications.get(i));
-                    info.setStatus(0);
-                    applies.add(info);
-                    if(info.getGroupApplication().getHandleStatus() == V2TIMGroupApplication.V2TIM_GROUP_APPLICATION_HANDLE_STATUS_UNHANDLED){
+                    V2TIMGroupApplication v = v2TIMGroupApplications.get(i);
+                    if(v.getHandleStatus() == V2TIMGroupApplication.V2TIM_GROUP_APPLICATION_HANDLE_STATUS_UNHANDLED){
+                        GroupApplyInfo info = new GroupApplyInfo(v);
+                        info.setStatus(0);
+                        applies.add(info);
                         mApplyGroupID.add(info.getGroupApplication().getGroupID());
                     }
+
                 }
                 if(listener==null){
                     return;

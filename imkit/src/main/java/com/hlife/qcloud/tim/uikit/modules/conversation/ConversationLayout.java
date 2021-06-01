@@ -56,58 +56,45 @@ public class ConversationLayout extends RelativeLayout implements IConversationL
     private void init() {
         inflate(getContext(), R.layout.conversation_layout, this);
         EditText mSearch = findViewById(R.id.search);
-        mSearch.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SearchAddMoreActivity.startSearchMore(getContext(),1);
-            }
-        });
+        mSearch.setOnClickListener(view -> SearchAddMoreActivity.startSearchMore(getContext(),1));
         mConversationList = findViewById(R.id.conversation_list);
         mNoticeLayout = findViewById(R.id.chat_group_apply_layout);
-        mNoticeLayout.setOnNoticeClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getContext().startActivity(new Intent(getContext(), GroupApplyManagerActivity.class));
-            }
-        });
+        mNoticeLayout.setOnNoticeClickListener(view -> getContext().startActivity(new Intent(getContext(), GroupApplyManagerActivity.class)));
     }
     private IConversationAdapter adapter;
-    public void initDefault(YzChatType type) {
+    public void initDefault(YzChatType type,IUIKitCallBack callBack) {
         final View mAddMore = findViewById(R.id.add_more);
         int functionPrem = YzIMKitAgent.instance().getFunctionPrem();
         if((functionPrem & 2)>0){
             mAddMore.setVisibility(VISIBLE);
-            mAddMore.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(mMenu==null){
-                        List<String> item = new ArrayList<>();
-                        item.add(getContext().getResources().getString(R.string.add_friend));
-                        item.add(getContext().getResources().getString(R.string.add_group));
-                        item.add(getContext().getResources().getString(R.string.scan_qr_code));
-                        mMenu = new MorePopWindow(getContext(),item , new BaseQuickAdapter.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                                mMenu.dismiss();
-                                switch (position){
-                                    case 0:
-                                        getContext().startActivity(new Intent(getContext(), SearchAddMoreActivity.class));
-                                        break;
-                                    case 1:
-                                        Intent intent = new Intent(getContext(), StartGroupChatActivity.class);
-                                        intent.putExtra(IMKitConstants.GroupType.TYPE, IMKitConstants.GroupType.PUBLIC);
-                                        getContext().startActivity(intent);
-                                        break;
-                                    case 2:
-                                        getContext().startActivity(new Intent(getContext(), ScanIMQRCodeActivity.class));
-                                        break;
-                                }
+            mAddMore.setOnClickListener(view -> {
+                if(mMenu==null){
+                    List<String> item = new ArrayList<>();
+                    item.add(getContext().getResources().getString(R.string.add_friend));
+                    item.add(getContext().getResources().getString(R.string.add_group));
+                    item.add(getContext().getResources().getString(R.string.scan_qr_code));
+                    mMenu = new MorePopWindow(getContext(),item , new BaseQuickAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                            mMenu.dismiss();
+                            switch (position){
+                                case 0:
+                                    getContext().startActivity(new Intent(getContext(), SearchAddMoreActivity.class));
+                                    break;
+                                case 1:
+                                    Intent intent = new Intent(getContext(), StartGroupChatActivity.class);
+                                    intent.putExtra(IMKitConstants.GroupType.TYPE, IMKitConstants.GroupType.PUBLIC);
+                                    getContext().startActivity(intent);
+                                    break;
+                                case 2:
+                                    getContext().startActivity(new Intent(getContext(), ScanIMQRCodeActivity.class));
+                                    break;
                             }
-                        });
-                    }
-                    mMenu.showPopupWindow(mAddMore);
-
+                        }
+                    });
                 }
+                mMenu.showPopupWindow(mAddMore);
+
             });
         }else{
             mAddMore.setVisibility(GONE);
@@ -120,6 +107,9 @@ public class ConversationLayout extends RelativeLayout implements IConversationL
             @Override
             public void onSuccess(Object data) {
                 adapter.setDataProvider((ConversationProvider) data);
+                if(callBack!=null){
+                    callBack.onSuccess(null);
+                }
             }
 
             @Override

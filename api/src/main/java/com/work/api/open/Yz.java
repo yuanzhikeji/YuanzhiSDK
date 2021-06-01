@@ -29,6 +29,7 @@ import com.work.api.open.model.GetUserByParamResp;
 import com.work.api.open.model.GetUserListByMobilesReq;
 import com.work.api.open.model.GetUserListByMobilesResp;
 import com.work.api.open.model.GetVersionResp;
+import com.work.api.open.model.GroupMemberResp;
 import com.work.api.open.model.InviteUserReq;
 import com.work.api.open.model.LoginReq;
 import com.work.api.open.model.LoginResp;
@@ -142,9 +143,9 @@ public class Yz extends ApiClient {
     /**
      * 移除群组的人员
      */
-//    public void deleteGroupUser(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
-//        requestPost(ModeApi.deleteGroupUser,createGroupReq,new GroupMemberResp(),onResultDataListener);
-//    }
+    public void deleteGroupUser(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
+        requestPost(ModeApi.deleteGroupUser,createGroupReq,new GroupMemberResp(),onResultDataListener);
+    }
     /**
      * 解散群组
      */

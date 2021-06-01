@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.base.BaseFragment;
+import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.component.action.PopActionClickListener;
@@ -56,7 +57,7 @@ public class ConversationFragment extends BaseFragment implements GroupChatManag
         // 从布局文件中获取会话列表面板
         mConversationLayout = mBaseView.findViewById(R.id.conversation_layout);
         // 会话列表面板的默认UI和交互初始化
-        mConversationLayout.initDefault(mType);
+        refreshData();
         // 通过API设置ConversataonLayout各种属性的样例，开发者可以打开注释，体验效果
 //        ConversationLayoutHelper.customizeConversation(mConversationLayout);
         if(mOnItemClickListener!=null){
@@ -86,7 +87,17 @@ public class ConversationFragment extends BaseFragment implements GroupChatManag
 
     public void refreshData(){
         if(mConversationLayout!=null){
-            mConversationLayout.initDefault(mType);
+            mConversationLayout.initDefault(mType, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    ConversationManagerKit.getInstance().refreshApply(ConversationFragment.this);
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+
+                }
+            });
         }
     }
 
@@ -168,18 +179,6 @@ public class ConversationFragment extends BaseFragment implements GroupChatManag
     private void startPopShow(View view, int position, ConversationInfo info) {
         showItemPopMenu(position, info, view.getX(), view.getY() + view.getHeight() / 2);
     }
-
-//    public void startChatActivity(ConversationInfo conversationInfo, ChatViewConfig config) {
-//        ChatInfo chatInfo = new ChatInfo();
-//        chatInfo.setType(conversationInfo.isGroup() ? V2TIMConversation.V2TIM_GROUP : V2TIMConversation.V2TIM_C2C);
-//        chatInfo.setId(conversationInfo.getId());
-//        chatInfo.setChatName(conversationInfo.getTitle());
-//        Intent intent = new Intent(TUIKit.getAppContext(), ChatActivity.class);
-//        intent.putExtra(Constants.CHAT_INFO, chatInfo);
-//        intent.putExtra(Constants.CHAT_CONFIG,config);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        TUIKit.getAppContext().startActivity(intent);
-//    }
 
     public void setType(YzChatType mType) {
         this.mType = mType;

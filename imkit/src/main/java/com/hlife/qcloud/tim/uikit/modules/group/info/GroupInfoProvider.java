@@ -392,14 +392,12 @@ public class GroupInfoProvider {
         V2TIMManager.getGroupManager().getGroupApplicationList(new V2TIMValueCallback<V2TIMGroupApplicationResult>() {
             @Override
             public void onError(int code, String desc) {
-                SLog.e("getGroupPendencyList failed, code: " + code + "|desc: " + desc);
                 callBack.onError("SLog",code, desc);
             }
 
             @Override
             public void onSuccess(V2TIMGroupApplicationResult v2TIMGroupApplicationResult) {
                 List<V2TIMGroupApplication> v2TIMGroupApplicationList = v2TIMGroupApplicationResult.getGroupApplicationList();
-                SLog.e("getGroupPendencyList success: " +v2TIMGroupApplicationResult.toString());
                 for (int i = 0; i < v2TIMGroupApplicationList.size(); i++) {
                     GroupApplyInfo info = new GroupApplyInfo(v2TIMGroupApplicationList.get(i));
                     info.setStatus(0);

@@ -192,7 +192,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
 //                s.add("4624e6e2fd351a0eeaee47490997258e");
                 CreateGroupReq createGroupReq = new CreateGroupReq();
                 createGroupReq.Owner_Account = UserApi.instance().getUserId();
-                createGroupReq.Name = "测试群";
+                createGroupReq.Name = "测试群"+UserApi.instance().getNickName();
                 createGroupReq.FaceUrl = "https://yzkj-pro.oss-cn-beijing.aliyuncs.com/avatar/lPto9oLiOp.jfif";
                 List<OpenGroupMember> members = new ArrayList<>();
                 OpenGroupMember openGroupMember = new OpenGroupMember();
@@ -270,33 +270,16 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 break;
             case  R.id.delete_group:
                 List<String> mm = new ArrayList<>();
-                mm.add("2d9de88e9cd754abea89736f29132056");
-//                YzIMKitAgent.instance().deleteGroupMember("@TGS#242ILVEH4", mm, new YzGroupDataListener() {
-//                    @Override
-//                    public void onCreate(int code, String groupId, String msg) {
-//
-//                    }
-//
-//                    @Override
-//                    public void update(int code, String msg) {
-//
-//                    }
-//
-//                    @Override
-//                    public void addMember(int code, String msg) {
-//
-//                    }
-//
-//                    @Override
-//                    public void deleteMember(int code, String msg) {
-//                        ToastUtil.info(DataTestActivity.this,code+">"+msg);
-//                    }
-//
-//                    @Override
-//                    public void joinMember(List<GroupApplyInfo> applies) {
-//
-//                    }
-//                });
+                mm.add("1234");
+                CreateGroupReq createGroupReq1 = new CreateGroupReq();
+                createGroupReq1.GroupId = "@TGS#2N3MJFGHM";
+                createGroupReq1.MemberToDel_Account = mm;
+                Yz.getSession().deleteGroupUser(createGroupReq1, new OnResultDataListener() {
+                    @Override
+                    public void onResult(RequestWork req, ResponseWork resp) throws Exception {
+
+                    }
+                });
                 break;
             case R.id.join_group:
                 startActivity(new Intent(this, GroupListDemoActivity.class));

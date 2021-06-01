@@ -30,25 +30,6 @@ public class GroupApplyManagerActivity extends BaseActivity {
         if (getIntent().getExtras() == null) {
             setTitleName(R.string.group_apply_members_all);
             ConversationManagerKit.getInstance().groupApplicationList(new YzGroupDataListener() {
-                @Override
-                public void onCreate(int code, String groupId, String msg) {
-
-                }
-
-                @Override
-                public void update(int code, String msg) {
-
-                }
-
-                @Override
-                public void addMember(int code, String msg) {
-
-                }
-
-                @Override
-                public void deleteMember(int code, String msg) {
-
-                }
 
                 @Override
                 public void joinMember(List<GroupApplyInfo> applies) {

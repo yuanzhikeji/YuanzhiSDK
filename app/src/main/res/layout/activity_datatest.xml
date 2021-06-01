@@ -95,7 +95,6 @@
             android:text="指定一个人加入公开群"/>
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/delete_group"
-            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_20"

@@ -702,7 +702,7 @@ public final class YzIMKitAgent {
         V2TIMManager.getGroupManager().getGroupApplicationList(new V2TIMValueCallback<V2TIMGroupApplicationResult>() {
             @Override
             public void onError(int code, String desc) {
-                if(listener==null){
+                if(listener==null || code==6015){//频繁调用
                     return;
                 }
                 listener.joinMember(new ArrayList<>());

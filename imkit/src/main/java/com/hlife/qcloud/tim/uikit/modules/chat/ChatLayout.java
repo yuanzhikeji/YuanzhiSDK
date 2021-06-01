@@ -121,7 +121,7 @@ public class ChatLayout extends AbsChatLayout implements GroupChatManagerKit.Gro
 
             @Override
             public void onError(String module, int errCode, String errMsg) {
-                ToastUtil.error(getContext(),"loadApplyList onError: " +errCode + ">" + errMsg);
+//                ToastUtil.error(getContext(),"loadApplyList onError: " +errCode + ">" + errMsg);
             }
         });
     }
