@@ -102,12 +102,12 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
 
             @Override
             public void onConversationData(ConversationInfo data) {
-                ToastUtil.info(DataTestActivity.this,"获取指定会话："+data.toString());
+                ToastUtil.info(DataTestActivity.this,"获取指定会话："+data);
             }
 
             @Override
             public void onConversationError(int code, String desc) {
-
+                ToastUtil.error(DataTestActivity.this,code+">>"+desc);
             }
         });
     }
@@ -152,9 +152,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 loadConversation(YzChatType.GROUP);
                 break;
             case R.id.get_conversation:
-                if(conversationInfos!=null && conversationInfos.size()>0){
-                    getConversation(conversationInfos.get(0).getId());
-                }
+                getConversation("123");
                 break;
             case R.id.get_unread:
                 conversationUnRead();
