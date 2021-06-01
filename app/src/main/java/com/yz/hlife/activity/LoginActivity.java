@@ -168,6 +168,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                     public void loginFail(String module, int errCode, String errMsg) {
                         super.loginFail(module, errCode, errMsg);
                         SLog.e(errCode+">>"+errMsg);
+                        ToastUtil.error(LoginActivity.this,errCode+">"+errMsg);
                     }
                 });
                 break;

@@ -37,7 +37,18 @@ public class MwClientApplication extends MultiDexApplication {
         MultiDex.install(this);
 
         YzIMKitAgent.init(this,"7b9533618a47e947d4fd83b966081a52",true);
+
         //账号被踢出，或者失效
+        YzIMKitAgent.instance().addStatusListener(new YzStatusListener() {
+            @Override
+            public void logout() {
+                super.logout();
+//                WemeetSdkHelper.logout();
+                Intent intent = new Intent(MwClientApplication.this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            }
+        });
         YzIMKitAgent.instance().addWorkAppItemClickListener(item -> {
             if(item instanceof WorkApp){
                 WorkApp wp = (WorkApp) item;
