@@ -14,8 +14,10 @@ import com.hlife.qcloud.tim.uikit.business.active.OSSFileActivity;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatHistoryMessageListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupChangeListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupJoinListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupMemberListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageSendCallback;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.business.inter.YzStatusListener;
@@ -34,6 +36,7 @@ import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.group.apply.GroupApplyInfo;
 import com.hlife.qcloud.tim.uikit.modules.group.info.GroupInfo;
+import com.hlife.qcloud.tim.uikit.modules.group.member.GroupMemberInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
 import com.hlife.qcloud.tim.uikit.utils.BrandUtil;
@@ -44,6 +47,9 @@ import com.http.network.task.ObjectMapperFactory;
 import com.tencent.imsdk.v2.V2TIMCallback;
 import com.tencent.imsdk.v2.V2TIMGroupApplication;
 import com.tencent.imsdk.v2.V2TIMGroupApplicationResult;
+import com.tencent.imsdk.v2.V2TIMGroupInfo;
+import com.tencent.imsdk.v2.V2TIMGroupMemberFullInfo;
+import com.tencent.imsdk.v2.V2TIMGroupMemberInfoResult;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.imsdk.v2.V2TIMMessage;
 import com.tencent.imsdk.v2.V2TIMValueCallback;
@@ -713,6 +719,166 @@ public final class YzIMKitAgent {
                     applies.add(info);
                 }
                 listener.joinMember(applies);
+            }
+        });
+    }
+    /**
+     * 修改群头像
+     */
+    public void changeGroupFaceUrl(String groupId, String url, YzGroupChangeListener listener){
+        V2TIMGroupInfo v2TIMGroupInfo = new V2TIMGroupInfo();
+        v2TIMGroupInfo.setGroupID(groupId);
+        v2TIMGroupInfo.setFaceUrl(url);
+        V2TIMManager.getGroupManager().setGroupInfo(v2TIMGroupInfo, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+        });
+    }
+    /**
+     * 修改群名字
+     */
+    public void changeGroupName(String groupId, String name, YzGroupChangeListener listener){
+        V2TIMGroupInfo v2TIMGroupInfo = new V2TIMGroupInfo();
+        v2TIMGroupInfo.setGroupID(groupId);
+        v2TIMGroupInfo.setGroupName(name);
+        V2TIMManager.getGroupManager().setGroupInfo(v2TIMGroupInfo, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+        });
+    }
+    /**
+     * 全体是否禁言
+     */
+    public void changeGroupMuted(String groupId,boolean muted,YzGroupChangeListener listener){
+        V2TIMGroupInfo v2TIMGroupInfo = new V2TIMGroupInfo();
+        v2TIMGroupInfo.setGroupID(groupId);
+        v2TIMGroupInfo.setAllMuted(muted);
+        V2TIMManager.getGroupManager().setGroupInfo(v2TIMGroupInfo, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+        });
+    }
+    /**
+     * 是否消息免打扰
+     */
+    public void changeGroupReceiveMessageOpt(String groupId,boolean opt,YzGroupChangeListener listener){
+        V2TIMManager.getGroupManager().setReceiveMessageOpt(groupId, opt ? V2TIMGroupInfo.V2TIM_GROUP_NOT_RECEIVE_MESSAGE : V2TIMGroupInfo.V2TIM_GROUP_RECEIVE_MESSAGE, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+        });
+    }
+    /**
+     * 修改群公告
+     */
+    public void changeGroupNotice(String groupId,String content,YzGroupChangeListener listener){
+        V2TIMGroupInfo v2TIMGroupInfo = new V2TIMGroupInfo();
+        v2TIMGroupInfo.setGroupID(groupId);
+        v2TIMGroupInfo.setNotification(content);
+        V2TIMManager.getGroupManager().setGroupInfo(v2TIMGroupInfo, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+        });
+    }
+    /**
+     * 设置管理员
+     */
+    public void changeGroupMemberRole(String groupId,String userid,boolean isAdd,YzGroupChangeListener listener){
+        V2TIMManager.getGroupManager().setGroupMemberRole(groupId, userid,isAdd?V2TIMGroupMemberFullInfo.V2TIM_GROUP_MEMBER_ROLE_ADMIN : V2TIMGroupMemberFullInfo.V2TIM_GROUP_MEMBER_ROLE_MEMBER, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+        });
+    }
+    /**
+     * 获取成员
+     * V2TIMGroupMemberFullInfo.V2TIM_GROUP_MEMBER_FILTER_ADMIN
+     * V2TIM_GROUP_MEMBER_FILTER_COMMON
+     * V2TIM_GROUP_MEMBER_FILTER_ALL
+     */
+    public void groupMember(String groupId, int filter, long nextSeq, YzGroupMemberListener listener){
+        V2TIMManager.getGroupManager().getGroupMemberList(groupId, filter, nextSeq, new V2TIMValueCallback<V2TIMGroupMemberInfoResult>() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess(V2TIMGroupMemberInfoResult v2TIMGroupMemberInfoResult) {
+                List<GroupMemberInfo> members = new ArrayList<>();
+                for (int i = 0; i < v2TIMGroupMemberInfoResult.getMemberInfoList().size(); i++) {
+                    GroupMemberInfo member = new GroupMemberInfo();
+                    members.add(member.covertTIMGroupMemberInfo(v2TIMGroupMemberInfoResult.getMemberInfoList().get(i)));
+                }
+                if(listener!=null){
+                    listener.groupMember(members);
+                }
             }
         });
     }

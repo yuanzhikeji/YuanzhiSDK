@@ -11,7 +11,6 @@ import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.group.info.GroupInfo;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
-import com.work.api.open.model.client.OpenGroupInfo;
 
 import java.util.List;
 
