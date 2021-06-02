@@ -679,7 +679,7 @@ public final class YzIMKitAgent {
         }
     }
     /**
-     * 获取群申请信息
+     * 申请加群
      */
     public void joinGroup(String groupId, String message, YzGroupJoinListener listener){
         V2TIMManager.getInstance().joinGroup(groupId, message, new V2TIMCallback() {
@@ -727,7 +727,7 @@ public final class YzIMKitAgent {
     /**
      * 修改群头像
      */
-    public void setGroupFaceUrl(String groupId, String url, YzGroupChangeListener listener){
+    public void changeGroupFaceUrl(String groupId, String url, YzGroupChangeListener listener){
         V2TIMGroupInfo v2TIMGroupInfo = new V2TIMGroupInfo();
         v2TIMGroupInfo.setGroupID(groupId);
         v2TIMGroupInfo.setFaceUrl(url);
@@ -750,7 +750,7 @@ public final class YzIMKitAgent {
     /**
      * 修改群名字
      */
-    public void setGroupName(String groupId, String name, YzGroupChangeListener listener){
+    public void changeGroupName(String groupId, String name, YzGroupChangeListener listener){
         V2TIMGroupInfo v2TIMGroupInfo = new V2TIMGroupInfo();
         v2TIMGroupInfo.setGroupID(groupId);
         v2TIMGroupInfo.setGroupName(name);
@@ -773,7 +773,7 @@ public final class YzIMKitAgent {
     /**
      * 全体是否禁言
      */
-    public void mutedGroup(String groupId,boolean muted,YzGroupChangeListener listener){
+    public void changeGroupMuted(String groupId,boolean muted,YzGroupChangeListener listener){
         V2TIMGroupInfo v2TIMGroupInfo = new V2TIMGroupInfo();
         v2TIMGroupInfo.setGroupID(groupId);
         v2TIMGroupInfo.setAllMuted(muted);
@@ -796,7 +796,7 @@ public final class YzIMKitAgent {
     /**
      * 是否消息免打扰
      */
-    public void receiveMessageOpt(String groupId,boolean opt,YzGroupChangeListener listener){
+    public void changeReceiveMessageOpt(String groupId,boolean opt,YzGroupChangeListener listener){
         V2TIMManager.getGroupManager().setReceiveMessageOpt(groupId, opt ? V2TIMGroupInfo.V2TIM_GROUP_NOT_RECEIVE_MESSAGE : V2TIMGroupInfo.V2TIM_GROUP_RECEIVE_MESSAGE, new V2TIMCallback() {
             @Override
             public void onError(int code, String desc) {
@@ -816,7 +816,7 @@ public final class YzIMKitAgent {
     /**
      * 修改群公告
      */
-    public void setGroupNotice(String groupId,String content,YzGroupChangeListener listener){
+    public void changeGroupNotice(String groupId,String content,YzGroupChangeListener listener){
         V2TIMGroupInfo v2TIMGroupInfo = new V2TIMGroupInfo();
         v2TIMGroupInfo.setGroupID(groupId);
         v2TIMGroupInfo.setNotification(content);
@@ -837,9 +837,32 @@ public final class YzIMKitAgent {
         });
     }
     /**
+     * 修改群简介
+     */
+    public void changeGroupIntroduction(String groupId,String content,YzGroupChangeListener listener){
+        V2TIMGroupInfo v2TIMGroupInfo = new V2TIMGroupInfo();
+        v2TIMGroupInfo.setGroupID(groupId);
+        v2TIMGroupInfo.setIntroduction(content);
+        V2TIMManager.getGroupManager().setGroupInfo(v2TIMGroupInfo, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+        });
+    }
+    /**
      * 设置管理员
      */
-    public void setGroupMemberRole(String groupId,String userid,boolean isAdd,YzGroupChangeListener listener){
+    public void changeGroupMemberRole(String groupId,String userid,boolean isAdd,YzGroupChangeListener listener){
         V2TIMManager.getGroupManager().setGroupMemberRole(groupId, userid,isAdd?V2TIMGroupMemberFullInfo.V2TIM_GROUP_MEMBER_ROLE_ADMIN : V2TIMGroupMemberFullInfo.V2TIM_GROUP_MEMBER_ROLE_MEMBER, new V2TIMCallback() {
             @Override
             public void onError(int code, String desc) {
