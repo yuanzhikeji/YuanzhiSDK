@@ -158,12 +158,12 @@ public class Yz extends ApiClient {
     public void getGroupMsg(GetGroupMsgReq getGroupMsgReq, OnResultDataListener onResultDataListener){
         requestPost(ModeApi.getGroupMsg,getGroupMsgReq,new GetGroupMsgResp(),onResultDataListener);
     }
-    /**
-     * 修改群信息
-     */
-    public void updateGroup(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
-        requestPost(ModeApi.updateGroup,createGroupReq,new BaseResp(),onResultDataListener);
-    }
+//    /**
+//     * 修改群信息
+//     */
+//    public void updateGroup(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
+//        requestPost(ModeApi.updateGroup,createGroupReq,new BaseResp(),onResultDataListener);
+//    }
     /**
      * 获取版本信息
      */

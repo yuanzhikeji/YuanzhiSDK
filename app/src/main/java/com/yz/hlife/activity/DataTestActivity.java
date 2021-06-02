@@ -211,29 +211,12 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 });
                 break;
             case R.id.update_group_name:
-//                YzIMKitAgent.instance().updateGroup("@TGS#242ILVEH4", "我改群名字", new YzGroupDataListener() {
+//                CreateGroupReq createGroupReq1 = new CreateGroupReq();
+//                createGroupReq1.GroupId = "@TGS#2ZTF2CGHX";
+//                createGroupReq1.Name = "我改一个名字";
+//                Yz.getSession().updateGroup(createGroupReq1, new OnResultDataListener() {
 //                    @Override
-//                    public void onCreate(int code, String groupId, String msg) {
-//
-//                    }
-//
-//                    @Override
-//                    public void update(int code, String msg) {
-//
-//                    }
-//
-//                    @Override
-//                    public void addMember(int code, String msg) {
-//
-//                    }
-//
-//                    @Override
-//                    public void deleteMember(int code, String msg) {
-//
-//                    }
-//
-//                    @Override
-//                    public void joinMember(List<GroupApplyInfo> applies) {
+//                    public void onResult(RequestWork req, ResponseWork resp) throws Exception {
 //
 //                    }
 //                });
@@ -271,10 +254,10 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
             case  R.id.delete_group:
                 List<String> mm = new ArrayList<>();
                 mm.add("1234");
-                CreateGroupReq createGroupReq1 = new CreateGroupReq();
-                createGroupReq1.GroupId = "@TGS#2N3MJFGHM";
-                createGroupReq1.MemberToDel_Account = mm;
-                Yz.getSession().deleteGroupUser(createGroupReq1, new OnResultDataListener() {
+                CreateGroupReq createGroupReq22 = new CreateGroupReq();
+                createGroupReq22.GroupId = "@TGS#2N3MJFGHM";
+                createGroupReq22.MemberToDel_Account = mm;
+                Yz.getSession().deleteGroupUser(createGroupReq22, new OnResultDataListener() {
                     @Override
                     public void onResult(RequestWork req, ResponseWork resp) throws Exception {
 

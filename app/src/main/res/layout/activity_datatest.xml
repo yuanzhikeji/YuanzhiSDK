@@ -85,7 +85,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_20"
-            android:visibility="gone"
             android:text="更新一个群的昵称"/>
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/add_group"
