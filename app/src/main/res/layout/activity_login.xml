@@ -31,35 +31,21 @@
                 android:textSize="16sp" />
 
         </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:background="@drawable/search_bg_img"
-            android:layout_marginLeft="@dimen/dp_20"
-            android:layout_marginRight="@dimen/dp_20"
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/mobile"
             android:layout_marginTop="44dp"
-            android:layout_width="match_parent"
-            android:gravity="center_vertical"
-            android:layout_height="40dp">
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/phone"
-                style="@style/EditorStyle"
-                android:layout_marginRight="0dp"
-                android:layout_marginLeft="0dp"
-                android:inputType="number"
-                android:hint="userid"
-                android:background="@color/transparent"/>
-        </LinearLayout>
+            android:hint="mobile"
+            style="@style/EditorStyle"/>
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/password"
             android:layout_marginTop="@dimen/dp_16"
             android:hint="username"
             style="@style/EditorStyle"/>
         <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/mobile"
+            android:id="@+id/phone"
+            style="@style/EditorStyle"
             android:layout_marginTop="@dimen/dp_16"
-            android:hint="mobile"
-            style="@style/EditorStyle"/>
+            android:hint="userid"/>
         <RelativeLayout
             android:visibility="gone"
             android:layout_width="match_parent"

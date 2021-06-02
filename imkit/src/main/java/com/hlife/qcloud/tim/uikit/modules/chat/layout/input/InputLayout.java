@@ -285,25 +285,7 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
                     SLog.e( "uri is empty");
                     return;
                 }
-
-                String videoPath = FileUtil.getPathFromUri((Uri) data);
-                String fileExtension = MimeTypeMap.getFileExtensionFromUrl(videoPath);
-                String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
-                if (mimeType != null && mimeType.contains("video")){
-                    MessageInfo msg = buildVideoMessage(FileUtil.getPathFromUri((Uri) data));
-                    if (msg == null){
-                        SLog.e("start send video error data: " + data);
-                    } else if (mMessageHandler != null) {
-                        mMessageHandler.sendMessage(msg);
-                        hideSoftInput();
-                    }
-                } else {
-                    MessageInfo info = MessageInfoUtil.buildImageMessage((Uri) data, true);
-                    if (mMessageHandler != null) {
-                        mMessageHandler.sendMessage(info);
-                        hideSoftInput();
-                    }
-                }
+                OSSFileActivity.uploadFile(mInputMoreFragment,(Uri)data,REQUEST_CODE_OSS_UPLOAD);
             }
 
             @Override
@@ -416,76 +398,11 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
             @Override
             public void onSuccess(Object data) {
                 OSSFileActivity.uploadFile(mInputMoreFragment,(Uri)data,REQUEST_CODE_OSS_UPLOAD);
-//                if(getContext() instanceof BaseActivity){
-//                    ((BaseActivity) getContext()).showProgressLoading(R.string.toast_upload_file);
-//                }
-//                MessageInfoUtil.buildFileMessage((Uri) data, new IUIKitCallBack() {
-//                    @Override
-//                    public void onSuccess(Object data) {
-//                        MessageInfo info = (MessageInfo) data;
-//                        String path = info.getDataPath();
-//                        OSSHelper ossHelper = new OSSHelper((BaseActivity) getContext());
-//                        ossHelper.setOnOSSUploadFileListener(new OSSHelper.OnOSSUploadFileListener() {
-//                            @Override
-//                            public void onSuccess(String fileUrl, String filePath) {
-//                            }
-//
-//                            @Override
-//                            public void onProgress(int progress) {
-//                            }
-//
-//                            @Override
-//                            public void onError() {
-//                            }
-//                        });
-//                        ossHelper.asyncPut(path);
-////                        if (mMessageHandler != null && info!=null) {
-////                            mMessageHandler.sendMessage(info);
-////                            hideSoftInput();
-////                        }
-//                    }
-//
-//                    @Override
-//                    public void onError(String module, int errCode, String errMsg) {
-//
-//                    }
-//                });
             }
 
             @Override
             public void onError(String module, int errCode, String errMsg) {
                 ToastUtil.error(getContext(),errMsg);
-            }
-        });
-        mInputMoreFragment.setOSSCallback(new IUIKitCallBack() {
-            @Override
-            public void onSuccess(Object data) {
-                if(data instanceof Uri){
-                    MessageInfo imgInfo = MessageInfoUtil.buildImageMessage((Uri) data,true);
-                    if (mMessageHandler != null) {
-                        mMessageHandler.sendMessage(imgInfo);
-                        hideSoftInput();
-                    }
-                }else if(data instanceof VideoFile){
-                    VideoFile videoFile = (VideoFile) data;
-                    MessageInfo videoInfo = MessageInfoUtil.buildVideoMessage(videoFile.imagePath,videoFile.filePath,videoFile.firstFrame.getWidth(),videoFile.firstFrame.getHeight(),videoFile.duration);
-                    if (mMessageHandler != null) {
-                        mMessageHandler.sendMessage(videoInfo);
-                        hideSoftInput();
-                    }
-                }else if(data instanceof CustomFileMessage){
-                    String custom = ObjectMapperFactory.getObjectMapper().model2JsonStr(data);
-                    MessageInfo customInfo = MessageInfoUtil.buildCustomMessage(custom);
-                    if (mMessageHandler != null) {
-                        mMessageHandler.sendMessage(customInfo);
-                        hideSoftInput();
-                    }
-                }
-            }
-
-            @Override
-            public void onError(String module, int errCode, String errMsg) {
-
             }
         });
         mInputMoreFragment.startActivityForResult(intent, InputMoreFragment.REQUEST_CODE_FILE);
@@ -792,6 +709,38 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
         }
         if (mInputMoreFragment == null) {
             mInputMoreFragment = new InputMoreFragment();
+            mInputMoreFragment.setOSSCallback(new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    SLog.e("data:"+data);
+                    if(data instanceof Uri){
+                        MessageInfo imgInfo = MessageInfoUtil.buildImageMessage((Uri) data,true);
+                        if (mMessageHandler != null) {
+                            mMessageHandler.sendMessage(imgInfo);
+                            hideSoftInput();
+                        }
+                    }else if(data instanceof VideoFile){
+                        VideoFile videoFile = (VideoFile) data;
+                        MessageInfo videoInfo = MessageInfoUtil.buildVideoMessage(videoFile.imagePath,videoFile.filePath,videoFile.firstFrame.getWidth(),videoFile.firstFrame.getHeight(),videoFile.duration);
+                        if (mMessageHandler != null) {
+                            mMessageHandler.sendMessage(videoInfo);
+                            hideSoftInput();
+                        }
+                    }else if(data instanceof CustomFileMessage){
+                        String custom = ObjectMapperFactory.getObjectMapper().model2JsonStr(data);
+                        MessageInfo customInfo = MessageInfoUtil.buildCustomMessage(custom);
+                        if (mMessageHandler != null) {
+                            mMessageHandler.sendMessage(customInfo);
+                            hideSoftInput();
+                        }
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+
+                }
+            });
         }
 
         assembleActions();

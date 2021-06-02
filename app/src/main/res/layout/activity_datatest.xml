@@ -75,6 +75,7 @@
             android:text="发一个自定义消息"/>
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/create_group"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_40"
@@ -97,6 +98,7 @@
             android:id="@+id/delete_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:layout_marginTop="@dimen/dp_20"
             android:text="指定成员退出公开群"/>
         <androidx.appcompat.widget.AppCompatButton
