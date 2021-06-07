@@ -38,6 +38,13 @@
             android:text="获取指定用户的会话"/>
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/del_conversation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
+            android:text="删除一个指定会话"/>
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/get_unread"
             android:layout_marginTop="@dimen/dp_20"
             android:visibility="gone"

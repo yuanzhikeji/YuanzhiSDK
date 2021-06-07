@@ -23,6 +23,7 @@ import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationListLayout;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 import com.tencent.imsdk.v2.V2TIMCustomElem;
+import com.tencent.imsdk.v2.V2TIMGroupAtInfo;
 import com.tencent.imsdk.v2.V2TIMMessage;
 import com.work.util.SLog;
 import com.work.util.ToastUtil;
@@ -114,6 +115,8 @@ public class ChatDemoActivity extends BaseActivity implements ConversationListLa
             });
             fragmentTransaction.replace(R.id.container,chatFragment);
             fragmentTransaction.commitAllowingStateLoss();
+            //@所有人
+            chatFragment.updateInputText("所有人", V2TIMGroupAtInfo.AT_ALL_TAG);
         }else{
             ConversationFragment fragment0 = ConversationFragment.newConversation(YzChatType.C2C);
             fragment0.setOnItemClickListener(this);

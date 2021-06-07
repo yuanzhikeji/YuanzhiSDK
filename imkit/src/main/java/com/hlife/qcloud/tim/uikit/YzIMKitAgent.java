@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
+import android.text.TextUtils;
 
 import com.hlife.qcloud.tim.uikit.base.IMEventListener;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
@@ -14,6 +15,7 @@ import com.hlife.qcloud.tim.uikit.business.active.OSSFileActivity;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatHistoryMessageListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzDeleteConversationListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupChangeListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupInfoListener;
@@ -630,6 +632,15 @@ public final class YzIMKitAgent {
     }
     public void removeMessageWatcher(YzMessageWatcher watcher){
         ConversationManagerKit.getInstance().removeMessageWatcher(watcher);
+    }
+    public void deleteConversation(String id, YzDeleteConversationListener listener){
+        if(TextUtils.isEmpty(id)){
+            if(listener!=null){
+                listener.error(-1,"ID cannot be empty");
+            }
+            return;
+        }
+        ConversationManagerKit.getInstance().deleteConversation(id,listener);
     }
     /**
      * 获取历史会话记录

@@ -8,6 +8,7 @@ import com.hlife.qcloud.tim.uikit.base.BaseActivity;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatHistoryMessageListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzDeleteConversationListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
@@ -63,6 +64,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
         findViewById(R.id.send_message).setOnClickListener(this);
         findViewById(R.id.send_group_message).setOnClickListener(this);
         findViewById(R.id.chat_history).setOnClickListener(this);
+        findViewById(R.id.del_conversation).setOnClickListener(this);
     }
 
     private void groupApplicationList(){
@@ -153,6 +155,19 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 break;
             case R.id.get_conversation:
                 getConversation("123");
+                break;
+            case R.id.del_conversation:
+                YzIMKitAgent.instance().deleteConversation("22222", new YzDeleteConversationListener() {
+                    @Override
+                    public void success() {
+                        ToastUtil.success(DataTestActivity.this,"删除成功");
+                    }
+
+                    @Override
+                    public void error(int code, String desc) {
+                        ToastUtil.error(DataTestActivity.this,"删除失败："+code+">"+desc);
+                    }
+                });
                 break;
             case R.id.get_unread:
                 conversationUnRead();

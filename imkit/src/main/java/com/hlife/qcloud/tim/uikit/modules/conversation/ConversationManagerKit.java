@@ -9,6 +9,7 @@ import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzDeleteConversationListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.config.TUIKitConfigs;
@@ -123,6 +124,54 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
                         searchConversation(id,nextSeq,listener);
                     }else{
                         listener.onConversationData(conversationInfo);
+                    }
+                }
+            }
+        });
+    }
+    /**
+     * 删除指定的消息会话
+     */
+    public void deleteConversation(String userIdOrGroupId, YzDeleteConversationListener listener){
+        deleteConversation(userIdOrGroupId,0,listener);
+    }
+    public void deleteConversation(String id,long nextSeq,final YzDeleteConversationListener listener){
+        loadConversation(nextSeq, YzChatType.ALL, new YzConversationDataListener() {
+            @Override
+            public void onConversationData(List<ConversationInfo> data, long unRead, long nextSeq) {
+                super.onConversationData(data, unRead, nextSeq);
+                if(data.size()==0){
+                    if(listener!=null){
+                        listener.success();
+                    }
+                }else{
+                    for (int i = 0; i < data.size(); i++) {
+                        ConversationInfo item = data.get(i);
+                        if(item.getId().equals(id)){
+                            V2TIMManager.getConversationManager().deleteConversation(item.getConversationId(), new V2TIMCallback() {
+                                @Override
+                                public void onError(int code, String desc) {
+                                    if(listener!=null){
+                                        listener.error(code,desc);
+                                    }
+                                }
+
+                                @Override
+                                public void onSuccess() {
+                                    if(listener!=null){
+                                        listener.success();
+                                    }
+                                }
+                            });
+                            break;
+                        }
+                    }
+                    if(nextSeq!=-1){
+                        deleteConversation(id,nextSeq,listener);
+                    }else{
+                        if(listener!=null){
+                            listener.success();
+                        }
                     }
                 }
             }
