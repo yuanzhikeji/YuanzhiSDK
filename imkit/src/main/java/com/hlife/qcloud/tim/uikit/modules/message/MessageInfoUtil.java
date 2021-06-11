@@ -354,119 +354,123 @@ public class MessageInfoUtil {
         int type = timMessage.getElemType();
         if (type == V2TIMMessage.V2TIM_ELEM_TYPE_CUSTOM) {
             V2TIMCustomElem customElem = timMessage.getCustomElem();
-            String data = new String(customElem.getData());
-            if (data.equals(MessageCustom.BUSINESS_ID_GROUP_CREATE)) {
-                // 兼容4.7版本以前的 tuikith
-                msgInfo.setMsgType(MessageInfo.MSG_TYPE_GROUP_CREATE);
-                String message =  (TextUtils.isEmpty(msgInfo.getTimMessage().getNameCard())?msgInfo.getTimMessage().getNickName():msgInfo.getTimMessage().getNameCard())+ " 发起了群聊";
-                msgInfo.setExtra(message);
-            } else {
-                if (isTyping(customElem.getData())) {
-                    // 忽略正在输入，它不能作为真正的消息展示
-                    return null;
+            if(customElem.getData()!=null){
+                String data = new String(customElem.getData());
+                if (data.equals(MessageCustom.BUSINESS_ID_GROUP_CREATE)) {
+                    // 兼容4.7版本以前的 tuikith
+                    msgInfo.setMsgType(MessageInfo.MSG_TYPE_GROUP_CREATE);
+                    String message =  (TextUtils.isEmpty(msgInfo.getTimMessage().getNameCard())?msgInfo.getTimMessage().getNickName():msgInfo.getTimMessage().getNameCard())+ " 发起了群聊";
+                    msgInfo.setExtra(message);
                 }
-                if(SLog.debug)SLog.i( "message info util custom data:" + data);
-                String content = "[自定义消息]";
-                msgInfo.setMsgType(MessageInfo.MSG_TYPE_CUSTOM);
-                msgInfo.setExtra(content);
-                Gson gson = new Gson();
-                MessageCustom messageCustom;
-                try {
-                    messageCustom = gson.fromJson(data, MessageCustom.class);
-                    String businessId = messageCustom.businessID;
-                    if (!TextUtils.isEmpty(businessId) && messageCustom.businessID.equals(MessageCustom.BUSINESS_ID_GROUP_CREATE)) {
-                        msgInfo.setMsgType(MessageInfo.MSG_TYPE_GROUP_CREATE);
-                        String message = IMKitConstants.covert2HTMLString(messageCustom.opUser) + messageCustom.content;
-                        msgInfo.setExtra(message);
-                    } else if(!TextUtils.isEmpty(businessId) && messageCustom.businessID.equals(BUSINESS_ID_CUSTOM_CARD)){
-                        msgInfo.setExtra("[链接]");
-                    } else if(!TextUtils.isEmpty(businessId) && messageCustom.businessID.equals(BUSINESS_ID_CUSTOM_FILE)){
-                        CustomFileMessage message = ObjectMapperFactory.getObjectMapper().json2Model(data,CustomFileMessage.class);
-                        msgInfo.setExtra("[文件]"+message.getFileName());
-                    }else if(!TextUtils.isEmpty(businessId) && messageCustom.businessID.equals(BUSINESS_ID_CUSTOM_LOCATION)){//来自小程序自己发送的位置消息
-                        msgInfo.setExtra("[位置]");
-                        msgInfo.setMsgType(MessageInfo.MSG_TYPE_LOCATION);
-                    } else {
-                        CallModel callModel = CallModel.convert2VideoCallData(timMessage);
-                        if (callModel != null) {
-                            String senderShowName = timMessage.getSender();
-                            if (!TextUtils.isEmpty(timMessage.getNameCard())) {
-                                senderShowName = timMessage.getNameCard();
-                            } else if (!TextUtils.isEmpty(timMessage.getFriendRemark())) {
-                                senderShowName = timMessage.getFriendRemark();
-                            } else if (!TextUtils.isEmpty(timMessage.getNickName())) {
-                                senderShowName = timMessage.getNickName();
-                            }
-                            switch (callModel.action) {
-                                case CallModel.VIDEO_CALL_ACTION_DIALING:
-                                    content = isGroup ? ("\"" + senderShowName + "\"" + "发起群通话") : ("发起通话");
-                                    if(!isGroup){
-                                        msgInfo.setCallType(callModel.callType);
-                                    }
-                                    break;
-                                case CallModel.VIDEO_CALL_ACTION_SPONSOR_CANCEL:
-                                    content = isGroup ? "取消群通话" : "取消通话";
-                                    if(!isGroup){
-                                        msgInfo.setCallType(callModel.callType);
-                                    }
-                                    break;
-                                case CallModel.VIDEO_CALL_ACTION_LINE_BUSY:
-                                    content = isGroup ? ("\"" + senderShowName + "\"" + "忙线") : "对方忙线";
-                                    if(!isGroup){
-                                        msgInfo.setCallType(callModel.callType);
-                                    }
-                                    break;
-                                case CallModel.VIDEO_CALL_ACTION_REJECT:
-                                    content = isGroup ? ("\"" + senderShowName + "\"" + "拒绝群通话") : "拒绝通话";
-                                    if(!isGroup){
-                                        msgInfo.setCallType(callModel.callType);
-                                    }
-                                    break;
-                                case CallModel.VIDEO_CALL_ACTION_SPONSOR_TIMEOUT:
-                                    if (isGroup && callModel.invitedList != null && callModel.invitedList.size() == 1
-                                            && callModel.invitedList.get(0).equals(timMessage.getSender())) {
-                                        content = "\"" + senderShowName + "\"" + "无应答";
-                                    } else {
+                else {
+                    if (isTyping(customElem.getData())) {
+                        // 忽略正在输入，它不能作为真正的消息展示
+                        return null;
+                    }
+                    if(SLog.debug)SLog.i( "message info util custom data:" + data);
+                    String content = "[自定义消息]";
+                    msgInfo.setMsgType(MessageInfo.MSG_TYPE_CUSTOM);
+                    msgInfo.setExtra(content);
+                    Gson gson = new Gson();
+                    MessageCustom messageCustom;
+                    try {
+                        messageCustom = gson.fromJson(data, MessageCustom.class);
+                        String businessId = messageCustom.businessID;
+                        if (!TextUtils.isEmpty(businessId) && messageCustom.businessID.equals(MessageCustom.BUSINESS_ID_GROUP_CREATE)) {
+                            msgInfo.setMsgType(MessageInfo.MSG_TYPE_GROUP_CREATE);
+                            String message = IMKitConstants.covert2HTMLString(messageCustom.opUser) + messageCustom.content;
+                            msgInfo.setExtra(message);
+                        } else if(!TextUtils.isEmpty(businessId) && messageCustom.businessID.equals(BUSINESS_ID_CUSTOM_CARD)){
+                            msgInfo.setExtra("[链接]");
+                        } else if(!TextUtils.isEmpty(businessId) && messageCustom.businessID.equals(BUSINESS_ID_CUSTOM_FILE)){
+                            CustomFileMessage message = ObjectMapperFactory.getObjectMapper().json2Model(data,CustomFileMessage.class);
+                            msgInfo.setExtra("[文件]"+message.getFileName());
+                        }else if(!TextUtils.isEmpty(businessId) && messageCustom.businessID.equals(BUSINESS_ID_CUSTOM_LOCATION)){//来自小程序自己发送的位置消息
+                            msgInfo.setExtra("[位置]");
+                            msgInfo.setMsgType(MessageInfo.MSG_TYPE_LOCATION);
+                        } else {
+                            CallModel callModel = CallModel.convert2VideoCallData(timMessage);
+                            if (callModel != null) {
+                                String senderShowName = timMessage.getSender();
+                                if (!TextUtils.isEmpty(timMessage.getNameCard())) {
+                                    senderShowName = timMessage.getNameCard();
+                                } else if (!TextUtils.isEmpty(timMessage.getFriendRemark())) {
+                                    senderShowName = timMessage.getFriendRemark();
+                                } else if (!TextUtils.isEmpty(timMessage.getNickName())) {
+                                    senderShowName = timMessage.getNickName();
+                                }
+                                switch (callModel.action) {
+                                    case CallModel.VIDEO_CALL_ACTION_DIALING:
+                                        content = isGroup ? ("\"" + senderShowName + "\"" + "发起群通话") : ("发起通话");
+                                        if(!isGroup){
+                                            msgInfo.setCallType(callModel.callType);
+                                        }
+                                        break;
+                                    case CallModel.VIDEO_CALL_ACTION_SPONSOR_CANCEL:
+                                        content = isGroup ? "取消群通话" : "取消通话";
+                                        if(!isGroup){
+                                            msgInfo.setCallType(callModel.callType);
+                                        }
+                                        break;
+                                    case CallModel.VIDEO_CALL_ACTION_LINE_BUSY:
+                                        content = isGroup ? ("\"" + senderShowName + "\"" + "忙线") : "对方忙线";
+                                        if(!isGroup){
+                                            msgInfo.setCallType(callModel.callType);
+                                        }
+                                        break;
+                                    case CallModel.VIDEO_CALL_ACTION_REJECT:
+                                        content = isGroup ? ("\"" + senderShowName + "\"" + "拒绝群通话") : "拒绝通话";
+                                        if(!isGroup){
+                                            msgInfo.setCallType(callModel.callType);
+                                        }
+                                        break;
+                                    case CallModel.VIDEO_CALL_ACTION_SPONSOR_TIMEOUT:
+                                        if (isGroup && callModel.invitedList != null && callModel.invitedList.size() == 1
+                                                && callModel.invitedList.get(0).equals(timMessage.getSender())) {
+                                            content = "\"" + senderShowName + "\"" + "无应答";
+                                        } else {
 //                                        StringBuilder inviteeShowStringBuilder = new StringBuilder();
-                                        if (callModel.invitedList != null && callModel.invitedList.size() > 0) {
+                                            if (callModel.invitedList != null && callModel.invitedList.size() > 0) {
 //                                            for (String invitee : callModel.invitedList) {
 //                                                inviteeShowStringBuilder.append(invitee).append("、");
 //                                            }
 //                                            if (inviteeShowStringBuilder.length() > 0) {
 //                                                inviteeShowStringBuilder.delete(inviteeShowStringBuilder.length() - 1, inviteeShowStringBuilder.length());
 //                                            }
-                                            content = isGroup ? ("音视频\"" + callModel.invitedList.size() + "\"" + "人无应答") : "无应答";
-                                        }
+                                                content = isGroup ? ("音视频\"" + callModel.invitedList.size() + "\"" + "人无应答") : "无应答";
+                                            }
 //                                        content = isGroup ? ("\"" + inviteeShowStringBuilder.toString() + "\"" + "无应答") : "无应答";
-                                    }
-                                    break;
-                                case CallModel.VIDEO_CALL_ACTION_ACCEPT:
-                                    content = isGroup ? ("\"" + senderShowName + "\"" + "已接听") : "已接听";
-                                    if(!isGroup){
-                                        msgInfo.setCallType(callModel.callType);
-                                    }
-                                    break;
-                                case CallModel.VIDEO_CALL_ACTION_HANGUP:
-                                    content = isGroup ? "结束群通话" : "结束通话，通话时长：" + DateTimeUtil.formatSecondsTo00(callModel.duration);
-                                    if(!isGroup){
-                                        msgInfo.setCallType(callModel.callType);
-                                    }
-                                    break;
-                                default:
-                                    content = "不能识别的通话指令";
-                                    break;
+                                        }
+                                        break;
+                                    case CallModel.VIDEO_CALL_ACTION_ACCEPT:
+                                        content = isGroup ? ("\"" + senderShowName + "\"" + "已接听") : "已接听";
+                                        if(!isGroup){
+                                            msgInfo.setCallType(callModel.callType);
+                                        }
+                                        break;
+                                    case CallModel.VIDEO_CALL_ACTION_HANGUP:
+                                        content = isGroup ? "结束群通话" : "结束通话，通话时长：" + DateTimeUtil.formatSecondsTo00(callModel.duration);
+                                        if(!isGroup){
+                                            msgInfo.setCallType(callModel.callType);
+                                        }
+                                        break;
+                                    default:
+                                        content = "不能识别的通话指令";
+                                        break;
+                                }
+                                if (isGroup) {
+                                    msgInfo.setMsgType(MessageInfo.MSG_TYPE_GROUP_AV_CALL_NOTICE);
+                                }else{
+                                    msgInfo.setMsgType(MessageInfo.MSG_TYPE_TEXT);
+                                }
+                                msgInfo.setExtra(content);
                             }
-                            if (isGroup) {
-                                msgInfo.setMsgType(MessageInfo.MSG_TYPE_GROUP_AV_CALL_NOTICE);
-                            }else{
-                                msgInfo.setMsgType(MessageInfo.MSG_TYPE_TEXT);
-                            }
-                            msgInfo.setExtra(content);
                         }
+                    } catch (Exception e) {
+                        SLog.e( "invalid json: " + data + ", exception:" + e);
                     }
-                } catch (Exception e) {
-                    SLog.e( "invalid json: " + data + ", exception:" + e);
                 }
+
             }
         } else if (type == V2TIMMessage.V2TIM_ELEM_TYPE_GROUP_TIPS) {
             V2TIMGroupTipsElem groupTipElem = timMessage.getGroupTipsElem();

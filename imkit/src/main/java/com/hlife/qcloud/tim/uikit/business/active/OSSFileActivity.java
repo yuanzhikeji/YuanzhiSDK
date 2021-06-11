@@ -32,7 +32,6 @@ import com.hlife.qcloud.tim.uikit.component.video.VideoViewActivity;
 import com.hlife.qcloud.tim.uikit.utils.FileUtil;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 import com.hlife.qcloud.tim.uikit.utils.OSSHelper;
-import com.work.util.SLog;
 import com.work.util.ToastUtil;
 
 import java.io.File;
