@@ -113,6 +113,7 @@
     <string name="user_gender_1" translatable="false">男</string>
     <string name="user_gender_2" translatable="false">女</string>
     <string name="user_city_select" translatable="false">选择地区</string>
+    <string name="im_search_message" translatable="false">搜索聊天记录</string>
 
     // 群信息相关
     <string name="tips_empty_group_member" translatable="false">请选择群成员</string>
@@ -295,4 +296,16 @@
     <string name="oss_file_upload_error" translatable="false">文件上传失败</string>
     <string name="oss_file_download_error" translatable="false">文件下载链接不存在</string>
     <string name="open_file" translatable="false">查看文件</string>
+
+    <string name="contact_subtitle" translatable="false">联系人</string>
+    <string name="group_subtitle" translatable="false">群组</string>
+    <string name="chat_record" translatable="false">聊天记录</string>
+    <string name="more_contact_label" translatable="false">更多联系人</string>
+    <string name="more_group_label" translatable="false">更多群聊</string>
+    <string name="more_conversation_label" translatable="false">更多聊天记录</string>
+    <string name="chat_record_reference" translatable="false">相关聊天记录</string>
+    <string name="chat_records" translatable="false">条相关聊天记录</string>
+    <string name="im_nick_name_search" translatable="false">昵称: </string>
+    <string name="include_group_id" translatable="false">包含群 ID: </string>
+    <string name="include_group_member" translatable="false">包含群成员: </string>
 </resources>

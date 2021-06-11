@@ -22,9 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConversationListAdapter extends IConversationAdapter {
-
+    public static int mItemAvatarRadius = ScreenUtil.getPxByDp(50);
     private boolean mHasShowUnreadDot = true;
-    private int mItemAvatarRadius = ScreenUtil.getPxByDp(50);
     private int mTopTextSize;
     private int mBottomTextSize;
     private int mDateTextSize;

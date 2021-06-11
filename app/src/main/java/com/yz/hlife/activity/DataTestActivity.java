@@ -9,6 +9,7 @@ import com.hlife.qcloud.tim.uikit.business.inter.YzChatHistoryMessageListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzDeleteConversationListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupChangeListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
@@ -65,6 +66,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
         findViewById(R.id.send_group_message).setOnClickListener(this);
         findViewById(R.id.chat_history).setOnClickListener(this);
         findViewById(R.id.del_conversation).setOnClickListener(this);
+        findViewById(R.id.c2c_receiver_opt).setOnClickListener(this);
     }
 
     private void groupApplicationList(){
@@ -188,7 +190,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                     YzIMKitAgent.instance().startChat(chatInfo,null);
                 }else{
                     ChatInfo chatInfo = new ChatInfo();
-                    chatInfo.setId("2124128975129831111");
+                    chatInfo.setId("@TGS#2MS63YGHQ");
                     chatInfo.setChatName("群");
                     chatInfo.setGroup(true);
                     YzIMKitAgent.instance().startChat(chatInfo,null);
@@ -206,7 +208,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 List<String> s = new ArrayList<>();
 //                s.add("4624e6e2fd351a0eeaee47490997258e");
                 CreateGroupReq createGroupReq = new CreateGroupReq();
-                createGroupReq.Owner_Account = UserApi.instance().getUserId();
+                createGroupReq.Owner_Account = "5398762486586751595398";
                 createGroupReq.Name = "测试群"+UserApi.instance().getNickName();
                 createGroupReq.FaceUrl = "https://yzkj-pro.oss-cn-beijing.aliyuncs.com/avatar/lPto9oLiOp.jfif";
                 List<OpenGroupMember> members = new ArrayList<>();
@@ -237,7 +239,8 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
 //                });
                 break;
             case R.id.add_group:
-                List<String> m = new ArrayList<>();
+
+//                List<String> m = new ArrayList<>();
 //                m.add("2d9de88e9cd754abea89736f29132056");
 //                YzIMKitAgent.instance().addGroupMember("@TGS#242ILVEH4", m, new YzGroupDataListener() {
 //                    @Override
@@ -306,6 +309,24 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 openTIMElem1.Data = "我是api发的自定义群组消息";
                 sendGroupMessageReq.setMsgContent(openTIMElem1);
                 Yz.getSession().sendCustomGroupTextMsg(sendGroupMessageReq,null);
+                break;
+            case R.id.c2c_receiver_opt:
+                List<String> ids = new ArrayList<>();
+                ids.add("userId1");
+                ids.add("userId2");
+                ids.add("userId3");
+                YzIMKitAgent.instance().changeC2CReceiveMessageOpt(ids,true,new YzGroupChangeListener(){
+
+                    @Override
+                    public void success() {
+
+                    }
+
+                    @Override
+                    public void error(int code, String desc) {
+
+                    }
+                });
                 break;
             case R.id.chat_history:
                 if(conversationInfos == null || conversationInfos.size()==0){

@@ -18,9 +18,12 @@ import com.hlife.qcloud.tim.uikit.modules.contact.ContactLayout;
 import com.hlife.qcloud.tim.uikit.modules.contact.ContactListView;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
+import com.http.network.task.ObjectMapperFactory;
 import com.tencent.imsdk.v2.V2TIMConversation;
 import com.work.util.SLog;
 import com.work.util.ToastUtil;
+
+import java.io.IOException;
 
 /**
  * Created by tangyx
@@ -71,19 +74,24 @@ public class SelectMessageActivity extends BaseActivity {
                     chatInfo.setChatName(chatName);
                     C2CChatManagerKit c2CChatManagerKit = C2CChatManagerKit.getInstance();
                     c2CChatManagerKit.setCurrentChatInfo(chatInfo);
-                    MessageInfo info = MessageInfoUtil.buildCustomMessage(message);
-                    c2CChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
-                        @Override
-                        public void onSuccess(Object data) {
-                            SLog.e("custom message send success:"+data);
-                            finish();
-                        }
+                    try {
+                        CustomMessage customMessage = ObjectMapperFactory.getObjectMapper().json2Model(message, CustomMessage.class);
+                        MessageInfo info = MessageInfoUtil.buildCustomMessage(message,customMessage.getTitle());
+                        c2CChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
+                            @Override
+                            public void onSuccess(Object data) {
+                                SLog.e("custom message send success:"+data);
+                                finish();
+                            }
 
-                        @Override
-                        public void onError(String module, int errCode, String errMsg) {
-                            ToastUtil.warning(SelectMessageActivity.this,errCode+">"+errMsg);
-                        }
-                    });
+                            @Override
+                            public void onError(String module, int errCode, String errMsg) {
+                                ToastUtil.warning(SelectMessageActivity.this,errCode+">"+errMsg);
+                            }
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });

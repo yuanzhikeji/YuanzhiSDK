@@ -7,6 +7,7 @@ import android.view.View;
 import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.business.Constants;
+import com.hlife.qcloud.tim.uikit.business.message.CustomMessage;
 import com.hlife.qcloud.tim.uikit.modules.chat.GroupChatManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.contact.ContactItemBean;
@@ -14,10 +15,13 @@ import com.hlife.qcloud.tim.uikit.modules.contact.ContactListView;
 import com.hlife.qcloud.tim.uikit.modules.group.info.GroupInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
+import com.http.network.task.ObjectMapperFactory;
 import com.tencent.imsdk.v2.V2TIMConversation;
 import com.hlife.qcloud.tim.uikit.R;
 import com.work.util.SLog;
 import com.work.util.ToastUtil;
+
+import java.io.IOException;
 
 public class GroupListActivity extends IMBaseActivity {
 
@@ -47,19 +51,24 @@ public class GroupListActivity extends IMBaseActivity {
                     groupInfo.setId(chatInfo.getId());
                     groupInfo.setChatName(chatInfo.getChatName());
                     groupChatManagerKit.setCurrentChatInfo(groupInfo);
-                    MessageInfo info = MessageInfoUtil.buildCustomMessage(customData);
-                    groupChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
-                        @Override
-                        public void onSuccess(Object data) {
-                            SLog.e("custom message group send success:"+data);
-                            finish();
-                        }
+                    try {
+                        CustomMessage customMessage = ObjectMapperFactory.getObjectMapper().json2Model(customData,CustomMessage.class);
+                        MessageInfo info = MessageInfoUtil.buildCustomMessage(customData,customMessage.getTitle());
+                        groupChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
+                            @Override
+                            public void onSuccess(Object data) {
+                                SLog.e("custom message group send success:"+data);
+                                finish();
+                            }
 
-                        @Override
-                        public void onError(String module, int errCode, String errMsg) {
-                            ToastUtil.warning(GroupListActivity.this,errCode+">"+errMsg);
-                        }
-                    });
+                            @Override
+                            public void onError(String module, int errCode, String errMsg) {
+                                ToastUtil.warning(GroupListActivity.this,errCode+">"+errMsg);
+                            }
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }else{
                     Intent intent = new Intent(GroupListActivity.this, ChatActivity.class);
                     intent.putExtra(Constants.CHAT_INFO, chatInfo);

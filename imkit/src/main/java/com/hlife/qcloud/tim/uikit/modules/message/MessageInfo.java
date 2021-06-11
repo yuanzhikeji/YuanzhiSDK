@@ -8,10 +8,11 @@ import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.imsdk.v2.V2TIMMessage;
 import com.work.util.SLog;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 
-public class MessageInfo {
+public class MessageInfo implements Serializable {
 
     public static final int MSG_TYPE_MIME = 0x1;
 

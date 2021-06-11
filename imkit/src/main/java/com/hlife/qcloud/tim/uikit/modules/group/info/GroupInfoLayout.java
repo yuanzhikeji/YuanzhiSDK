@@ -31,6 +31,7 @@ import com.hlife.qcloud.tim.uikit.component.LineControllerView;
 import com.hlife.qcloud.tim.uikit.component.SelectionActivity;
 import com.hlife.qcloud.tim.uikit.component.TitleBarLayout;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
+import com.tencent.imsdk.v2.V2TIMMessage;
 import com.tencent.imsdk.v2.V2TIMValueCallback;
 import com.work.util.SLog;
 import com.work.util.ToastUtil;
@@ -166,22 +167,37 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
                 if(mGroupInfo==null){
                     return;
                 }
-                V2TIMManager.getGroupManager().setReceiveMessageOpt(mGroupInfo.getId(), b ? V2TIMGroupInfo.V2TIM_GROUP_NOT_RECEIVE_MESSAGE : V2TIMGroupInfo.V2TIM_GROUP_RECEIVE_MESSAGE, new V2TIMCallback() {
+                V2TIMManager.getMessageManager().setGroupReceiveMessageOpt(mGroupInfo.getId(), b ? V2TIMMessage.V2TIM_NOT_RECEIVE_MESSAGE : V2TIMMessage.V2TIM_RECEIVE_MESSAGE, new V2TIMCallback() {
                     @Override
-                    public void onError(int i, String s) {
-                        SLog.e("消息免打扰:" + i + "|desc:" + s);
+                    public void onSuccess() {
+                        if(b){
+                            mGroupInfo.setRevOpt(V2TIMMessage.V2TIM_NOT_RECEIVE_MESSAGE);
+                        }else{
+                            mGroupInfo.setRevOpt(V2TIMMessage.V2TIM_RECEIVE_MESSAGE);
+                        }
                     }
 
                     @Override
-                    public void onSuccess() {
-                        SLog.e("消息免打扰设置:"+b);
-                        if(b){
-                            mGroupInfo.setRevOpt(V2TIMGroupInfo.V2TIM_GROUP_NOT_RECEIVE_MESSAGE);
-                        }else{
-                            mGroupInfo.setRevOpt(V2TIMGroupInfo.V2TIM_GROUP_RECEIVE_MESSAGE);
-                        }
+                    public void onError(int code, String desc) {
+                        SLog.e("消息免打扰:" + code + "|desc:" + desc);
                     }
                 });
+//                V2TIMManager.getGroupManager().setReceiveMessageOpt(mGroupInfo.getId(), b ? V2TIMGroupInfo.V2TIM_GROUP_NOT_RECEIVE_MESSAGE : V2TIMGroupInfo.V2TIM_GROUP_RECEIVE_MESSAGE, new V2TIMCallback() {
+//                    @Override
+//                    public void onError(int i, String s) {
+//                        SLog.e("消息免打扰:" + i + "|desc:" + s);
+//                    }
+//
+//                    @Override
+//                    public void onSuccess() {
+//                        SLog.e("消息免打扰设置:"+b);
+//                        if(b){
+//                            mGroupInfo.setRevOpt(V2TIMGroupInfo.V2TIM_GROUP_NOT_RECEIVE_MESSAGE);
+//                        }else{
+//                            mGroupInfo.setRevOpt(V2TIMGroupInfo.V2TIM_GROUP_RECEIVE_MESSAGE);
+//                        }
+//                    }
+//                });
             }
         });
         //全群禁言
@@ -381,7 +397,7 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
         mNickView.setContent(mPresenter.getNickName());
         mMutedSwitchView.setChecked(mGroupInfo.isMuted());
         mTopSwitchView.setChecked(mGroupInfo.isTopChat());
-        mRevOptView.setChecked(mGroupInfo.getRevOpt()==V2TIMGroupInfo.V2TIM_GROUP_NOT_RECEIVE_MESSAGE);
+        mRevOptView.setChecked(mGroupInfo.isRevOpt());
         mDissolveBtn.setText(R.string.dissolve);
 //            mJoinTypeView.setVisibility(VISIBLE);
         if (mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_WORK)

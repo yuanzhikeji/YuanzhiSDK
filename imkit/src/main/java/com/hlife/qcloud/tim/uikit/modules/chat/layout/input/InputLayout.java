@@ -703,7 +703,6 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
     }
 
     private void showInputMoreLayout() {
-        SLog.i("showInputMoreLayout");
         if (mFragmentManager == null) {
             mFragmentManager = mActivity.getSupportFragmentManager();
         }
@@ -712,7 +711,6 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
             mInputMoreFragment.setOSSCallback(new IUIKitCallBack() {
                 @Override
                 public void onSuccess(Object data) {
-                    SLog.e("data:"+data);
                     if(data instanceof Uri){
                         MessageInfo imgInfo = MessageInfoUtil.buildImageMessage((Uri) data,true);
                         if (mMessageHandler != null) {
@@ -728,7 +726,7 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
                         }
                     }else if(data instanceof CustomFileMessage){
                         String custom = ObjectMapperFactory.getObjectMapper().model2JsonStr(data);
-                        MessageInfo customInfo = MessageInfoUtil.buildCustomMessage(custom);
+                        MessageInfo customInfo = MessageInfoUtil.buildCustomMessage(custom,((CustomFileMessage) data).getFileName());
                         if (mMessageHandler != null) {
                             mMessageHandler.sendMessage(customInfo);
                             hideSoftInput();

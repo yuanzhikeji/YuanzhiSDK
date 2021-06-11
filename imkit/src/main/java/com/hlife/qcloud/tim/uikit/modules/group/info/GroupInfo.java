@@ -6,6 +6,7 @@ import com.tencent.imsdk.v2.V2TIMGroupInfoResult;
 import com.tencent.imsdk.v2.V2TIMGroupMemberFullInfo;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
+import com.tencent.imsdk.v2.V2TIMMessage;
 import com.work.util.SLog;
 
 import java.util.List;
@@ -184,6 +185,10 @@ public class GroupInfo extends ChatInfo {
 
     public int getRevOpt() {
         return revOpt;
+    }
+
+    public boolean isRevOpt(){
+        return revOpt == V2TIMMessage.V2TIM_NOT_RECEIVE_MESSAGE;
     }
 
     public void setRevOpt(int revOpt) {

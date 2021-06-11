@@ -30,6 +30,11 @@ public class TUIKitConstants {
     public static String UI_PARAMS = "ilive_ui_params";
     public static String SOFT_KEY_BOARD_HEIGHT = "soft_key_board_height";
 
+    public static final String CHAT_INFO = "chatInfo";
+    public static final String SEARCH_LIST_TYPE = "search_list_type";
+    public static final String SEARCH_DATA_RESULT = "search_data_result";
+    public static final String SEARCH_KEY_WORDS = "search_key_words";
+    public static final String SEARCH_DATA_BEAN = "search_data_bean";
     /**
      * 1: 仅仅是一个带链接的文本消息
      * 2: iOS支持的视频通话版本，后续已经不兼容

@@ -192,28 +192,26 @@ public class ChatLayoutHelper {
             btn1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ToastUtil.toastShortMessage("自定义的按钮1");
-                    if (getChatLayout() != null) {
-                        Gson gson = new Gson();
-                        CustomMessage customHelloMessage = new CustomMessage();
-                        String data = gson.toJson(customHelloMessage);
-                        MessageInfo info = MessageInfoUtil.buildCustomMessage(data);
-                        getChatLayout().sendMessage(info, false);
-                    }
+//                    if (getChatLayout() != null) {
+//                        Gson gson = new Gson();
+//                        CustomMessage customHelloMessage = new CustomMessage();
+//                        String data = gson.toJson(customHelloMessage);
+//                        MessageInfo info = MessageInfoUtil.buildCustomMessage(data);
+//                        getChatLayout().sendMessage(info, false);
+//                    }
                 }
             });
             Button btn2 = baseView.findViewById(R.id.test_send_message_btn2);
             btn2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ToastUtil.toastShortMessage("自定义的按钮2");
-                    if (getChatLayout() != null) {
-                        Gson gson = new Gson();
-                        CustomMessage customHelloMessage = new CustomMessage();
-                        String data = gson.toJson(customHelloMessage);
-                        MessageInfo info = MessageInfoUtil.buildCustomMessage(data);
-                        getChatLayout().sendMessage(info, false);
-                    }
+//                    if (getChatLayout() != null) {
+//                        Gson gson = new Gson();
+//                        CustomMessage customHelloMessage = new CustomMessage();
+//                        String data = gson.toJson(customHelloMessage);
+//                        MessageInfo info = MessageInfoUtil.buildCustomMessage(data);
+//                        getChatLayout().sendMessage(info, false);
+//                    }
                 }
             });
             return baseView;

@@ -11,7 +11,9 @@ import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzDeleteConversationListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupFaceListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
+import com.hlife.qcloud.tim.uikit.business.modal.SearchDataMessage;
 import com.hlife.qcloud.tim.uikit.config.TUIKitConfigs;
 import com.hlife.qcloud.tim.uikit.modules.chat.GroupChatManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
@@ -31,7 +33,6 @@ import com.tencent.imsdk.v2.V2TIMGroupMemberInfoResult;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.imsdk.v2.V2TIMMessage;
 import com.tencent.imsdk.v2.V2TIMValueCallback;
-import com.work.api.open.model.client.OpenGroupInfo;
 import com.work.util.SLog;
 
 import java.io.File;
@@ -50,6 +51,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
 
     private ConversationProvider mProvider;
     private final List<YzMessageWatcher> mUnreadWatchers = new ArrayList<>();
+    private final List<YzGroupFaceListener> mGroupFaceListener = new ArrayList<>();
     private SharedPreferences mConversationPreferences;
     private LinkedList<ConversationInfo> mTopLinkedList = new LinkedList<>();
     private int mUnreadTotal;
@@ -376,18 +378,15 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
      * @param conversation
      * @return
      */
-    private ConversationInfo TIMConversation2ConversationInfo(final V2TIMConversation conversation) {
+    public SearchDataMessage TIMConversation2ConversationInfo(final V2TIMConversation conversation) {
         if (conversation == null) {
             return null;
         }
-//        SLog.i( "TIMConversation2ConversationInfo id:" + conversation.getConversationID()
-//                + "|name:" + conversation.getShowName()
-//                + "|unreadNum:" + conversation.getUnreadCount());
         V2TIMMessage message = conversation.getLastMessage();
         if (message == null) {
             return null;
         }
-        final ConversationInfo info = new ConversationInfo();
+        final SearchDataMessage info = new SearchDataMessage();
         int type = conversation.getType();
         if (type != V2TIMConversation.V2TIM_C2C && type != V2TIMConversation.V2TIM_GROUP) {
             return null;
@@ -579,6 +578,11 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
                 if(mSearchProvide!=null){
                     mSearchProvide.updateAdapter(info.getConversationId());
                 }
+                if(mGroupFaceListener.size()>0){
+                    for (YzGroupFaceListener listener:mGroupFaceListener) {
+                        listener.onFaceUrl(info);
+                    }
+                }
             }
         });
     }
@@ -590,7 +594,6 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
      * @param conversation
      */
     public void setConversationTop(int index, ConversationInfo conversation) {
-        SLog.i( "setConversationTop index:" + index + "|conversation:" + conversation);
         if (!conversation.isTop()) {
             mTopLinkedList.remove(conversation);
             mTopLinkedList.addFirst(conversation);
@@ -808,7 +811,6 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
     }
 
     public boolean isTopConversation(String groupId) {
-        SLog.i( "isTopConversation:" + groupId);
         return isTop(groupId);
     }
 
@@ -819,7 +821,6 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
      */
     @Override
     public void handleInvoke(String msgID) {
-        SLog.i( "handleInvoke msgID:" + msgID);
         if (mProvider != null) {
             loadConversation(mType,null);
         }
@@ -855,11 +856,11 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
      * 与UI做解绑操作，避免内存泄漏
      */
     public void destroyConversation() {
-        SLog.i( "destroyConversation");
         if (mProvider != null) {
             mProvider.attachAdapter(null);
         }
         mUnreadWatchers.clear();
+        mGroupFaceListener.clear();
     }
 
     public void destroyConversationSearch(){
@@ -867,6 +868,16 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
             mSearchProvide.attachAdapter(null);
             mSearchProvide = null;
         }
+    }
+
+    public void addGroupFaceListener(YzGroupFaceListener listener){
+        if(listener!=null){
+            mGroupFaceListener.add(listener);
+        }
+    }
+
+    public void removeGroupFaceListener(YzGroupFaceListener listener){
+        mGroupFaceListener.remove(listener);
     }
 
     public String getGroupConversationAvatar(String groupId) {

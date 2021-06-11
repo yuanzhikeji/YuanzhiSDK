@@ -11,25 +11,17 @@ import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.base.BaseActivity;
 import com.hlife.qcloud.tim.uikit.business.fragment.ChatFragment;
 import com.hlife.qcloud.tim.uikit.business.fragment.ConversationFragment;
-import com.hlife.qcloud.tim.uikit.business.helper.CustomIMUIController;
-import com.hlife.qcloud.tim.uikit.business.inter.YzChatMessageListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageClickListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageSendCallback;
-import com.hlife.qcloud.tim.uikit.business.message.CustomMessage;
 import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationListLayout;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
-import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
-import com.tencent.imsdk.v2.V2TIMCustomElem;
 import com.tencent.imsdk.v2.V2TIMGroupAtInfo;
-import com.tencent.imsdk.v2.V2TIMMessage;
 import com.work.util.SLog;
 import com.work.util.ToastUtil;
 import com.yz.hlife.R;
-
-import static com.hlife.qcloud.tim.uikit.utils.IMKitConstants.BUSINESS_ID_CUSTOM_CARD;
 
 public class ChatDemoActivity extends BaseActivity implements ConversationListLayout.OnItemClickListener, YzMessageClickListener {
 
@@ -84,12 +76,7 @@ public class ChatDemoActivity extends BaseActivity implements ConversationListLa
             });
             ChatFragment chatFragment = ChatFragment.newChatFragment(chatInfo,chatViewConfig);
             chatFragment.setYzMessageClickListener(this);
-            chatFragment.setYzChatMessageListener(new YzChatMessageListener() {
-                @Override
-                public void onChatSendMessageError(int code, String desc) {
-                    SLog.e("send fail>>"+code+">"+desc);
-                }
-            });
+            chatFragment.setYzChatMessageListener((code, desc) -> SLog.e("send fail>>"+code+">"+desc));
             chatFragment.setYzCustomMessageDrawListener((parent, info) -> {
 //                SLog.e("接收到自定义消息："+new String(info.getTimMessage().getCustomElem().getData()));
 //                // 获取到自定义消息的json数据

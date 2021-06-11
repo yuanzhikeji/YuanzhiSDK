@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
+import com.hlife.qcloud.tim.uikit.business.active.IMSearchMainActivity;
 import com.yzcm.library.adapter.mm.BaseQuickAdapter;
 import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
@@ -56,7 +57,7 @@ public class ConversationLayout extends RelativeLayout implements IConversationL
     private void init() {
         inflate(getContext(), R.layout.conversation_layout, this);
         EditText mSearch = findViewById(R.id.search);
-        mSearch.setOnClickListener(view -> SearchAddMoreActivity.startSearchMore(getContext(),1));
+        mSearch.setOnClickListener(view -> getContext().startActivity(new Intent(getContext(), IMSearchMainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)));
         mConversationList = findViewById(R.id.conversation_list);
         mNoticeLayout = findViewById(R.id.chat_group_apply_layout);
         mNoticeLayout.setOnNoticeClickListener(view -> getContext().startActivity(new Intent(getContext(), GroupApplyManagerActivity.class)));

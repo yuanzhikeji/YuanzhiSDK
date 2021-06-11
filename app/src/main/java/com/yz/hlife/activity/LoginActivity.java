@@ -160,7 +160,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                         SharedUtils.putData("userid",userid);
                         SharedUtils.putData("mobile",mobile);
                         SharedUtils.putData("nickname",password);
-                        startActivity(new Intent(LoginActivity.this,DataTestActivity.class));
+//                        startActivity(new Intent(LoginActivity.this,DataTestActivity.class));
+                        YzIMKitAgent.instance().startAuto();
                         finish();
                     }
 

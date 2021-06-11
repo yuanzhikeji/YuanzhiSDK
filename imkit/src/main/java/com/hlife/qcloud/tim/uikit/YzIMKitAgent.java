@@ -23,10 +23,13 @@ import com.hlife.qcloud.tim.uikit.business.inter.YzGroupJoinListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupMemberListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageSendCallback;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
+import com.hlife.qcloud.tim.uikit.business.inter.YzSearchMessageListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzStatusListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzWorkAppItemClickListener;
 import com.hlife.qcloud.tim.uikit.business.message.CustomFileMessage;
 import com.hlife.qcloud.tim.uikit.business.message.MessageNotification;
+import com.hlife.qcloud.tim.uikit.business.modal.SearchDataMessage;
+import com.hlife.qcloud.tim.uikit.business.modal.SearchParam;
 import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
 import com.hlife.qcloud.tim.uikit.business.modal.VideoFile;
 import com.hlife.qcloud.tim.uikit.business.thirdpush.HUAWEIHmsMessageService;
@@ -43,11 +46,13 @@ import com.hlife.qcloud.tim.uikit.modules.group.member.GroupMemberInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
 import com.hlife.qcloud.tim.uikit.utils.BrandUtil;
+import com.hlife.qcloud.tim.uikit.utils.SearchDataUtils;
 import com.http.network.listener.OnResultDataListener;
 import com.http.network.model.RequestWork;
 import com.http.network.model.ResponseWork;
 import com.http.network.task.ObjectMapperFactory;
 import com.tencent.imsdk.v2.V2TIMCallback;
+import com.tencent.imsdk.v2.V2TIMConversation;
 import com.tencent.imsdk.v2.V2TIMGroupApplication;
 import com.tencent.imsdk.v2.V2TIMGroupApplicationResult;
 import com.tencent.imsdk.v2.V2TIMGroupInfo;
@@ -56,6 +61,9 @@ import com.tencent.imsdk.v2.V2TIMGroupMemberFullInfo;
 import com.tencent.imsdk.v2.V2TIMGroupMemberInfoResult;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.imsdk.v2.V2TIMMessage;
+import com.tencent.imsdk.v2.V2TIMMessageSearchParam;
+import com.tencent.imsdk.v2.V2TIMMessageSearchResult;
+import com.tencent.imsdk.v2.V2TIMMessageSearchResultItem;
 import com.tencent.imsdk.v2.V2TIMValueCallback;
 import com.tencent.smtt.export.external.TbsCoreSettings;
 import com.tencent.smtt.sdk.QbSdk;
@@ -74,6 +82,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by tangyx
@@ -280,7 +289,7 @@ public final class YzIMKitAgent {
             return;
         }
         if(chatInfo.isGroup()){
-            MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
+            MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage,customMessage);
             groupChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
                 @Override
                 public void onSuccess(Object data) {
@@ -297,7 +306,7 @@ public final class YzIMKitAgent {
                 }
             });
         }else{
-            MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
+            MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage,customMessage);
             c2CChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
                 @Override
                 public void onSuccess(Object data) {
@@ -316,7 +325,7 @@ public final class YzIMKitAgent {
         }
     }
     public void sendCustomMessage(String customMessage, YzMessageSendCallback callback){
-        MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
+        MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage,customMessage);
         C2CChatManagerKit c2CChatManagerKit = C2CChatManagerKit.getInstance();
         if(c2CChatManagerKit.getCurrentChatInfo()!=null){
             c2CChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
@@ -616,6 +625,125 @@ public final class YzIMKitAgent {
         return c2CChatManagerKit;
     }
     /**
+     * 搜索本地消息
+     */
+    public void searchMessage(SearchParam searchParam, YzSearchMessageListener listener){
+        final V2TIMMessageSearchParam param = new V2TIMMessageSearchParam();
+        List<String> keywords = new ArrayList<>();
+        keywords.add(searchParam.getKeyword());
+        param.setPageSize(searchParam.getPageSize());
+        param.setPageIndex(searchParam.getPageIndex());
+        param.setKeywordList(keywords);
+        if(!TextUtils.isEmpty(searchParam.getConversationId())){
+            param.setConversationID(searchParam.getConversationId());
+        }
+        V2TIMManager.getMessageManager().searchLocalMessages(param, new V2TIMValueCallback<V2TIMMessageSearchResult>() {
+            @Override
+            public void onSuccess(V2TIMMessageSearchResult v2TIMMessageSearchResult) {
+                List<SearchDataMessage> dataMessages = new ArrayList<>();
+                if (v2TIMMessageSearchResult == null || v2TIMMessageSearchResult.getTotalCount() == 0 ||
+                        v2TIMMessageSearchResult.getMessageSearchResultItems() == null ||
+                        v2TIMMessageSearchResult.getMessageSearchResultItems().size() == 0) {
+                    if(listener!=null){
+                        listener.success(dataMessages);
+                    }
+                    return;
+                }
+                if(TextUtils.isEmpty(searchParam.getConversationId())){
+                    final Map<String, V2TIMMessageSearchResultItem> mMsgsCountInConversationMap = new HashMap<>();
+                    List<V2TIMMessageSearchResultItem> v2TIMMessageSearchResultItems = v2TIMMessageSearchResult.getMessageSearchResultItems();
+                    List<String> conversationIDList = new ArrayList<>();
+                    for(V2TIMMessageSearchResultItem v2TIMMessageSearchResultItem : v2TIMMessageSearchResultItems) {
+                        conversationIDList.add(v2TIMMessageSearchResultItem.getConversationID());
+                        mMsgsCountInConversationMap.put(v2TIMMessageSearchResultItem.getConversationID(), v2TIMMessageSearchResultItem);
+                    }
+                    V2TIMManager.getConversationManager().getConversationList(conversationIDList, new V2TIMValueCallback<List<V2TIMConversation>>() {
+                        @Override
+                        public void onSuccess(List<V2TIMConversation> v2TIMConversationList) {
+                            if (v2TIMConversationList == null || v2TIMConversationList.size() == 0){
+                                if(listener!=null){
+                                    listener.success(dataMessages);
+                                }
+                                return;
+                            }
+
+                            for (V2TIMConversation v2TIMConversation : v2TIMConversationList) {
+                                SearchDataMessage searchDataMessage = ConversationManagerKit.getInstance().TIMConversation2ConversationInfo(v2TIMConversation);
+                                dataMessages.add(searchDataMessage);
+                            }
+                            if (dataMessages.size() > 0) {
+                                for (int i = 0; i < dataMessages.size(); i++) {
+                                    V2TIMMessageSearchResultItem v2TIMMessageSearchResultItem = mMsgsCountInConversationMap.get(dataMessages.get(i).getConversationId());
+                                    if (v2TIMMessageSearchResultItem != null) {
+                                        int count = v2TIMMessageSearchResultItem.getMessageCount();
+                                        SearchDataMessage searchDataMessage = dataMessages.get(i);
+                                        searchDataMessage.setCount(count);
+                                        if (count == 1) {
+                                            searchDataMessage.setSubTitle(SearchDataUtils.getMessageText(v2TIMMessageSearchResultItem.getMessageList().get(0)));
+                                            searchDataMessage.setSubTextMatch(1);
+                                            searchDataMessage.setLocateTimMessage(v2TIMMessageSearchResultItem.getMessageList().get(0));
+                                        } else if (count > 1) {
+                                            searchDataMessage.setSubTitle(count + TUIKit.getAppContext().getString(R.string.chat_records));
+                                            searchDataMessage.setSubTextMatch(0);
+                                        }
+                                    }
+                                }
+                            }
+                            if(listener!=null){
+                                listener.success(dataMessages);
+                            }
+                        }
+
+                        @Override
+                        public void onError(int code, String desc) {
+                            if(listener!=null){
+                                listener.success(dataMessages);
+                            }
+                        }
+                    });
+                }
+                else{
+                    List<V2TIMMessage> v2TIMMessages = v2TIMMessageSearchResult.getMessageSearchResultItems().get(0).getMessageList();
+                    if (v2TIMMessages != null && !v2TIMMessages.isEmpty()) {
+                        for (V2TIMMessage v2TIMMessage:v2TIMMessages) {
+                            SearchDataMessage searchDataMessage = new SearchDataMessage();
+                            searchDataMessage.setConversationId(searchParam.getConversationId());
+                            String title;
+                            if (!TextUtils.isEmpty(v2TIMMessage.getFriendRemark())) {
+                                title = v2TIMMessage.getFriendRemark();
+                            } else if (!TextUtils.isEmpty(v2TIMMessage.getNameCard())) {
+                                title = v2TIMMessage.getNameCard();
+                            } else if (!TextUtils.isEmpty(v2TIMMessage.getNickName())) {
+                                title = v2TIMMessage.getNickName();
+                            } else {
+                                title = v2TIMMessage.getUserID()== null ? v2TIMMessage.getGroupID() : v2TIMMessage.getUserID();
+                            }
+                            searchDataMessage.setTitle(title);
+                            searchDataMessage.setId(v2TIMMessage.getSender());
+                            String subTitle = SearchDataUtils.getMessageText(v2TIMMessage);
+                            searchDataMessage.setSubTitle(subTitle);
+                            searchDataMessage.setLocateTimMessage(v2TIMMessage);
+                            searchDataMessage.setIconUrlList(new ArrayList<Object>(){{
+                                add(v2TIMMessage.getFaceUrl());
+                            }});
+                            dataMessages.add(searchDataMessage);
+                        }
+                    }
+                    if(listener!=null){
+                        listener.success(dataMessages);
+                    }
+                }
+            }
+
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+        });
+    }
+    /**
      * 获取所有的聊天会话
      */
     public void loadConversation(int nextSeq, YzChatType type, final YzConversationDataListener callBack){
@@ -808,18 +936,35 @@ public final class YzIMKitAgent {
      * 是否消息免打扰
      */
     public void changeReceiveMessageOpt(String groupId,boolean opt,YzGroupChangeListener listener){
-        V2TIMManager.getGroupManager().setReceiveMessageOpt(groupId, opt ? V2TIMGroupInfo.V2TIM_GROUP_NOT_RECEIVE_MESSAGE : V2TIMGroupInfo.V2TIM_GROUP_RECEIVE_MESSAGE, new V2TIMCallback() {
+        V2TIMManager.getMessageManager().setGroupReceiveMessageOpt(groupId, opt ? V2TIMMessage.V2TIM_NOT_RECEIVE_MESSAGE : V2TIMMessage.V2TIM_RECEIVE_MESSAGE, new V2TIMCallback() {
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+
             @Override
             public void onError(int code, String desc) {
                 if(listener!=null){
                     listener.error(code,desc);
                 }
             }
-
+        });
+    }
+    public void changeC2CReceiveMessageOpt(List<String> ids,boolean opt,YzGroupChangeListener listener){
+        V2TIMManager.getMessageManager().setC2CReceiveMessageOpt(ids, opt ? V2TIMMessage.V2TIM_NOT_RECEIVE_MESSAGE : V2TIMMessage.V2TIM_RECEIVE_MESSAGE, new V2TIMCallback() {
             @Override
             public void onSuccess() {
                 if(listener!=null){
                     listener.success();
+                }
+            }
+
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
                 }
             }
         });

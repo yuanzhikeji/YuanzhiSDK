@@ -233,11 +233,12 @@ public class MessageInfoUtil {
      * 创建一条自定义消息
      *
      * @param data 自定义消息内容，可以是任何内容
+     *             desc很重要，关系到搜索
      * @return
      */
-    public static MessageInfo buildCustomMessage(String data) {
+    public static MessageInfo buildCustomMessage(String data,String desc) {
         MessageInfo info = new MessageInfo();
-        V2TIMMessage v2TIMMessage = V2TIMManager.getMessageManager().createCustomMessage(data.getBytes());
+        V2TIMMessage v2TIMMessage = V2TIMManager.getMessageManager().createCustomMessage(data.getBytes(),desc,desc.getBytes());
 
         info.setSelf(true);
         info.setTimMessage(v2TIMMessage);

@@ -82,7 +82,6 @@
             android:text="发一个自定义消息"/>
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/create_group"
-            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_40"
@@ -136,6 +135,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_20"
             android:text="获取一个聊天的历史记录"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/c2c_receiver_opt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
+            android:text="设置单聊免打扰"/>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/start_auto"
