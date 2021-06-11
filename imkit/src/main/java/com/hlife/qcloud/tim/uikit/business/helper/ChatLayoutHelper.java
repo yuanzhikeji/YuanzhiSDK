@@ -242,13 +242,16 @@ public class ChatLayoutHelper {
                 return;
             }
             V2TIMCustomElem elem = info.getTimMessage().getCustomElem();
-            String elemStr = new String(elem.getData());
+            String elemStr = "";
+            if(elem.getData()!=null){
+                elemStr = new String(elem.getData());
+            }
             // 自定义的json数据，需要解析成bean实例
             CustomMessage data = null;
             try {
                 data = ObjectMapperFactory.getObjectMapper().json2Model(elemStr,CustomMessage.class);
             } catch (Exception e) {
-                SLog.w("invalid json: " + new String(elem.getData()) + " " + e.getMessage());
+                SLog.w("invalid json: " + elemStr + " " + e.getMessage());
             }
             if (data!=null) {
                 if(data.getBusinessID().equals(BUSINESS_ID_CUSTOM_CARD)){
