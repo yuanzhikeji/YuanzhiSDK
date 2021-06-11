@@ -189,6 +189,13 @@ public class OSSFileActivity extends BaseActivity {
                         videoFile.firstFrame = firstFrame;
                         videoFile.duration = duration;
                         return videoFile;
+                    }else{
+                        CustomFileMessage customFileMessage = new CustomFileMessage();
+                        customFileMessage.setFileName(file.getName());
+                        customFileMessage.setFilePath(filePath);
+                        customFileMessage.setFileSize(fileLength);
+                        customFileMessage.setSendUserId(UserApi.instance().getUserId());
+                        return customFileMessage;
                     }
                 }
             }
