@@ -718,14 +718,21 @@ public final class YzIMKitAgent {
                             } else {
                                 title = v2TIMMessage.getUserID()== null ? v2TIMMessage.getGroupID() : v2TIMMessage.getUserID();
                             }
-                            searchDataMessage.setTitle(title);
+                            if(v2TIMMessage.getSender().equals(UserApi.instance().getUserId())){//是自己
+                                searchDataMessage.setTitle(UserApi.instance().getNickName());
+                                searchDataMessage.setIconUrlList(new ArrayList<Object>(){{
+                                    add(UserApi.instance().getUserIcon());
+                                }});
+                            }else{
+                                searchDataMessage.setTitle(title);
+                                searchDataMessage.setIconUrlList(new ArrayList<Object>(){{
+                                    add(v2TIMMessage.getFaceUrl());
+                                }});
+                            }
                             searchDataMessage.setId(v2TIMMessage.getSender());
                             String subTitle = SearchDataUtils.getMessageText(v2TIMMessage);
                             searchDataMessage.setSubTitle(subTitle);
                             searchDataMessage.setLocateTimMessage(v2TIMMessage);
-                            searchDataMessage.setIconUrlList(new ArrayList<Object>(){{
-                                add(v2TIMMessage.getFaceUrl());
-                            }});
                             dataMessages.add(searchDataMessage);
                         }
                     }
