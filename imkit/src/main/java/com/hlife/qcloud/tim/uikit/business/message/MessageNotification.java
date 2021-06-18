@@ -110,7 +110,7 @@ public class MessageNotification {
             public void onConversationData(ConversationInfo data) {
                 super.onConversationData(data);
                 if(data!=null){
-                    if(!data.isShowDisturbIcon()){
+                    if(!data.isRevOpt()){
                         showNotice(msg);
                     }
                 }

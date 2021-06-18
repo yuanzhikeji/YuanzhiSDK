@@ -75,7 +75,7 @@ public class ConversationInfo implements Serializable, Comparable<ConversationIn
     /**
      * 会话界面显示消息免打扰图标
      */
-    private boolean showDisturbIcon;
+    private boolean isRevOpt;
 
     /**
      * 草稿
@@ -86,12 +86,12 @@ public class ConversationInfo implements Serializable, Comparable<ConversationIn
      */
     private String groupType;
 
-    public void setShowDisturbIcon(boolean showDisturbIcon) {
-        this.showDisturbIcon = showDisturbIcon;
+    public void setRevOpt(boolean revOpt) {
+        isRevOpt = revOpt;
     }
 
-    public boolean isShowDisturbIcon() {
-        return showDisturbIcon;
+    public boolean isRevOpt() {
+        return isRevOpt;
     }
 
     public void setDraft(DraftInfo draft) {

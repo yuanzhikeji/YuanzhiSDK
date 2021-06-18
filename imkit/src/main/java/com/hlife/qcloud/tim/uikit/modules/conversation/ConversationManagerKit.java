@@ -447,7 +447,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
             info.setId(conversation.getUserID());
         }
 
-        info.setShowDisturbIcon(conversation.getRecvOpt() == V2TIMMessage.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE);
+        info.setRevOpt(conversation.getRecvOpt() == V2TIMMessage.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE);
         info.setConversationId(conversation.getConversationID());
         info.setGroup(isGroup);
         // AVChatRoom 不支持未读数。

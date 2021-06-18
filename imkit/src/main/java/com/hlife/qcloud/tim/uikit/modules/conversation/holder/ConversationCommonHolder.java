@@ -5,7 +5,6 @@ import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -19,7 +18,6 @@ import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.DraftInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.utils.DateTimeUtil;
-import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 import com.hlife.qcloud.tim.uikit.utils.TUIKitConstants;
 import com.work.util.SLog;
 
@@ -105,7 +103,7 @@ public class ConversationCommonHolder extends ConversationBaseHolder {
             }
         }
 
-        if (conversation.getUnRead() > 0 && !conversation.isShowDisturbIcon()) {
+        if (conversation.getUnRead() > 0 && !conversation.isRevOpt()) {
             unreadText.setVisibility(View.VISIBLE);
             if (conversation.getUnRead() > 99) {
                 unreadText.setText("99+");
@@ -147,7 +145,7 @@ public class ConversationCommonHolder extends ConversationBaseHolder {
         SLog.e(conversation.getTitle()+">:"+conversation.getIconUrlList());
         conversationIconView.setConversation(conversation);
 
-        if (conversation.isShowDisturbIcon()) {
+        if (conversation.isRevOpt()) {
             disturbView.setVisibility(View.VISIBLE);
             remind.setVisibility(conversation.getUnRead()>0?View.VISIBLE:View.GONE);
         } else {
