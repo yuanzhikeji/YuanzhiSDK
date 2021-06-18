@@ -40,6 +40,7 @@ public class ConversationFragment extends BaseFragment implements GroupChatManag
     private final List<PopMenuAction> mConversationPopActions = new ArrayList<>();
     private ConversationListLayout.OnItemClickListener mOnItemClickListener;
     private YzChatType mType = YzChatType.ALL;
+    private boolean isShowSearchLayout = true;
 
     public ConversationFragment(){
 
@@ -67,10 +68,10 @@ public class ConversationFragment extends BaseFragment implements GroupChatManag
                 @Override
                 public void onItemClick(View view, int position, ConversationInfo conversationInfo) {
                     //此处为demo的实现逻辑，更根据会话类型跳转到相关界面，开发者可根据自己的应用场景灵活实现
-//                    startChatActivity(conversationInfo,null);
                     ChatInfo chatInfo = new ChatInfo();
-                    chatInfo.setType(conversationInfo.isGroup() ? V2TIMConversation.V2TIM_GROUP : V2TIMConversation.V2TIM_C2C);
+                    chatInfo.setGroup(conversationInfo.isGroup());
                     chatInfo.setId(conversationInfo.getId());
+                    chatInfo.setDraft(conversationInfo.getDraft());
                     chatInfo.setChatName(conversationInfo.getTitle());
                     YzIMKitAgent.instance().startChat(chatInfo,null);
                 }
@@ -87,6 +88,7 @@ public class ConversationFragment extends BaseFragment implements GroupChatManag
 
     public void refreshData(){
         if(mConversationLayout!=null){
+            mConversationLayout.setShowSearchLayout(isShowSearchLayout);
             mConversationLayout.initDefault(mType, new IUIKitCallBack() {
                 @Override
                 public void onSuccess(Object data) {
@@ -184,6 +186,10 @@ public class ConversationFragment extends BaseFragment implements GroupChatManag
         this.mType = mType;
     }
 
+    public void setShowSearchLayout(boolean showSearchLayout) {
+        isShowSearchLayout = showSearchLayout;
+    }
+
     public void setOnItemClickListener(ConversationListLayout.OnItemClickListener mOnItemClickListener) {
         this.mOnItemClickListener = mOnItemClickListener;
     }
@@ -191,9 +197,15 @@ public class ConversationFragment extends BaseFragment implements GroupChatManag
     public static ConversationFragment newConversation(YzChatType type){
         ConversationFragment fragment = new ConversationFragment();
         fragment.setType(type);
+        fragment.setShowSearchLayout(false);
         return fragment;
     }
-
+    public static ConversationFragment newConversation(YzChatType type,boolean showSearch){
+        ConversationFragment fragment = new ConversationFragment();
+        fragment.setType(type);
+        fragment.setShowSearchLayout(showSearch);
+        return fragment;
+    }
     @Override
     public void onResume() {
         super.onResume();

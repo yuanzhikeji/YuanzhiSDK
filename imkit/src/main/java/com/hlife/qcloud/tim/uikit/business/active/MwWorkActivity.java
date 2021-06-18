@@ -123,7 +123,7 @@ public class MwWorkActivity extends IMBaseActivity implements
         mFragments = new ArrayList<>();
         int functionPrem = YzIMKitAgent.instance().getFunctionPrem();
         if((functionPrem & 1)>0){
-            mFragments.add(ConversationFragment.newConversation(YzChatType.ALL));
+            mFragments.add(ConversationFragment.newConversation(YzChatType.ALL,true));
         }
         if((functionPrem & 2)>0){
             mFragments.add(new ContactFragment());

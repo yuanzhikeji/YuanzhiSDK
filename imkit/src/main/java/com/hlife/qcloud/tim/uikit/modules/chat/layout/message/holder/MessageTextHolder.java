@@ -42,8 +42,8 @@ public class MessageTextHolder extends MessageContentHolder {
 
                 @Override
                 public void onLongClickSpan() {
-                    if(onItemClickListener!=null){
-                        onItemClickListener.onMessageLongClick(msgContentFrame,position,msg);
+                    if (onItemLongClickListener != null) {
+                        onItemLongClickListener.onMessageLongClick(msgContentFrame, position, msg);
                     }
                 }
             });

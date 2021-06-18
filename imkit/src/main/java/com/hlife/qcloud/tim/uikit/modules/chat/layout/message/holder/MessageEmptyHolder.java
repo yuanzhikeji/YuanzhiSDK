@@ -2,6 +2,7 @@ package com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder;
 
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
@@ -14,6 +15,8 @@ public abstract class MessageEmptyHolder extends MessageBaseHolder {
 
     public TextView chatTimeText;
     public FrameLayout msgContentFrame;
+    public RelativeLayout mContentLayout;
+    public RelativeLayout rightGroupLayout;
 
     public MessageEmptyHolder(View itemView) {
         super(itemView);
@@ -21,6 +24,8 @@ public abstract class MessageEmptyHolder extends MessageBaseHolder {
 
         chatTimeText = itemView.findViewById(R.id.chat_time_tv);
         msgContentFrame = itemView.findViewById(R.id.msg_content_fl);
+        mContentLayout = itemView.findViewById(R.id.messsage_content_layout);
+        rightGroupLayout = itemView.findViewById(R.id.right_group_layout);
         initVariableLayout();
     }
 

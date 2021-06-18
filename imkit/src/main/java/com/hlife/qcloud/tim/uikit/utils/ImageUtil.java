@@ -317,6 +317,10 @@ public class ImageUtil {
 
     }
 
+    public static String generateImagePath(String uuid, int imageType) {
+        return TUIKitConstants.IMAGE_DOWNLOAD_DIR + uuid + "_" + imageType;
+    }
+
     public static CopyImageInfo copyImage(String path, String dir) {
         CopyImageInfo info = new CopyImageInfo();
         if (null == path) {

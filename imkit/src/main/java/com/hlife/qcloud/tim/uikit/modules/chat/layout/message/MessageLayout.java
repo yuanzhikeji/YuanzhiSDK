@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -14,6 +15,7 @@ import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.component.PopupList;
 import com.hlife.qcloud.tim.uikit.component.action.PopActionClickListener;
 import com.hlife.qcloud.tim.uikit.component.action.PopMenuAction;
+import com.hlife.qcloud.tim.uikit.utils.TUIKitConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,7 @@ public class MessageLayout extends MessageLayoutUI {
     public static final int DATA_CHANGE_TYPE_UPDATE = 4;
     public static final int DATA_CHANGE_TYPE_DELETE = 5;
     public static final int DATA_CHANGE_TYPE_CLEAR = 6;
+    public static final int DATA_CHANGE_SCROLL_TO_POSITION = 7;
 
 
     public MessageLayout(Context context) {
@@ -101,12 +104,30 @@ public class MessageLayout extends MessageLayoutUI {
                 }
             }
         });
-        postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                popupList.hidePopupListWindow();
+        postDelayed(() -> popupList.hidePopupListWindow(), 10000); // 10s后无操作自动消失
+    }
+
+    public void onMsgAddBack() {
+        if (mAdapter != null) {
+            // 如果当前显示最后一条消息，则消息刷新跳转到底部，否则不跳转
+            if (isLastItemVisibleCompleted()) {
+                scrollToEnd();
             }
-        }, 10000); // 10s后无操作自动消失
+        }
+    }
+
+    public boolean isLastItemVisibleCompleted() {
+        LinearLayoutManager linearLayoutManager = (LinearLayoutManager) getLayoutManager();
+        if (linearLayoutManager == null) {
+            return false;
+        }
+        int lastPosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
+        int childCount = linearLayoutManager.getChildCount();
+        int firstPosition = linearLayoutManager.findFirstVisibleItemPosition();
+        if (lastPosition >= firstPosition + childCount - 1) {
+            return true;
+        }
+        return false;
     }
 
     private void initPopActions(final MessageInfo msg) {
@@ -169,7 +190,7 @@ public class MessageLayout extends MessageLayoutUI {
     @Override
     public void onScrollStateChanged(int state) {
         super.onScrollStateChanged(state);
-        if (state == SCROLL_STATE_IDLE) {
+        if (state == RecyclerView.SCROLL_STATE_IDLE) {
             if (mHandler != null) {
                 LinearLayoutManager layoutManager = (LinearLayoutManager) getLayoutManager();
                 int firstPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
@@ -178,16 +199,37 @@ public class MessageLayout extends MessageLayoutUI {
                     if (getAdapter() instanceof MessageListAdapter) {
                         ((MessageListAdapter) getAdapter()).showLoading();
                     }
-                    mHandler.loadMore();
+                    mHandler.loadMore(TUIKitConstants.GET_MESSAGE_FORWARD);
+                } else if (lastPosition == getAdapter().getItemCount() -1 && !isListEnd(lastPosition)){
+                    if (getAdapter() instanceof MessageListAdapter) {
+                        ((MessageListAdapter) getAdapter()).showLoading();
+                    }
+                    mHandler.loadMore(TUIKitConstants.GET_MESSAGE_BACKWARD);
                 }
             }
         }
     }
 
 
+    private boolean isListEnd(int lastPosition) {
+        return mHandler.isListEnd(lastPosition);
+    }
+
     public void scrollToEnd() {
         if (getAdapter() != null) {
             scrollToPosition(getAdapter().getItemCount() - 1);
+        }
+    }
+
+    public void scrollToPositon(int position) {
+        if (getAdapter() != null && position < getAdapter().getItemCount()) {
+            scrollToPosition(position);
+        }
+    }
+
+    public void setHighShowPosition(int position) {
+        if (mAdapter != null) {
+            mAdapter.setHighShowPosition(position);
         }
     }
 
@@ -213,32 +255,33 @@ public class MessageLayout extends MessageLayoutUI {
 
     @Override
     public void postSetAdapter(MessageListAdapter adapter) {
-        mAdapter.setOnItemClickListener(new MessageLayout.OnItemClickListener() {
+        mAdapter.setOnItemClickListener(new OnItemLongClickListener() {
             @Override
             public void onMessageLongClick(View view, int position, MessageInfo messageInfo) {
-                if (mOnItemClickListener != null) {
-                    mOnItemClickListener.onMessageLongClick(view, position, messageInfo);
+                if (mOnItemLongClickListener != null) {
+                    mOnItemLongClickListener.onMessageLongClick(view, position, messageInfo);
                 }
             }
 
             @Override
             public void onUserIconClick(View view, int position, MessageInfo info) {
-                if (mOnItemClickListener != null) {
-                    mOnItemClickListener.onUserIconClick(view, position, info);
+                if (mOnItemLongClickListener != null) {
+                    mOnItemLongClickListener.onUserIconClick(view, position, info);
                 }
             }
         });
     }
 
     public interface OnLoadMoreHandler {
-        void loadMore();
+        void loadMore(int type);
+        boolean isListEnd(int postion);
     }
 
     public interface OnEmptySpaceClickListener {
         void onClick();
     }
 
-    public interface OnItemClickListener {
+    public interface OnItemLongClickListener {
         void onMessageLongClick(View view, int position, MessageInfo messageInfo);
 
         void onUserIconClick(View view, int position, MessageInfo messageInfo);

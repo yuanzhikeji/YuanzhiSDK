@@ -35,6 +35,7 @@ public class ConversationLayout extends RelativeLayout implements IConversationL
     private ConversationListLayout mConversationList;
     private NoticeLayout mNoticeLayout;
     private MorePopWindow mMenu;
+    private View mSearchLayout;
 
     public ConversationLayout(Context context) {
         super(context);
@@ -58,12 +59,20 @@ public class ConversationLayout extends RelativeLayout implements IConversationL
         inflate(getContext(), R.layout.conversation_layout, this);
         EditText mSearch = findViewById(R.id.search);
         mSearch.setOnClickListener(view -> getContext().startActivity(new Intent(getContext(), IMSearchMainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)));
+        mSearchLayout = findViewById(R.id.search_layout);
         mConversationList = findViewById(R.id.conversation_list);
         mNoticeLayout = findViewById(R.id.chat_group_apply_layout);
         mNoticeLayout.setOnNoticeClickListener(view -> getContext().startActivity(new Intent(getContext(), GroupApplyManagerActivity.class)));
     }
     private IConversationAdapter adapter;
-    public void initDefault(YzChatType type,IUIKitCallBack callBack) {
+
+    public void setShowSearchLayout(boolean showSearchLayout) {
+        if(mSearchLayout!=null){
+            mSearchLayout.setVisibility(showSearchLayout?VISIBLE:GONE);
+        }
+    }
+
+    public void initDefault(YzChatType type, IUIKitCallBack callBack) {
         final View mAddMore = findViewById(R.id.add_more);
         int functionPrem = YzIMKitAgent.instance().getFunctionPrem();
         if((functionPrem & 2)>0){

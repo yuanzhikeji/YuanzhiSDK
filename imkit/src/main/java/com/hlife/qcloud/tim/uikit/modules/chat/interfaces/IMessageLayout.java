@@ -8,7 +8,7 @@ import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMes
 import java.util.List;
 
 /**
- * 消息区域 {@link MessageLayout} 继承自 {@link RecyclerView}，提供了消息的展示功能。<br>
+ * 消息区域 {@link MessageLayout} 继承自 {@link }，提供了消息的展示功能。<br>
  * 本类提供了大量的方法以供定制化需求，包括外观设置、事件点击，以及自定义消息的展示等。
  */
 public interface IMessageLayout extends IMessageProperties {
@@ -25,14 +25,14 @@ public interface IMessageLayout extends IMessageProperties {
      *
      * @return
      */
-    MessageLayout.OnItemClickListener getOnItemClickListener();
+    MessageLayout.OnItemLongClickListener getOnItemClickListener();
 
     /**
-     * 设置消息列表的事件监听器 {@link MessageLayout.OnItemClickListener}
+     * 设置消息列表的事件监听器 {@link MessageLayout.OnItemLongClickListener}
      *
      * @param listener
      */
-    void setOnItemClickListener(MessageLayout.OnItemClickListener listener);
+    void setOnItemClickListener(MessageLayout.OnItemLongClickListener listener);
 
     /**
      * 获取 PopMenu 的 Action 列表

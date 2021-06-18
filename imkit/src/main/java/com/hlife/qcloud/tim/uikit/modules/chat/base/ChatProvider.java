@@ -175,12 +175,18 @@ public class ChatProvider implements IChatProvider {
     public void updateReadMessage(V2TIMMessageReceipt max) {
         for (int i = 0; i < mDataSource.size(); i++) {
             MessageInfo messageInfo = mDataSource.get(i);
-            if (messageInfo.getMsgTime() > max.getTimestamp()) {
-                messageInfo.setPeerRead(false);
-            } else {
+            if(!messageInfo.isPeerRead()){
                 messageInfo.setPeerRead(true);
                 updateAdapter(MessageLayout.DATA_CHANGE_TYPE_UPDATE, i);
             }
+//            if (messageInfo.getMsgTime() > max.getTimestamp()) {
+//                messageInfo.setPeerRead(false);
+//            } else if (messageInfo.isPeerRead()) {
+//                // do nothing
+//            } else {
+//                messageInfo.setPeerRead(true);
+//                updateAdapter(MessageLayout.DATA_CHANGE_TYPE_UPDATE, i);
+//            }
         }
     }
 
@@ -212,6 +218,10 @@ public class ChatProvider implements IChatProvider {
 
     public void setAdapter(MessageListAdapter adapter) {
         this.mAdapter = adapter;
+    }
+
+    public MessageListAdapter getAdapter() {
+        return mAdapter;
     }
 
     public interface TypingListener {

@@ -131,6 +131,7 @@
 
     <string name="test_custom_action" translatable="false">自定义消息</string>
     <string name="test_custom_message" translatable="false">查看详情>></string>
+    <string name="custom_msg" translatable="false">[自定义消息]</string>
 
 
     <string name="pic" translatable="false">图片</string>
@@ -263,6 +264,7 @@
     <string name="ui_at_me" translatable="false">[有人@我]</string>
     <string name="ui_at_all_me" translatable="false">[@所有人][有人@我]</string>
     <string name="ui_group_apply" translatable="false">[加群申请]</string>
+    <string name="ui_im_drafts" translatable="false">[草稿]</string>
 
     <string name="date_yesterday" translatable="false">昨天</string>
     <string name="date_tommorow" translatable="false">明天</string>
@@ -308,4 +310,27 @@
     <string name="im_nick_name_search" translatable="false">昵称: </string>
     <string name="include_group_id" translatable="false">包含群 ID: </string>
     <string name="include_group_member" translatable="false">包含群成员: </string>
+
+    <string name="etc">等</string>
+    <string name="revoke_tips_you" translatable="false">您撤回了一条消息</string>
+    <string name="revoke_tips" translatable="false">撤回了一条消息</string>
+    <string name="revoke_tips_other" translatable="false">对方撤回了一条消息</string>
+    <string name="create_group" translatable="false">创建群组</string>
+    <string name="custom_emoji" translatable="false">[自定义表情]</string>
+    <string name="picture_extra" translatable="false">[图片]</string>
+    <string name="video_extra" translatable="false">[视频]</string>
+    <string name="audio_extra" translatable="false">[语音]</string>
+    <string name="file_extra" translatable="false">[文件]</string>
+    <string name="join_group" translatable="false">加入群组</string>
+    <string name="invite_joined_group" translatable="false">被邀请进群</string>
+    <string name="quit_group" translatable="false">退出群组</string>
+    <string name="kick_group_tip" translatable="false">被踢出群组</string>
+    <string name="be_group_manager" translatable="false">被设置管理员</string>
+    <string name="cancle_group_manager" translatable="false">被取消管理员</string>
+    <string name="modify_group_name_is" translatable="false">修改群名称为</string>
+    <string name="modify_notice" translatable="false">修改群公告为</string>
+    <string name="move_owner" translatable="false">转让群主给</string>
+    <string name="modify_group_avatar" translatable="false">修改了群头像</string>
+    <string name="banned" translatable="false">被禁言</string>
+    <string name="cancle_banned" translatable="false">被取消禁言</string>
 </resources>

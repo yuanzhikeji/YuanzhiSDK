@@ -188,7 +188,7 @@ public class GroupInfo extends ChatInfo {
     }
 
     public boolean isRevOpt(){
-        return revOpt == V2TIMMessage.V2TIM_NOT_RECEIVE_MESSAGE;
+        return revOpt == V2TIMMessage.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE;
     }
 
     public void setRevOpt(int revOpt) {
@@ -202,10 +202,10 @@ public class GroupInfo extends ChatInfo {
      * @return
      */
     public GroupInfo covertTIMGroupDetailInfo(V2TIMGroupInfoResult infoResult) {
-        SLog.e("infoResult.getResultCode():"+infoResult.getResultCode());
         if (infoResult.getResultCode() != 0) {
             return this;
         }
+        if(SLog.debug)SLog.i("getGroupID():"+infoResult.getGroupInfo().getGroupID());
         setChatName(infoResult.getGroupInfo().getGroupName());
         setGroupName(infoResult.getGroupInfo().getGroupName());
         setId(infoResult.getGroupInfo().getGroupID());

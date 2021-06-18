@@ -8,10 +8,12 @@ import android.text.TextUtils;
 
 import com.hlife.qcloud.tim.uikit.base.IMEventListener;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
+import com.hlife.qcloud.tim.uikit.base.TUIKitListenerManager;
 import com.hlife.qcloud.tim.uikit.business.Constants;
 import com.hlife.qcloud.tim.uikit.business.active.ChatActivity;
 import com.hlife.qcloud.tim.uikit.business.active.MwWorkActivity;
 import com.hlife.qcloud.tim.uikit.business.active.OSSFileActivity;
+import com.hlife.qcloud.tim.uikit.business.helper.CustomChatController;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatHistoryMessageListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
@@ -23,6 +25,7 @@ import com.hlife.qcloud.tim.uikit.business.inter.YzGroupJoinListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupMemberListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageSendCallback;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
+import com.hlife.qcloud.tim.uikit.business.inter.YzReceiveMessageOptListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzSearchMessageListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzStatusListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzWorkAppItemClickListener;
@@ -64,6 +67,7 @@ import com.tencent.imsdk.v2.V2TIMMessage;
 import com.tencent.imsdk.v2.V2TIMMessageSearchParam;
 import com.tencent.imsdk.v2.V2TIMMessageSearchResult;
 import com.tencent.imsdk.v2.V2TIMMessageSearchResultItem;
+import com.tencent.imsdk.v2.V2TIMReceiveMessageOptInfo;
 import com.tencent.imsdk.v2.V2TIMValueCallback;
 import com.tencent.smtt.export.external.TbsCoreSettings;
 import com.tencent.smtt.sdk.QbSdk;
@@ -190,6 +194,7 @@ public final class YzIMKitAgent {
         QbSdk.initX5Environment(mContext,cb);
         //注册消息通知离线登录
         registerPush();
+        TUIKitListenerManager.getInstance().addChatListener(new CustomChatController());
     };
 
     public int getFunctionPrem() {
@@ -285,11 +290,14 @@ public final class YzIMKitAgent {
         TUIKit.getAppContext().startActivity(intent);
     }
     public void sendCustomMessage(final ChatInfo chatInfo, String customMessage,YzMessageSendCallback callback){
+        this.sendCustomMessage(chatInfo,customMessage,customMessage,callback);
+    }
+    public void sendCustomMessage(final ChatInfo chatInfo, String customMessage,String desc,YzMessageSendCallback callback){
         if(chatInfo==null){
             return;
         }
         if(chatInfo.isGroup()){
-            MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage,customMessage);
+            MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage,desc);
             groupChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
                 @Override
                 public void onSuccess(Object data) {
@@ -943,7 +951,7 @@ public final class YzIMKitAgent {
      * 是否消息免打扰
      */
     public void changeReceiveMessageOpt(String groupId,boolean opt,YzGroupChangeListener listener){
-        V2TIMManager.getMessageManager().setGroupReceiveMessageOpt(groupId, opt ? V2TIMMessage.V2TIM_NOT_RECEIVE_MESSAGE : V2TIMMessage.V2TIM_RECEIVE_MESSAGE, new V2TIMCallback() {
+        V2TIMManager.getMessageManager().setGroupReceiveMessageOpt(groupId, opt ? V2TIMMessage.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE : V2TIMMessage.V2TIM_RECEIVE_MESSAGE, new V2TIMCallback() {
             @Override
             public void onSuccess() {
                 if(listener!=null){
@@ -960,11 +968,32 @@ public final class YzIMKitAgent {
         });
     }
     public void changeC2CReceiveMessageOpt(List<String> ids,boolean opt,YzGroupChangeListener listener){
-        V2TIMManager.getMessageManager().setC2CReceiveMessageOpt(ids, opt ? V2TIMMessage.V2TIM_NOT_RECEIVE_MESSAGE : V2TIMMessage.V2TIM_RECEIVE_MESSAGE, new V2TIMCallback() {
+        V2TIMManager.getMessageManager().setC2CReceiveMessageOpt(ids, opt ? V2TIMMessage.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE : V2TIMMessage.V2TIM_RECEIVE_MESSAGE, new V2TIMCallback() {
             @Override
             public void onSuccess() {
                 if(listener!=null){
                     listener.success();
+                }
+            }
+
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+        });
+    }
+    public void getC2CReceiveMessageOpt(List<String> ids, YzReceiveMessageOptListener listener){
+        V2TIMManager.getMessageManager().getC2CReceiveMessageOpt(ids, new V2TIMValueCallback<List<V2TIMReceiveMessageOptInfo>>() {
+            @Override
+            public void onSuccess(List<V2TIMReceiveMessageOptInfo> v2TIMReceiveMessageOptInfos) {
+                HashMap<String,Boolean> result = new HashMap<>();
+                for (V2TIMReceiveMessageOptInfo v2TIMReceiveMessageOptInfo:v2TIMReceiveMessageOptInfos) {
+                    result.put(v2TIMReceiveMessageOptInfo.getUserID(),v2TIMReceiveMessageOptInfo.getC2CReceiveMessageOpt() == V2TIMMessage.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE);
+                }
+                if(listener!=null){
+                    listener.result(result);
                 }
             }
 

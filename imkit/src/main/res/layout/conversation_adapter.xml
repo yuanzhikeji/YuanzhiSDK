@@ -7,19 +7,29 @@
     android:paddingTop="12dp"
     android:paddingLeft="14.85dp"
     android:orientation="horizontal">
-
-        <com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationIconView
-            android:id="@+id/conversation_icon"
-            android:layout_width="@dimen/conversation_avatar_width"
-            android:layout_height="@dimen/conversation_avatar_height" />
-
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationIconView
+                android:id="@+id/conversation_icon"
+                android:layout_width="@dimen/conversation_avatar_width"
+                android:layout_height="@dimen/conversation_avatar_height" />
+            <View
+                android:id="@+id/remind"
+                android:layout_gravity="end"
+                android:layout_marginTop="1dp"
+                android:layout_marginEnd="3dp"
+                android:background="@drawable/circle_dot"
+                android:layout_width="10dp"
+                android:visibility="gone"
+                android:layout_height="10dp"/>
+        </FrameLayout>
         <RelativeLayout
             android:layout_width="match_parent"
             android:paddingTop="1.37dp"
-            android:paddingLeft="11.43dp"
-            android:paddingRight="18.11dp"
-            android:layout_height="62.3dp">
-
+            android:paddingStart="12dp"
+            android:paddingEnd="18dp"
+            android:layout_height="62dp">
             <TextView
                 android:id="@+id/conversation_title"
                 android:layout_width="match_parent"
@@ -56,7 +66,6 @@
                 android:textColor="@color/list_bottom_text_bg"
                 android:textSize="12.86sp"
                 android:visibility="gone"/>
-
             <TextView
                 android:id="@+id/conversation_last_msg"
                 android:layout_width="wrap_content"
@@ -69,8 +78,19 @@
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:textColor="@color/list_bottom_text_bg"
-                android:textSize="12.86sp" />
-
+                android:textSize="12sp" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:id="@+id/not_disturb"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="15dp"
+                android:visibility="gone"
+                android:layout_above="@+id/view_line"
+                android:includeFontPadding="false"
+                android:src="@drawable/ic_disturb" />
             <com.hlife.qcloud.tim.uikit.component.UnreadCountTextView
                 android:id="@+id/conversation_unread"
                 android:layout_width="wrap_content"
@@ -81,7 +101,7 @@
                 android:layout_marginBottom="15.54dp"
                 android:gravity="center"
                 android:includeFontPadding="false"
-                android:textColor="#fff"
+                android:textColor="@color/colorWhite"
                 android:textSize="10sp" />
 
             <View

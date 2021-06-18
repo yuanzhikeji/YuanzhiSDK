@@ -17,10 +17,12 @@ import com.hlife.qcloud.tim.uikit.business.modal.SearchDataMessage;
 import com.hlife.qcloud.tim.uikit.config.TUIKitConfigs;
 import com.hlife.qcloud.tim.uikit.modules.chat.GroupChatManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
+import com.hlife.qcloud.tim.uikit.modules.conversation.base.DraftInfo;
 import com.hlife.qcloud.tim.uikit.modules.group.apply.GroupApplyInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageRevokedManager;
+import com.hlife.qcloud.tim.uikit.utils.DateTimeUtil;
 import com.hlife.qcloud.tim.uikit.utils.SharedPreferenceUtils;
 import com.tencent.imsdk.v2.V2TIMCallback;
 import com.tencent.imsdk.v2.V2TIMConversation;
@@ -382,10 +384,6 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         if (conversation == null) {
             return null;
         }
-        V2TIMMessage message = conversation.getLastMessage();
-        if (message == null) {
-            return null;
-        }
         final SearchDataMessage info = new SearchDataMessage();
         int type = conversation.getType();
         if (type != V2TIMConversation.V2TIM_C2C && type != V2TIMConversation.V2TIM_GROUP) {
@@ -393,28 +391,43 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         }
 
         boolean isGroup = type == V2TIMConversation.V2TIM_GROUP;
-        info.setLastMessageTime(message.getTimestamp());
-        List<MessageInfo> list = MessageInfoUtil.TIMMessage2MessageInfo(message);
-        if (list != null && list.size() > 0) {
-            info.setLastMessage(list.get(list.size() - 1));
+
+        String draftText = conversation.getDraftText();
+        if (!TextUtils.isEmpty(draftText)) {
+            DraftInfo draftInfo = new DraftInfo();
+            draftInfo.setDraftText(draftText);
+            draftInfo.setDraftTime(conversation.getDraftTimestamp());
+            info.setDraft(draftInfo);
         }
-        StringBuilder atInfo = new StringBuilder();
-        if(isGroup && mApplyGroupID.contains(conversation.getGroupID())){
-            atInfo.append(TUIKit.getAppContext().getString(R.string.ui_group_apply));
+        V2TIMMessage message = conversation.getLastMessage();
+        if (message == null) {
+            long time = DateTimeUtil.getStringToDate("0001-01-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
+            info.setLastMessageTime(time);
+        } else {
+            info.setLastMessageTime(message.getTimestamp());
         }
+        MessageInfo messageInfo = MessageInfoUtil.TIMMessage2MessageInfo(message);
+        if (messageInfo != null) {
+            info.setLastMessage(messageInfo);
+        }
+
         int atInfoType = getAtInfoType(conversation);
         switch (atInfoType){
             case V2TIMGroupAtInfo.TIM_AT_ME:
-                atInfo.append(TUIKit.getAppContext().getString(R.string.ui_at_me));
+                info.setAtInfoText(TUIKit.getAppContext().getString(R.string.ui_at_me));
                 break;
             case V2TIMGroupAtInfo.TIM_AT_ALL:
-                atInfo.append(TUIKit.getAppContext().getString(R.string.ui_at_all));
+                info.setAtInfoText(TUIKit.getAppContext().getString(R.string.ui_at_all));
                 break;
             case V2TIMGroupAtInfo.TIM_AT_ALL_AT_ME:
-                atInfo.append(TUIKit.getAppContext().getString(R.string.ui_at_all_me));
+                info.setAtInfoText(TUIKit.getAppContext().getString(R.string.ui_at_all_me));
                 break;
+            default:
+                info.setAtInfoText("");
+                break;
+
         }
-        info.setAtInfoText(atInfo.toString());
+
         info.setTitle(conversation.getShowName());
         if (isGroup) {
             fillConversationUrlForGroup(conversation, info);
@@ -429,12 +442,19 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         }
         if (isGroup) {
             info.setId(conversation.getGroupID());
+            info.setGroupType(conversation.getGroupType());
         } else {
             info.setId(conversation.getUserID());
         }
+
+        info.setShowDisturbIcon(conversation.getRecvOpt() == V2TIMMessage.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE);
         info.setConversationId(conversation.getConversationID());
         info.setGroup(isGroup);
-        info.setUnRead(conversation.getUnreadCount());
+        // AVChatRoom 不支持未读数。
+        if (!V2TIMManager.GROUP_TYPE_AVCHATROOM.equals(conversation.getGroupType())) {
+            info.setUnRead(conversation.getUnreadCount());
+        }
+        info.setTop(conversation.isPinned());
         return info;
     }
 
@@ -613,7 +633,6 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
      * @param flag 是否置顶
      */
     public void setConversationTop(String id, boolean flag) {
-        SLog.i( "setConversationTop id:" + id + "|flag:" + flag);
         handleTopData(id, flag);
         mProvider.setDataSource(sortConversations(mProvider.getDataSource()));
         SharedPreferenceUtils.putListData(mConversationPreferences, TOP_LIST, mTopLinkedList);
@@ -794,7 +813,6 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
      * @param unreadTotal
      */
     public void updateUnreadTotal(int unreadTotal) {
-        SLog.i( "updateUnreadTotal:" + unreadTotal);
         mUnreadTotal = unreadTotal;
         for (int i = 0; i < mUnreadWatchers.size(); i++) {
             mUnreadWatchers.get(i).updateUnread(mUnreadTotal);

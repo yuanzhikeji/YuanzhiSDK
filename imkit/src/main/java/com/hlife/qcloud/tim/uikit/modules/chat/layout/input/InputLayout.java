@@ -25,12 +25,15 @@ import com.hlife.qcloud.tim.uikit.business.active.ListStopMapActivity;
 import com.hlife.qcloud.tim.uikit.business.active.OSSFileActivity;
 import com.hlife.qcloud.tim.uikit.business.message.CustomFileMessage;
 import com.hlife.qcloud.tim.uikit.business.modal.VideoFile;
+import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.chat.interfaces.IChatLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.inputmore.InputMoreFragment;
+import com.hlife.qcloud.tim.uikit.modules.conversation.base.DraftInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
 import com.hlife.qcloud.tim.uikit.utils.FileUtil;
 import com.http.network.task.ObjectMapperFactory;
+import com.tencent.imsdk.v2.V2TIMCallback;
 import com.tencent.imsdk.v2.V2TIMConversation;
 import com.hlife.liteav.SelectContactActivity;
 import com.hlife.liteav.login.UserModel;
@@ -48,6 +51,7 @@ import com.hlife.qcloud.tim.uikit.config.TUIKitConfigs;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.BaseInputFragment;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 import com.tencent.imsdk.v2.V2TIMGroupAtInfo;
+import com.tencent.imsdk.v2.V2TIMManager;
 import com.work.util.SLog;
 import com.work.util.ToastUtil;
 
@@ -812,6 +816,41 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
             }
             if (!TextUtils.equals(mInputContent, mTextInput.getText().toString())) {
                 FaceManager.handlerEmojiText(mTextInput, mTextInput.getText().toString(), true,0,null);
+            }
+        }
+    }
+
+
+    public void setDraft() {
+        if (mChatInfo == null) {
+            return;
+        }
+        if (mTextInput == null) {
+            return;
+        }
+        String conversationIdPrefix = mChatInfo.getType() == V2TIMConversation.V2TIM_C2C ? "c2c_" : "group_";
+        String conversationId = conversationIdPrefix + mChatInfo.getId();
+        final String content = mTextInput.getText().toString();
+        V2TIMManager.getConversationManager().setConversationDraft(conversationId, content, new V2TIMCallback() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onError(int code, String desc) {
+                SLog.e("set drafts error : " + code + " " + desc);
+            }
+        });
+    }
+
+    @Override
+    public void setChatInfo(ChatInfo chatInfo) {
+        super.setChatInfo(chatInfo);
+        if (chatInfo != null) {
+            DraftInfo draftInfo = chatInfo.getDraft();
+            if (draftInfo != null && !TextUtils.isEmpty(draftInfo.getDraftText()) && mTextInput != null) {
+                mTextInput.setText(draftInfo.getDraftText());
+                mTextInput.setSelection(mTextInput.getText().length());
             }
         }
     }

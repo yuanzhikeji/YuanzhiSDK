@@ -28,6 +28,7 @@
     </RelativeLayout>
     
     <LinearLayout
+        android:id="@+id/search_layout"
         android:background="@color/white"
         android:visibility="visible"
         android:layout_width="match_parent"

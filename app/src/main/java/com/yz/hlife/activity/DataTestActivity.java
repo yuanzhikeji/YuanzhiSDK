@@ -9,7 +9,6 @@ import com.hlife.qcloud.tim.uikit.business.inter.YzChatHistoryMessageListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzDeleteConversationListener;
-import com.hlife.qcloud.tim.uikit.business.inter.YzGroupChangeListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
@@ -20,6 +19,7 @@ import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.http.network.listener.OnResultDataListener;
 import com.http.network.model.RequestWork;
 import com.http.network.model.ResponseWork;
+import com.http.network.task.ObjectMapperFactory;
 import com.work.api.open.Yz;
 import com.work.api.open.model.CreateGroupReq;
 import com.work.api.open.model.CreateGroupResp;
@@ -90,7 +90,6 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
             @Override
             public void onConversationData(List<ConversationInfo> data, long unRead, long nextSeq) {
                 conversationInfos = data;
-                SLog.e("conversationInfos:"+conversationInfos.size());
                 ToastUtil.info(DataTestActivity.this,yzChatType+":"+conversationInfos.toString());
             }
 
@@ -120,14 +119,13 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
             @Override
             public void onUnReadCount(long singleUnRead, long groupUnRead) {
                 super.onUnReadCount(singleUnRead, groupUnRead);
-                ToastUtil.info(DataTestActivity.this,"单聊未读："+singleUnRead+"----群聊未读："+groupUnRead);
+//                ToastUtil.info(DataTestActivity.this,"单聊未读："+singleUnRead+"----群聊未读："+groupUnRead);
             }
         });
     }
 
     @Override
     public void updateUnread(int count) {
-        SLog.e("未读总数："+count);
         conversationUnRead();
     }
 
@@ -190,9 +188,9 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                     YzIMKitAgent.instance().startChat(chatInfo,null);
                 }else{
                     ChatInfo chatInfo = new ChatInfo();
-                    chatInfo.setId("@TGS#2MS63YGHQ");
-                    chatInfo.setChatName("群");
-                    chatInfo.setGroup(true);
+                    chatInfo.setId("3648680472945510534");
+                    chatInfo.setChatName("测试");
+                    chatInfo.setGroup(false);
                     YzIMKitAgent.instance().startChat(chatInfo,null);
                 }
                 break;
@@ -302,31 +300,34 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 break;
             case R.id.send_group_message:
                 SendGroupMessageReq sendGroupMessageReq = new SendGroupMessageReq();
-                sendGroupMessageReq.setFromUserId("52ac0e63c55ba493dfb7134cd938fe81");
-                sendGroupMessageReq.setGroupId("@TGS#2XM253EHK");
-                sendGroupMessageReq.setMsgType("TIMTextElem");
+//                sendGroupMessageReq.setFromUserId("91429818885382211469142");
+                sendGroupMessageReq.setGroupId("@TGS#2536TCHHD");
+//                sendGroupMessageReq.setGroupId("@TGS#2Q2K37GHF");
+                sendGroupMessageReq.setMsgType("TIMCustomElem");
                 OpenTIMElem openTIMElem1 = new OpenTIMElem();
-                openTIMElem1.Data = "我是api发的自定义群组消息";
+                openTIMElem1.Data = ObjectMapperFactory.getObjectMapper().model2JsonStr(new CustomModel());
+                openTIMElem1.Desc = ObjectMapperFactory.getObjectMapper().model2JsonStr(new CustomModel());
+//                openTIMElem1.Data = "{'123':'223'}";
                 sendGroupMessageReq.setMsgContent(openTIMElem1);
                 Yz.getSession().sendCustomGroupTextMsg(sendGroupMessageReq,null);
                 break;
             case R.id.c2c_receiver_opt:
-                List<String> ids = new ArrayList<>();
-                ids.add("userId1");
-                ids.add("userId2");
-                ids.add("userId3");
-                YzIMKitAgent.instance().changeC2CReceiveMessageOpt(ids,true,new YzGroupChangeListener(){
-
-                    @Override
-                    public void success() {
-
-                    }
-
-                    @Override
-                    public void error(int code, String desc) {
-
-                    }
-                });
+//                List<String> ids = new ArrayList<>();
+//                ids.add("userId1");
+//                ids.add("userId2");
+//                ids.add("userId3");
+//                YzIMKitAgent.instance().changeC2CReceiveMessageOpt(ids,true,new YzGroupChangeListener(){
+//
+//                    @Override
+//                    public void success() {
+//
+//                    }
+//
+//                    @Override
+//                    public void error(int code, String desc) {
+//
+//                    }
+//                });
                 break;
             case R.id.chat_history:
                 if(conversationInfos == null || conversationInfos.size()==0){

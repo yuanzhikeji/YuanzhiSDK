@@ -155,8 +155,8 @@ public class MessageImageHolder extends MessageContentHolder {
                     img.downloadImage(path, new V2TIMDownloadCallback() {
                         @Override
                         public void onProgress(V2TIMElem.V2ProgressInfo progressInfo) {
-                            SLog.i("downloadImage progress current:"+
-                                    progressInfo.getCurrentSize() + ", total:" + progressInfo.getTotalSize());
+//                            SLog.i("downloadImage progress current:"+
+//                                    progressInfo.getCurrentSize() + ", total:" + progressInfo.getTotalSize());
                         }
 
                         @Override
@@ -193,14 +193,11 @@ public class MessageImageHolder extends MessageContentHolder {
                 TUIKit.getAppContext().startActivity(intent);
             }
         });
-        contentImage.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                if (onItemClickListener != null) {
-                    onItemClickListener.onMessageLongClick(view, position, msg);
-                }
-                return true;
+        contentImage.setOnLongClickListener(view -> {
+            if (onItemLongClickListener != null) {
+                onItemLongClickListener.onMessageLongClick(view, position, msg);
             }
+            return true;
         });
     }
 

@@ -13,9 +13,11 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 
+import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.base.BaseActivity;
 import com.hlife.qcloud.tim.uikit.business.dialog.ConfirmDialog;
 import com.hlife.qcloud.tim.uikit.business.dialog.GroupJoinTypeDialog;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupChangeListener;
 import com.hlife.qcloud.tim.uikit.modules.group.interfaces.IGroupMemberLayout;
 import com.hlife.qcloud.tim.uikit.modules.group.member.GroupMemberInfo;
 import com.hlife.qcloud.tim.uikit.modules.group.member.GroupMemberRemindActivity;
@@ -167,37 +169,21 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
                 if(mGroupInfo==null){
                     return;
                 }
-                V2TIMManager.getMessageManager().setGroupReceiveMessageOpt(mGroupInfo.getId(), b ? V2TIMMessage.V2TIM_NOT_RECEIVE_MESSAGE : V2TIMMessage.V2TIM_RECEIVE_MESSAGE, new V2TIMCallback() {
+                YzIMKitAgent.instance().changeReceiveMessageOpt(mGroupInfo.getId(), b, new YzGroupChangeListener() {
                     @Override
-                    public void onSuccess() {
+                    public void success() {
                         if(b){
-                            mGroupInfo.setRevOpt(V2TIMMessage.V2TIM_NOT_RECEIVE_MESSAGE);
+                            mGroupInfo.setRevOpt(V2TIMMessage.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE);
                         }else{
                             mGroupInfo.setRevOpt(V2TIMMessage.V2TIM_RECEIVE_MESSAGE);
                         }
                     }
 
                     @Override
-                    public void onError(int code, String desc) {
-                        SLog.e("消息免打扰:" + code + "|desc:" + desc);
+                    public void error(int code, String desc) {
+                        SLog.e("changeReceiveMessageOpt:" + code + "|desc:" + desc);
                     }
                 });
-//                V2TIMManager.getGroupManager().setReceiveMessageOpt(mGroupInfo.getId(), b ? V2TIMGroupInfo.V2TIM_GROUP_NOT_RECEIVE_MESSAGE : V2TIMGroupInfo.V2TIM_GROUP_RECEIVE_MESSAGE, new V2TIMCallback() {
-//                    @Override
-//                    public void onError(int i, String s) {
-//                        SLog.e("消息免打扰:" + i + "|desc:" + s);
-//                    }
-//
-//                    @Override
-//                    public void onSuccess() {
-//                        SLog.e("消息免打扰设置:"+b);
-//                        if(b){
-//                            mGroupInfo.setRevOpt(V2TIMGroupInfo.V2TIM_GROUP_NOT_RECEIVE_MESSAGE);
-//                        }else{
-//                            mGroupInfo.setRevOpt(V2TIMGroupInfo.V2TIM_GROUP_RECEIVE_MESSAGE);
-//                        }
-//                    }
-//                });
             }
         });
         //全群禁言

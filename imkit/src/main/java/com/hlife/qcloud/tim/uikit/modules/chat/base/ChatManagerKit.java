@@ -1,20 +1,26 @@
 package com.hlife.qcloud.tim.uikit.modules.chat.base;
 
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.hlife.qcloud.tim.uikit.TUIKit;
+import com.hlife.qcloud.tim.uikit.base.IBaseInfo;
+import com.hlife.qcloud.tim.uikit.base.IBaseMessageSender;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatMessageListener;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageRevokedManager;
+import com.hlife.qcloud.tim.uikit.utils.TUIKitConstants;
 import com.tencent.imsdk.v2.V2TIMAdvancedMsgListener;
 import com.tencent.imsdk.v2.V2TIMCallback;
 import com.tencent.imsdk.v2.V2TIMConversation;
 import com.tencent.imsdk.v2.V2TIMFriendInfo;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.imsdk.v2.V2TIMMessage;
+import com.tencent.imsdk.v2.V2TIMMessageListGetOption;
 import com.tencent.imsdk.v2.V2TIMMessageReceipt;
 import com.tencent.imsdk.v2.V2TIMOfflinePushInfo;
 import com.tencent.imsdk.v2.V2TIMSendCallback;
@@ -28,7 +34,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements MessageRevokedManager.MessageRevokeHandler {
+public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements MessageRevokedManager.MessageRevokeHandler, IBaseMessageSender {
+
+    // 消息已读上报时间间隔
+    private static final int READ_REPORT_INTERVAL = 100; // 单位： 毫秒
 
     protected static final int MSG_PAGE_COUNT = 20;
     protected static final int REVOKE_TIME_OUT = 20016;
@@ -36,9 +45,14 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
 
     protected boolean mIsMore;
     private boolean mIsLoading;
+    private boolean mIsChatFragmentShow = false;
 
     private MessageInfo mLastMessageInfo;
     private YzChatMessageListener mYzChatMessageListener;
+
+    private long lastReadReportTime = 0L;
+    private boolean canReadReport = true;
+    private final MessageReadReportHandler readReportHandler = new MessageReadReportHandler();
 
     protected void init() {
         destroyChat();
@@ -48,6 +62,54 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
 
     public void destroyChat() {
         mCurrentProvider = null;
+    }
+
+    public void markMessageAsRead(ChatInfo chatInfo) {
+        if (chatInfo == null) {
+            SLog.e("markMessageAsRead() chatInfo is null");
+            return;
+        }
+        boolean isGroup = chatInfo.getType() != V2TIMConversation.V2TIM_C2C;
+        String chatId = chatInfo.getId();
+        if (isGroup) {
+            groupReadReport(chatId);
+        } else {
+            c2cReadReport(chatId);
+        }
+    }
+
+    public boolean isChatFragmentShow() {
+        return mIsChatFragmentShow;
+    }
+
+    public void setChatFragmentShow(boolean isChatFragmentShow) {
+        this.mIsChatFragmentShow = isChatFragmentShow;
+    }
+
+    private void groupReadReport(String groupId) {
+        V2TIMManager.getMessageManager().markGroupMessageAsRead(groupId, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                SLog.e("markGroupMessageAsRead failed, code = " + code + ", desc = " + desc);
+            }
+
+            @Override
+            public void onSuccess() {
+            }
+        });
+    }
+
+    private void c2cReadReport(String userId) {
+        V2TIMManager.getMessageManager().markC2CMessageAsRead(userId, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                SLog.e("maonNewMessagerkC2CMessageAsRead setReadMessage failed, code = " + code + ", desc = " + desc);
+            }
+
+            @Override
+            public void onSuccess() {
+            }
+        });
     }
 
     public abstract ChatInfo getCurrentChatInfo();
@@ -138,11 +200,10 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
 
     protected void addMessage(V2TIMMessage msg) {
         if (!safetyCall()) {
-            SLog.w("addMessage unSafetyCall");
             return;
         }
-        final List<MessageInfo> list = MessageInfoUtil.TIMMessage2MessageInfo(msg);
-        if (list != null && list.size() != 0) {
+        final MessageInfo messageInfo = MessageInfoUtil.TIMMessage2MessageInfo(msg);
+        if (messageInfo != null) {
             ChatInfo chatInfo = getCurrentChatInfo();
             boolean isGroupMessage = false;
             String groupID = null;
@@ -165,35 +226,18 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
             } else {
                 return;
             }
-            mCurrentProvider.addMessageInfoList(list);
-            for (MessageInfo msgInfo : list) {
-                msgInfo.setRead(true);
-                addGroupMessage(msgInfo);
+            mCurrentProvider.addMessageInfo(messageInfo);
+            if (isChatFragmentShow()) {
+                messageInfo.setRead(true);
             }
-            if (isGroupMessage) {
-                V2TIMManager.getMessageManager().markGroupMessageAsRead(groupID, new V2TIMCallback() {
-                    @Override
-                    public void onError(int code, String desc) {
-                        SLog.e("addMessage() markGroupMessageAsRead failed, code = " + code + ", desc = " + desc);
-                    }
+            addGroupMessage(messageInfo);
 
-                    @Override
-                    public void onSuccess() {
-                        SLog.i("addMessage() markGroupMessageAsRead success");
-                    }
-                });
-            } else {
-                V2TIMManager.getMessageManager().markC2CMessageAsRead(userID, new V2TIMCallback() {
-                    @Override
-                    public void onError(int code, String desc) {
-                        SLog.e("addMessage() markC2CMessageAsRead failed, code = " + code + ", desc = " + desc);
-                    }
-
-                    @Override
-                    public void onSuccess() {
-                        SLog.i("addMessage() markC2CMessageAsRead success");
-                    }
-                });
+            if (isChatFragmentShow()) {
+                if (isGroupMessage) {
+                    limitReadReport(null, groupID);
+                } else {
+                    limitReadReport(userID, null);
+                }
             }
         }
     }
@@ -366,15 +410,15 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
 
                         @Override
                         public void onSuccess(List<V2TIMMessage> v2TIMMessages) {
-                            processHistoryMsgs(v2TIMMessages, chatInfo, callBack);
+                            processHistoryMsgs(v2TIMMessages, chatInfo, true, callBack);
                         }
                     });
         }
     }
 
-    public void loadChatMessages(MessageInfo lastMessage, final IUIKitCallBack callBack) {
+
+    public void loadChatMessages(int getMessageType, V2TIMMessage lastMessage, final IUIKitCallBack callBack) {
         if (!safetyCall()) {
-            SLog.w("loadLocalChatMessages unSafetyCall");
             return;
         }
         if (mIsLoading) {
@@ -392,82 +436,188 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
         if (lastMessage == null) {
             mCurrentProvider.clear();
         } else {
-            lastTIMMsg = lastMessage.getTimMessage();
+            lastTIMMsg = lastMessage;
         }
 //        final int unread = (int) mCurrentConversation.getUnreadMessageNum();
         final ChatInfo chatInfo = getCurrentChatInfo();
-        if (chatInfo.getType() == V2TIMConversation.V2TIM_C2C) {
-            V2TIMManager.getMessageManager().getC2CHistoryMessageList(chatInfo.getId(), MSG_PAGE_COUNT, lastTIMMsg, new V2TIMValueCallback<List<V2TIMMessage>>() {
+        if (getMessageType == TUIKitConstants.GET_MESSAGE_FORWARD) {
+            if (chatInfo.getType() == V2TIMConversation.V2TIM_C2C) {
+                V2TIMManager.getMessageManager().getC2CHistoryMessageList(chatInfo.getId(), MSG_PAGE_COUNT, lastTIMMsg, new V2TIMValueCallback<List<V2TIMMessage>>() {
+                    @Override
+                    public void onError(int code, String desc) {
+                        mIsLoading = false;
+                        callBack.onError("SLog", code, desc);
+                    }
+
+                    @Override
+                    public void onSuccess(List<V2TIMMessage> v2TIMMessages) {
+                        processHistoryMsgs(v2TIMMessages, chatInfo, true, callBack);
+                    }
+                });
+            } else {
+                V2TIMManager.getMessageManager().getGroupHistoryMessageList(chatInfo.getId(), MSG_PAGE_COUNT, lastTIMMsg, new V2TIMValueCallback<List<V2TIMMessage>>() {
+                    @Override
+                    public void onError(int code, String desc) {
+                        mIsLoading = false;
+                        callBack.onError("SLog", code, desc);
+                        SLog.e("loadChatMessages getGroupHistoryMessageList failed, code = " + code + ", desc = " + desc);
+                    }
+
+                    @Override
+                    public void onSuccess(List<V2TIMMessage> v2TIMMessages) {
+                        processHistoryMsgs(v2TIMMessages, chatInfo, true, callBack);
+                    }
+                });
+            }
+        } else if (getMessageType == TUIKitConstants.GET_MESSAGE_TWO_WAY){
+            //older
+            V2TIMMessageListGetOption optionForward = new V2TIMMessageListGetOption();
+            optionForward.setCount(MSG_PAGE_COUNT);
+            optionForward.setGetType(V2TIMMessageListGetOption.V2TIM_GET_CLOUD_OLDER_MSG);
+            optionForward.setLastMsg(lastTIMMsg);
+            if (chatInfo.getType() == V2TIMConversation.V2TIM_C2C) {
+                optionForward.setUserID(chatInfo.getId());
+            } else {
+                optionForward.setGroupID(chatInfo.getId());
+            }
+
+            final V2TIMMessage finalLastTIMMsg = lastTIMMsg;
+            V2TIMManager.getMessageManager().getHistoryMessageList(optionForward, new V2TIMValueCallback<List<V2TIMMessage>>() {
                 @Override
                 public void onError(int code, String desc) {
                     mIsLoading = false;
-                    callBack.onError("SLog",code, desc);
-                    SLog.e("loadChatMessages getC2CHistoryMessageList failed, code = " + code + ", desc = " + desc);
+                    callBack.onError("SLog", code, desc);
+                    SLog.e("loadChatMessages getHistoryMessageList optionForward failed, code = " + code + ", desc = " + desc);
                 }
 
                 @Override
                 public void onSuccess(List<V2TIMMessage> v2TIMMessages) {
-                    processHistoryMsgs(v2TIMMessages, chatInfo, callBack);
+                    if (v2TIMMessages == null) {
+                        v2TIMMessages = new ArrayList<>();
+                    }
+                    v2TIMMessages.add(0, finalLastTIMMsg);
+                    processTwoWayHistoryMsgs(v2TIMMessages, chatInfo, true, false, callBack);
+
+                    //newer
+                    V2TIMMessageListGetOption optionBackward = new V2TIMMessageListGetOption();
+                    optionBackward.setCount(MSG_PAGE_COUNT);
+                    optionBackward.setGetType(V2TIMMessageListGetOption.V2TIM_GET_CLOUD_NEWER_MSG);
+                    optionBackward.setLastMsg(finalLastTIMMsg);
+                    if (chatInfo.getType() == V2TIMConversation.V2TIM_C2C) {
+                        optionBackward.setUserID(chatInfo.getId());
+                    } else {
+                        optionBackward.setGroupID(chatInfo.getId());
+                    }
+
+                    V2TIMManager.getMessageManager().getHistoryMessageList(optionBackward, new V2TIMValueCallback<List<V2TIMMessage>>() {
+                        @Override
+                        public void onError(int code, String desc) {
+                            mIsLoading = false;
+                            callBack.onError("SLog", code, desc);
+                            SLog.e( "loadChatMessages getHistoryMessageList optionBackward failed, code = " + code + ", desc = " + desc);
+                        }
+
+                        @Override
+                        public void onSuccess(List<V2TIMMessage> v2TIMMessages) {
+                            processTwoWayHistoryMsgs(v2TIMMessages, chatInfo, false, true, callBack);
+                        }
+                    });
+                }
+            });
+        } else if (getMessageType == TUIKitConstants.GET_MESSAGE_BACKWARD){
+            //newer
+            V2TIMMessageListGetOption optionBackward = new V2TIMMessageListGetOption();
+            optionBackward.setCount(MSG_PAGE_COUNT);
+            optionBackward.setGetType(V2TIMMessageListGetOption.V2TIM_GET_CLOUD_NEWER_MSG);
+            optionBackward.setLastMsg(lastTIMMsg);
+            if (chatInfo.getType() == V2TIMConversation.V2TIM_C2C) {
+                optionBackward.setUserID(chatInfo.getId());
+            } else {
+                optionBackward.setGroupID(chatInfo.getId());
+            }
+
+            V2TIMManager.getMessageManager().getHistoryMessageList(optionBackward, new V2TIMValueCallback<List<V2TIMMessage>>() {
+                @Override
+                public void onError(int code, String desc) {
+                    mIsLoading = false;
+                    callBack.onError("SLog", code, desc);
+                    SLog.e( "loadChatMessages getHistoryMessageList optionBackward failed, code = " + code + ", desc = " + desc);
+                }
+
+                @Override
+                public void onSuccess(List<V2TIMMessage> v2TIMMessages) {
+                    processHistoryMsgs(v2TIMMessages, chatInfo, false, callBack);
                 }
             });
         } else {
-            V2TIMManager.getMessageManager().getGroupHistoryMessageList(chatInfo.getId(), MSG_PAGE_COUNT, lastTIMMsg, new V2TIMValueCallback<List<V2TIMMessage>>() {
-                @Override
-                public void onError(int code, String desc) {
-                    mIsLoading = false;
-                    callBack.onError("SLog",code, desc);
-                    SLog.e("loadChatMessages getGroupHistoryMessageList failed, code = " + code + ", desc = " + desc);
-                }
-
-                @Override
-                public void onSuccess(List<V2TIMMessage> v2TIMMessages) {
-                    processHistoryMsgs(v2TIMMessages, chatInfo, callBack);
-                }
-            });
+            SLog.e("loadChatMessages getMessageType is invalid");
         }
     }
 
-    private void processHistoryMsgs(List<V2TIMMessage> v2TIMMessages, ChatInfo chatInfo, IUIKitCallBack callBack) {
-        mIsLoading = false;
-        if (!safetyCall()) {
-            SLog.w("getLocalMessage unSafetyCall");
+    private void processTwoWayHistoryMsgs(List<V2TIMMessage> v2TIMMessages, ChatInfo chatInfo, boolean front, boolean calllback, IUIKitCallBack callBack) {
+        // 两者不一致说明加载到的消息已经不是当前聊天的消息
+        if (chatInfo != getCurrentChatInfo()) {
             return;
         }
-        if (chatInfo.getType() == V2TIMConversation.V2TIM_C2C) {
-            V2TIMManager.getMessageManager().markC2CMessageAsRead(chatInfo.getId(), new V2TIMCallback() {
-                @Override
-                public void onError(int code, String desc) {
-                    SLog.e("processHistoryMsgs setReadMessage failed, code = " + code + ", desc = " + desc);
-                }
-
-                @Override
-                public void onSuccess() {
-                    SLog.d("processHistoryMsgs setReadMessage success");
-                }
-            });
-        } else {
-            V2TIMManager.getMessageManager().markGroupMessageAsRead(chatInfo.getId(), new V2TIMCallback() {
-                @Override
-                public void onError(int code, String desc) {
-                    SLog.e("processHistoryMsgs markC2CMessageAsRead failed, code = " + code + ", desc = " + desc);
-                }
-
-                @Override
-                public void onSuccess() {
-                    SLog.d("processHistoryMsgs markC2CMessageAsRead success");
-                }
-            });
+        mIsLoading = false;
+        if (!safetyCall()) {
+            return;
         }
 
+        if (chatInfo.getType() == V2TIMConversation.V2TIM_C2C) {
+            c2cReadReport(chatInfo.getId());
+        } else {
+            groupReadReport(chatInfo.getId());
+        }
+
+       /* if (v2TIMMessages.size() < MSG_PAGE_COUNT) {
+            mIsMore = false;
+        }*/
+        ArrayList<V2TIMMessage> messages = new ArrayList<>(v2TIMMessages);
+        if (front) {
+            Collections.reverse(messages);
+        }
+
+        List<MessageInfo> msgInfos = MessageInfoUtil.TIMMessages2MessageInfos(messages, isGroup());
+        mCurrentProvider.addMessageList(msgInfos, front);
+        for (int i = 0; i < msgInfos.size(); i++) {
+            MessageInfo info = msgInfos.get(i);
+            if (info.getStatus() == MessageInfo.MSG_STATUS_SENDING) {
+                sendMessage(info, true, null);
+            }
+        }
+
+        if (calllback) {
+            callBack.onSuccess(mCurrentProvider);
+        }
+    }
+
+    private void processHistoryMsgs(List<V2TIMMessage> v2TIMMessages, ChatInfo chatInfo, boolean front, IUIKitCallBack callBack) {
+        // 两者不一致说明加载到的消息已经不是当前聊天的消息
+        if (chatInfo != getCurrentChatInfo()) {
+            return;
+        }
+        mIsLoading = false;
+        if (!safetyCall()) {
+            return;
+        }
+
+        if (chatInfo.getType() == V2TIMConversation.V2TIM_C2C) {
+            c2cReadReport(chatInfo.getId());
+        } else {
+            groupReadReport(chatInfo.getId());
+        }
 
         if (v2TIMMessages.size() < MSG_PAGE_COUNT) {
             mIsMore = false;
         }
         ArrayList<V2TIMMessage> messages = new ArrayList<>(v2TIMMessages);
-        Collections.reverse(messages);
+        if (front) {
+            Collections.reverse(messages);
+        }
 
         List<MessageInfo> msgInfos = MessageInfoUtil.TIMMessages2MessageInfos(messages, isGroup());
-        mCurrentProvider.addMessageList(msgInfos, true);
+        mCurrentProvider.addMessageList(msgInfos, front);
         for (int i = 0; i < msgInfos.size(); i++) {
             MessageInfo info = msgInfos.get(i);
             if (info.getStatus() == MessageInfo.MSG_STATUS_SENDING) {
@@ -475,6 +625,38 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
             }
         }
         callBack.onSuccess(mCurrentProvider);
+    }
+    /**
+     * 收到消息上报已读加频率限制
+     * @param userId 如果是 C2C 消息， userId 不为空， groupId 为空
+     * @param groupId 如果是 Group 消息， groupId 不为空， userId 为空
+     */
+    private void limitReadReport(final String userId, final String groupId) {
+        final long currentTime = System.currentTimeMillis();
+        long timeDifference = currentTime - lastReadReportTime;
+        if (timeDifference >= READ_REPORT_INTERVAL) {
+            readReport(userId, groupId);
+            lastReadReportTime = currentTime;
+        } else {
+            if (!canReadReport) {
+                return;
+            }
+            long delay = READ_REPORT_INTERVAL - timeDifference;
+            canReadReport = false;
+            readReportHandler.postDelayed(() -> {
+                readReport(userId, groupId);
+                lastReadReportTime = System.currentTimeMillis();
+                canReadReport = true;
+            }, delay);
+        }
+    }
+
+    private void readReport(String userId, String groupId) {
+        if (!TextUtils.isEmpty(userId)) {
+            c2cReadReport(userId);
+        } else if (!TextUtils.isEmpty(groupId)) {
+            groupReadReport(groupId);
+        }
     }
 
     @Override
@@ -501,5 +683,81 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
 
     public MessageInfo getLastMessageInfo() {
         return mLastMessageInfo;
+    }
+
+    @Override
+    public void sendMessage(IBaseInfo baseInfo, V2TIMOfflinePushInfo pushInfo, String receiver, boolean isGroup, boolean onlineUserOnly, final IUIKitCallBack callBack) {
+        if (!safetyCall()) {
+            SLog.w("sendMessage unSafetyCall ,baseInfo : " + baseInfo);
+            return;
+        }
+        if (baseInfo instanceof MessageInfo) {
+            final MessageInfo message = (MessageInfo) baseInfo;
+            String groupType = "";
+            if (isGroup) {
+                ChatInfo chatInfo = getCurrentChatInfo();
+                groupType = chatInfo.getGroupType();
+            }
+            if (!isGroup) {
+                message.getTimMessage().setExcludedFromUnreadCount(TUIKitConfigs.getConfigs().getGeneralConfig().isExcludedFromUnreadCount());
+            } else if (!TextUtils.isEmpty(groupType)) {
+                message.getTimMessage().setExcludedFromUnreadCount(TUIKitConfigs.getConfigs().getGeneralConfig().isExcludedFromUnreadCount());
+            }
+
+            message.getTimMessage().setExcludedFromLastMessage(TUIKitConfigs.getConfigs().getGeneralConfig().isExcludedFromLastMessage());
+
+            message.setSelf(true);
+            message.setRead(true);
+            assembleGroupMessage(message);
+            String msgID = V2TIMManager.getMessageManager().sendMessage(((MessageInfo) baseInfo).getTimMessage(),
+                    isGroup ? null : receiver, isGroup ? receiver : null, V2TIMMessage.V2TIM_PRIORITY_DEFAULT,
+                    onlineUserOnly, pushInfo, new V2TIMSendCallback<V2TIMMessage>() {
+
+                        @Override
+                        public void onError(int code, String desc) {
+                            if (!safetyCall()) {
+                                return;
+                            }
+                            if (callBack != null) {
+                                callBack.onError("SLog", code, desc);
+                            }
+                            message.setStatus(MessageInfo.MSG_STATUS_SEND_FAIL);
+                            mCurrentProvider.updateMessageInfo(message);
+                        }
+
+                        @Override
+                        public void onSuccess(V2TIMMessage v2TIMMessage) {
+                            if (!safetyCall()) {
+                                return;
+                            }
+                            if (callBack != null) {
+                                callBack.onSuccess(mCurrentProvider);
+                            }
+                            message.setStatus(MessageInfo.MSG_STATUS_SEND_SUCCESS);
+                            message.setMsgTime(v2TIMMessage.getTimestamp());
+                            mCurrentProvider.updateMessageInfo(message);
+                        }
+
+                        @Override
+                        public void onProgress(int progress) {
+
+                        }
+                    });
+            //消息先展示，通过状态来确认发送是否成功
+            if (message.getIsIgnoreShow()) {
+                return;
+            }
+            message.setId(msgID);
+            if (message.getMsgType() < MessageInfo.MSG_TYPE_TIPS || message.getMsgType() > MessageInfo.MSG_STATUS_REVOKE) {
+                message.setStatus(MessageInfo.MSG_STATUS_SENDING);
+                mCurrentProvider.addMessageInfo(message);
+            }
+        }
+    }
+    static class MessageReadReportHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+        }
     }
 }

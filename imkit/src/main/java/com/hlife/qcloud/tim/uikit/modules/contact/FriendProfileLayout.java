@@ -19,6 +19,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupChangeListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzReceiveMessageOptListener;
 import com.http.network.listener.OnResultDataListener;
 import com.http.network.model.RequestWork;
 import com.http.network.model.ResponseWork;
@@ -42,6 +45,8 @@ import com.tencent.imsdk.v2.V2TIMFriendInfo;
 import com.tencent.imsdk.v2.V2TIMFriendOperationResult;
 import com.tencent.imsdk.v2.V2TIMGroupApplication;
 import com.tencent.imsdk.v2.V2TIMManager;
+import com.tencent.imsdk.v2.V2TIMMessage;
+import com.tencent.imsdk.v2.V2TIMReceiveMessageOptInfo;
 import com.tencent.imsdk.v2.V2TIMUserFullInfo;
 import com.tencent.imsdk.v2.V2TIMValueCallback;
 import com.hlife.qcloud.tim.uikit.R;
@@ -63,6 +68,7 @@ import com.work.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class FriendProfileLayout extends LinearLayout implements View.OnClickListener {
@@ -79,6 +85,7 @@ public class FriendProfileLayout extends LinearLayout implements View.OnClickLis
     private LineControllerView mRemarkView;
     private LineControllerView mAddBlackView;
     private LineControllerView mChatTopView;
+    private LineControllerView mChatRevOpt;
     private TextView mDeleteView;
     private TextView mChatView;
     private TextView mChatAudioVideo;
@@ -136,10 +143,10 @@ public class FriendProfileLayout extends LinearLayout implements View.OnClickLis
         mDepLayout = findViewById(R.id.dep_layout);
         mAddWordingLayout = findViewById(R.id.add_wording_layout);
         mAddGroupMember = findViewById(R.id.add_group_member);
+        mChatRevOpt = findViewById(R.id.chat_rev_opt);
     }
     private boolean isShowAddGroup;
     public void initData(Object data) {
-        SLog.e("friendProfile data:"+data);
         if (data instanceof ChatInfo) {
             ChatInfo mChatInfo = (ChatInfo) data;
             mId = mChatInfo.getId();
@@ -397,6 +404,33 @@ public class FriendProfileLayout extends LinearLayout implements View.OnClickLis
                 }else{
                     deleteBlack();
                 }
+            }
+        });
+        final List<String> userId = new ArrayList<String>(){{
+            add(mId);
+        }};
+        YzIMKitAgent.instance().getC2CReceiveMessageOpt(userId, new YzReceiveMessageOptListener() {
+            @Override
+            public void result(HashMap<String, Boolean> optMap) {
+                Boolean opt = optMap.get(mId);
+                if(opt!=null){
+                    mChatRevOpt.setChecked(opt);
+                }
+                mChatRevOpt.setCheckListener((compoundButton, b) -> YzIMKitAgent.instance().changeC2CReceiveMessageOpt(userId, b, new YzGroupChangeListener() {
+                    @Override
+                    public void success() {
+
+                    }
+
+                    @Override
+                    public void error(int code, String desc) {
+                    }
+                }));
+            }
+
+            @Override
+            public void error(int code, String desc) {
+
             }
         });
         if (bean.isFriend()) {

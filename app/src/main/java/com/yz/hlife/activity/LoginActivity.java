@@ -116,10 +116,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     protected void onResume() {
         super.onResume();
         mPhone.setText(SharedUtils.getString("userid"));
-//        mPhone.setText("4298188853822114691");
+//        mPhone.setText("3648680472945510534");
         mPassword.setText(SharedUtils.getString("nickname"));
         mMobile.setText(SharedUtils.getString("mobile"));
-//        mMobile.setText("18612207651");
+//        mMobile.setText("18612889548");
     }
 
     @Override
@@ -221,8 +221,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                             SLog.e("im success:"+data);
                             dismissProgress();
                             finish();
-//                            YzIMKitAgent.instance().startAuto();
-                            startActivity(new Intent(LoginActivity.this,DataTestActivity.class));
+                            YzIMKitAgent.instance().startAuto();
+//                            startActivity(new Intent(LoginActivity.this,DataTestActivity.class));
                         }
 
                         @Override

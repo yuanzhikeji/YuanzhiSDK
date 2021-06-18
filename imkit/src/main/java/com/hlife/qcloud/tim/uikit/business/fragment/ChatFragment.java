@@ -63,6 +63,13 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.fragment_im_chat, container, false);
         initView();
+        if(helper == null){
+            helper = new ChatLayoutHelper(getActivity());
+        }
+        if(mConfig==null){
+            mConfig = new ChatViewConfig();
+        }
+        helper.customizeChatLayout(mChatLayout,mConfig,mYzCustomMessageDrawListener);
         return mBaseView;
     }
 
@@ -96,9 +103,7 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
         TitleBarLayout mTitleBar = mChatLayout.getTitleBar();
 
         //单聊面板标记栏返回按钮点击事件，这里需要开发者自行控制
-        mTitleBar.setOnLeftClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        mTitleBar.setOnLeftClickListener(view -> {
 //                if(bundle.getBoolean(Constants.CHAT_TO_CONVERSATION,true)){
 //                    if(MwWorkActivity.instance==null){
 //                        Intent intent = new Intent(getActivity(),MwWorkActivity.class);
@@ -106,8 +111,7 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
 //                        startActivity(intent);
 //                    }
 //                }
-                getActivity().finish();
-            }
+            getActivity().finish();
         });
         if (mChatInfo.getType() == V2TIMConversation.V2TIM_C2C) {
             mTitleBar.setOnRightClickListener(new View.OnClickListener() {
@@ -121,7 +125,7 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
                 }
             });
         }
-        mChatLayout.getMessageLayout().setOnItemClickListener(new MessageLayout.OnItemClickListener() {
+        mChatLayout.getMessageLayout().setOnItemClickListener(new MessageLayout.OnItemLongClickListener() {
             @Override
             public void onMessageLongClick(View view, int position, MessageInfo messageInfo) {
                 //因为adapter中第一条为加载条目，位置需减1
@@ -320,21 +324,26 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
     public void onResume() {
         super.onResume();
         // TODO 通过api设置ChatLayout各种属性的样例
-        if(helper == null){
-            helper = new ChatLayoutHelper(getActivity());
-        }
-        if(mConfig==null){
-            mConfig = new ChatViewConfig();
-        }
-        helper.customizeChatLayout(mChatLayout,mConfig,mYzCustomMessageDrawListener);
         if(mChatLayout!=null){
             mChatLayout.loadApplyList();
+        }
+        if (mChatLayout != null && mChatLayout.getChatManager() != null) {
+            mChatLayout.getChatManager().setChatFragmentShow(true);
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        if (mChatLayout != null) {
+            if (mChatLayout.getInputLayout() != null) {
+                mChatLayout.getInputLayout().setDraft();
+            }
+
+            if (mChatLayout.getChatManager() != null) {
+                mChatLayout.getChatManager().setChatFragmentShow(false);
+            }
+        }
         AudioPlayer.getInstance().stopPlay();
     }
 

@@ -35,6 +35,10 @@ public class TUIKitConstants {
     public static final String SEARCH_DATA_RESULT = "search_data_result";
     public static final String SEARCH_KEY_WORDS = "search_key_words";
     public static final String SEARCH_DATA_BEAN = "search_data_bean";
+
+    public static final int GET_MESSAGE_FORWARD = 0;
+    public static final int GET_MESSAGE_BACKWARD = 1;
+    public static final int GET_MESSAGE_TWO_WAY = 2;
     /**
      * 1: 仅仅是一个带链接的文本消息
      * 2: iOS支持的视频通话版本，后续已经不兼容

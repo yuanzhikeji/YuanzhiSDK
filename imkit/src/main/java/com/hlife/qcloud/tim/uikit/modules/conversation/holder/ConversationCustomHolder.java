@@ -39,7 +39,8 @@ public class ConversationCustomHolder extends ConversationBaseHolder {
         } else {
             leftItemLayout.setBackgroundColor(Color.WHITE);
         }
-        conversationIconView.setConversation(conversation);
+        conversationIconView.setDefaultImageResId(R.drawable.default_head);
+        conversationIconView.setIconUrls(conversation.getIconUrlList());
 
         titleText.setText(conversation.getTitle());
         messageText.setText("");

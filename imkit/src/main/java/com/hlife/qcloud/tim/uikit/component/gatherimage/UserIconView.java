@@ -53,11 +53,9 @@ public class UserIconView extends RelativeLayout {
         inflate(getContext(), R.layout.profile_icon_view, this);
         if (attributeSet != null) {
             TypedArray ta = getContext().obtainStyledAttributes(attributeSet, R.styleable.UserIconView);
-            if (null != ta) {
-                mDefaultImageResId = ta.getResourceId(R.styleable.UserIconView_default_image, mDefaultImageResId);
-                mIconRadius = ta.getDimensionPixelSize(R.styleable.UserIconView_image_radius, mIconRadius);
-                ta.recycle();
-            }
+            mDefaultImageResId = ta.getResourceId(R.styleable.UserIconView_default_image, mDefaultImageResId);
+            mIconRadius = ta.getDimensionPixelSize(R.styleable.UserIconView_image_radius, mIconRadius);
+            ta.recycle();
         }
 
         mIconView = findViewById(R.id.profile_icon);

@@ -20,6 +20,8 @@ public class GeneralConfig {
     private String userId = "";
     private String userSig = "";
     private String userNickname = "";
+    private boolean excludedFromUnreadCount;
+    private boolean excludedFromLastMessage;
 
     public String getUserNickname() {
         return userNickname;
@@ -199,4 +201,19 @@ public class GeneralConfig {
         this.userSig = userSig;
     }
 
+    public boolean isExcludedFromUnreadCount() {
+        return excludedFromUnreadCount;
+    }
+
+    public void setExcludedFromUnreadCount(boolean excludedFromUnreadCount) {
+        this.excludedFromUnreadCount = excludedFromUnreadCount;
+    }
+
+    public boolean isExcludedFromLastMessage() {
+        return excludedFromLastMessage;
+    }
+
+    public void setExcludedFromLastMessage(boolean excludedFromLastMessage) {
+        this.excludedFromLastMessage = excludedFromLastMessage;
+    }
 }

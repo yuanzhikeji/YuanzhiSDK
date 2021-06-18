@@ -21,17 +21,25 @@ import com.hlife.qcloud.tim.uikit.modules.chat.layout.input.InputLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.MessageLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.MessageListAdapter;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
+import com.hlife.qcloud.tim.uikit.utils.TUIKitConstants;
+import com.tencent.imsdk.v2.V2TIMConversation;
+import com.tencent.imsdk.v2.V2TIMManager;
+import com.tencent.imsdk.v2.V2TIMMessage;
 import com.tencent.imsdk.v2.V2TIMTextElem;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.component.AudioPlayer;
 import com.hlife.qcloud.tim.uikit.utils.BackgroundTasks;
-import com.hlife.qcloud.tim.uikit.utils.ToastUtil;
+import com.tencent.imsdk.v2.V2TIMValueCallback;
+import com.work.util.SLog;
+import com.work.util.ToastUtil;
 
 
 public abstract class AbsChatLayout extends ChatLayoutUI implements IChatLayout {
 
     protected MessageListAdapter mAdapter;
+
+    private V2TIMMessage mConversationLastMessage;
 
     private AnimationDrawable mVolumeAnim;
     private Runnable mTypingRunnable = null;
@@ -98,16 +106,23 @@ public abstract class AbsChatLayout extends ChatLayoutUI implements IChatLayout 
         });
         getMessageLayout().setLoadMoreMessageHandler(new MessageLayout.OnLoadMoreHandler() {
             @Override
-            public void loadMore() {
-                loadMessages();
+            public void loadMore(int type) {
+                loadMessages(type);
             }
-        });
-        getMessageLayout().setEmptySpaceClickListener(new MessageLayout.OnEmptySpaceClickListener() {
+
             @Override
-            public void onClick() {
-                getInputLayout().hideSoftInput();
+            public boolean isListEnd(int postion) {
+                if (mAdapter == null || mConversationLastMessage == null || mAdapter.getItem(postion) == null) {
+                    return true;
+                }
+                if (postion < 0 || postion >= mAdapter.getItemCount()) {
+                    return true;
+                }
+
+                return mAdapter.getItem(postion).getTimMessage().getSeq() >= mConversationLastMessage.getSeq();
             }
         });
+        getMessageLayout().setEmptySpaceClickListener(() -> getInputLayout().hideSoftInput());
 
         /**
          * 设置消息列表空白处点击处理
@@ -294,25 +309,53 @@ public abstract class AbsChatLayout extends ChatLayoutUI implements IChatLayout 
     public abstract ChatManagerKit getChatManager();
 
     @Override
-    public void loadMessages() {
-        loadChatMessages(mAdapter.getItemCount() > 0 ? mAdapter.getItem(1) : null);
+    public void loadMessages(int type) {
+        if (type == TUIKitConstants.GET_MESSAGE_FORWARD) {
+            loadChatMessages(mAdapter.getItemCount() > 0 ? mAdapter.getItem(1).getTimMessage() : null, type);
+        } else if (type == TUIKitConstants.GET_MESSAGE_BACKWARD){
+            loadChatMessages(mAdapter.getItemCount() > 0 ? mAdapter.getItem(mAdapter.getItemCount() -1).getTimMessage() : null, type);
+        }
     }
 
-    public void loadChatMessages(final MessageInfo lastMessage) {
-        getChatManager().loadChatMessages(lastMessage, new IUIKitCallBack() {
+    public void loadChatMessages(final V2TIMMessage lastMessage, final int getMessageType) {
+        getChatManager().loadChatMessages(getMessageType, lastMessage, new IUIKitCallBack() {
             @Override
             public void onSuccess(Object data) {
-                if (lastMessage == null && data != null) {
+                if (getMessageType == TUIKitConstants.GET_MESSAGE_TWO_WAY || (lastMessage == null && data != null)) {
                     setDataProvider((ChatProvider) data);
+                }
+
+                if (getMessageType == TUIKitConstants.GET_MESSAGE_TWO_WAY) {
+                    if (mAdapter != null) {
+                        mAdapter.notifyDataSourceChanged(MessageLayout.DATA_CHANGE_SCROLL_TO_POSITION, mAdapter.getLastMessagePosition(lastMessage));
+                    }
                 }
             }
 
             @Override
             public void onError(String module, int errCode, String errMsg) {
-//                ToastUtil.toastLongMessage(errMsg);
+                SLog.e(errCode+">"+errMsg);
                 if (lastMessage == null) {
                     setDataProvider(null);
                 }
+            }
+        });
+    }
+
+    public void getConversationLastMessage(String id) {
+        V2TIMManager.getConversationManager().getConversation(id, new V2TIMValueCallback<V2TIMConversation>() {
+            @Override
+            public void onError(int code, String desc) {
+                SLog.e("getConversationLastMessage error:"+code+">>"+desc);
+            }
+
+            @Override
+            public void onSuccess(V2TIMConversation v2TIMConversation) {
+                if (v2TIMConversation == null){
+                    mConversationLastMessage = null;
+                    return;
+                }
+                mConversationLastMessage = v2TIMConversation.getLastMessage();
             }
         });
     }
@@ -342,7 +385,7 @@ public abstract class AbsChatLayout extends ChatLayoutUI implements IChatLayout 
             public void onError(String module, int errCode, String errMsg) {
 //                ToastUtil.toastLongMessage(errMsg);
                 if(errCode == 10017){
-                    ToastUtil.toastLongMessage("该群已禁言");
+                    ToastUtil.info(getContext(),"该群已经禁言");
                 }
             }
         });
@@ -354,7 +397,12 @@ public abstract class AbsChatLayout extends ChatLayoutUI implements IChatLayout 
         getTitleBar().getMiddleTitle().removeCallbacks(mTypingRunnable);
         AudioPlayer.getInstance().stopRecord();
         AudioPlayer.getInstance().stopPlay();
+        getChatManager().markMessageAsRead(mChatInfo);
         if (getChatManager() != null) {
+            // 两者不相等说明 ChatManagerKit 中的 ChatInfo 已经在外部被修改，不能销毁不属于自己的 ChatInfo
+            if (getChatInfo() != getChatManager().getCurrentChatInfo()) {
+                return;
+            }
             getChatManager().destroyChat();
         }
     }

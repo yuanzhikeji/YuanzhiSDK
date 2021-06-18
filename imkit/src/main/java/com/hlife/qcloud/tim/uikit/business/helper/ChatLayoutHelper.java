@@ -21,8 +21,6 @@ import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.MessageLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageViewGroup;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageDrawListener;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
-import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
-import com.hlife.qcloud.tim.uikit.utils.ToastUtil;
 import com.http.network.task.ObjectMapperFactory;
 import com.tencent.imsdk.v2.V2TIMCustomElem;
 import com.tencent.imsdk.v2.V2TIMMessage;
