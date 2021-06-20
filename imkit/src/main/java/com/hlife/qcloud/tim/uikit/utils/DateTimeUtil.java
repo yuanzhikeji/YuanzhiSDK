@@ -55,11 +55,28 @@ public class DateTimeUtil {
         } else {
             Context context = TUIKit.getAppContext();
             if (currentDayIndex - msgDayIndex == 1 && currentYear == msgYear) {
-                msgTimeStr = context.getString(R.string.date_yesterday) + msgTimeStr;
-            } else if (false/*currentDayIndex - msgDayIndex > 1 && currentYear == msgYear*/) { //本年消息,注释掉统一按照 "年/月/日" 格式显示
+                msgTimeStr = context.getString(R.string.date_yesterday) +" "+ msgTimeStr;
+            } else if (currentDayIndex - msgDayIndex > 1 && currentDayIndex-msgDayIndex<7 && currentYear == msgYear) { //本年消息,注释掉统一按照 "年/月/日" 格式显示
                 //不同周显示具体月，日，注意函数：calendar.get(Calendar.MONTH) 一月对应0，十二月对应11
-                msgTimeStr = (calendar.get(Calendar.MONTH) + 1) + "/"+ calendar.get(Calendar.DAY_OF_MONTH) + " " + msgTimeStr + " ";
-                //msgTimeStr = (Integer.valueOf(calendar.get(Calendar.MONTH) + 1)) + context.getString(R.string.date_month_short) + " "+ calendar.get(Calendar.DAY_OF_MONTH) + context.getString(R.string.date_day_short) + " " + msgTimeStr + " ";
+//                msgTimeStr = (calendar.get(Calendar.MONTH) + 1) + "/"+ calendar.get(Calendar.DAY_OF_MONTH) + " " + msgTimeStr + " ";
+                String msgWeek = "";
+                if(msgDayInWeek==6){
+                    msgWeek = "星期五";
+                }else if(msgDayInWeek==5){
+                    msgWeek = "星期四";
+                }else if(msgDayInWeek==4){
+                    msgWeek = "星期三";
+                }else if(msgDayInWeek==3){
+                    msgWeek = "星期二";
+                }else if(msgDayInWeek==2){
+                    msgWeek = "星期一";
+                }else if(msgDayInWeek==1){
+                    msgWeek = "星期六";
+                }else if(msgDayInWeek==0){
+                    msgWeek = "星期日";
+                }
+                msgTimeStr = msgWeek + " " + msgTimeStr + " ";
+//                msgTimeStr = (Integer.valueOf(calendar.get(Calendar.MONTH) + 1)) + context.getString(R.string.date_month_short) + " "+ calendar.get(Calendar.DAY_OF_MONTH) + context.getString(R.string.date_day_short) + " " + msgTimeStr + " ";
             } else { // 1、非正常时间，如currentYear < msgYear，或者currentDayIndex < msgDayIndex
                 //2、非本年消息（currentYear > msgYear），如：历史消息是2018，今年是2019，显示年、月、日
                 msgTimeStr = msgYear + "/" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH) + " " + msgTimeStr + " ";
