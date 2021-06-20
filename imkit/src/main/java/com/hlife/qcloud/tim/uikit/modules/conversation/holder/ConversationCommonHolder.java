@@ -142,7 +142,6 @@ public class ConversationCommonHolder extends ConversationBaseHolder {
         }
         conversationIconView.setRadius(mAdapter.getItemAvatarRadius());
         conversationIconView.setDefaultImageResId(R.drawable.default_head);
-        SLog.e(conversation.getTitle()+">:"+conversation.getIconUrlList());
         conversationIconView.setConversation(conversation);
 
         if (conversation.isRevOpt()) {
