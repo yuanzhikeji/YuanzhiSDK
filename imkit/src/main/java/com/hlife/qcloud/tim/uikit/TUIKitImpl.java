@@ -431,14 +431,12 @@ public class TUIKitImpl {
     }
 
     public static void addIMEventListener(IMEventListener listener) {
-        SLog.i("addIMEventListener:" + sIMEventListeners.size() + "|l:" + listener);
         if (listener != null && !sIMEventListeners.contains(listener)) {
             sIMEventListeners.add(listener);
         }
     }
 
     public static void removeIMEventListener(IMEventListener listener) {
-        SLog.i("removeIMEventListener:" + sIMEventListeners.size() + "|l:" + listener);
         if (listener == null) {
             sIMEventListeners.clear();
         } else {

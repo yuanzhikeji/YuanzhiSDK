@@ -306,7 +306,6 @@ public class TeamHeadSynthesizer implements Synthesizer {
         ThreadHelper.INST.execute(() -> {
             //根据id获取存储的文件路径
             final File file = new File(IMKitConstants.IMAGE_BASE_DIR + TeamHeadSynthesizer.this.currentTargetID);
-            SLog.e("file:"+file);
             boolean cacheBitmapExists = false;
             if (file.exists() && file.isFile()) {
                 //文件存在，加载到内存

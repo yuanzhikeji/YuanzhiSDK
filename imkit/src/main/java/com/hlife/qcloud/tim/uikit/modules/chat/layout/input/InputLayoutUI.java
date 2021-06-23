@@ -28,6 +28,10 @@ import java.util.List;
 
 abstract class InputLayoutUI extends LinearLayout implements IInputLayout {
 
+    public static String[] PERMISSIONS = new String[]{
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.CAMERA};
+
     protected static final int CAPTURE = 1;
     protected static final int AUDIO_RECORD = 2;
     protected static final int VIDEO_RECORD = 3;

@@ -130,7 +130,6 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
     public void onReadReport(List<V2TIMMessageReceipt> receiptList) {
         SLog.i("onReadReport:" + receiptList.size());
         if (!safetyCall()) {
-            SLog.w("onReadReport unSafetyCall");
             return;
         }
         if (receiptList.size() == 0) {

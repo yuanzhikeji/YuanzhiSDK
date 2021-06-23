@@ -48,9 +48,6 @@ import static android.view.View.VISIBLE;
 
 
 public class ChatFragment extends BaseFragment implements YzMessageWatcher {
-    public static String[] PERMISSIONS = new String[]{
-            Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.CAMERA};
     private View mBaseView;
     private ChatLayout mChatLayout;
     private ChatInfo mChatInfo;
@@ -74,9 +71,6 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
     }
 
     private void initView() {
-        if(!PermissionsManager.getInstance().hasAllPermissions(getContext(),PERMISSIONS)){
-            PermissionsManager.getInstance().requestPermissionsIfNecessaryForResult(this, PERMISSIONS, null);
-        }
         ConversationManagerKit.getInstance().addMessageWatcher(this);
         final Bundle bundle = getArguments();
         if(mChatInfo==null){

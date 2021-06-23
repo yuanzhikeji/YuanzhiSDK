@@ -42,10 +42,7 @@ import com.yz.hlife.R;
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener, TextWatcher {
     public static String[] PERMISSIONS = new String[]{
-            Manifest.permission.READ_PHONE_STATE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.CHANGE_WIFI_STATE,
-            Manifest.permission.CHANGE_NETWORK_STATE};
+            Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private EditText mPhone;
     private EditText mPassword;
     private EditText mMobile;
@@ -116,10 +113,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     protected void onResume() {
         super.onResume();
         mPhone.setText(SharedUtils.getString("userid"));
-//        mPhone.setText("3648680472945510534");
+//        mPhone.setText("4306226076634663684");
         mPassword.setText(SharedUtils.getString("nickname"));
         mMobile.setText(SharedUtils.getString("mobile"));
-//        mMobile.setText("18612889548");
+//        mMobile.setText("15210212222");
     }
 
     @Override
@@ -161,8 +158,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                         SharedUtils.putData("userid",userid);
                         SharedUtils.putData("mobile",mobile);
                         SharedUtils.putData("nickname",password);
-//                        startActivity(new Intent(LoginActivity.this,DataTestActivity.class));
-                        YzIMKitAgent.instance().startAuto();
+                        startActivity(new Intent(LoginActivity.this,DataTestActivity.class));
+//                        YzIMKitAgent.instance().startAuto();
                         finish();
                     }
 

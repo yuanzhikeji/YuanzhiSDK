@@ -1,6 +1,7 @@
 package com.yz.hlife.activity;
 
 import android.content.Intent;
+import android.text.TextUtils;
 import android.view.View;
 
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
@@ -12,7 +13,9 @@ import com.hlife.qcloud.tim.uikit.business.inter.YzDeleteConversationListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
+import com.hlife.qcloud.tim.uikit.modules.chat.C2CChatManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
+import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
 import com.hlife.qcloud.tim.uikit.modules.group.apply.GroupApplyInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
@@ -20,6 +23,9 @@ import com.http.network.listener.OnResultDataListener;
 import com.http.network.model.RequestWork;
 import com.http.network.model.ResponseWork;
 import com.http.network.task.ObjectMapperFactory;
+import com.tencent.imsdk.v2.V2TIMCallback;
+import com.tencent.imsdk.v2.V2TIMFriendInfo;
+import com.tencent.imsdk.v2.V2TIMManager;
 import com.work.api.open.Yz;
 import com.work.api.open.model.CreateGroupReq;
 import com.work.api.open.model.CreateGroupResp;
@@ -179,7 +185,6 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 startActivity(new Intent(this,ChatDemoActivity.class).putExtra(ChatDemoActivity.class.getSimpleName(),1));
                 break;
             case R.id.start_chat:
-
                 if(conversationInfos!=null && conversationInfos.size()>0){
                     ChatInfo chatInfo = new ChatInfo();
                     chatInfo.setId(conversationInfos.get(0).getId());
@@ -188,8 +193,8 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                     YzIMKitAgent.instance().startChat(chatInfo,null);
                 }else{
                     ChatInfo chatInfo = new ChatInfo();
-                    chatInfo.setId("3648680472945510534");
-                    chatInfo.setChatName("测试");
+                    chatInfo.setId("77777");
+                    chatInfo.setChatName("老胜");
                     chatInfo.setGroup(false);
                     YzIMKitAgent.instance().startChat(chatInfo,null);
                 }

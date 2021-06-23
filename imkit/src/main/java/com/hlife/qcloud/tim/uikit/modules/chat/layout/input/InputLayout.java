@@ -3,7 +3,6 @@ package com.hlife.qcloud.tim.uikit.modules.chat.layout.input;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -13,7 +12,6 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.MimeTypeMap;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -31,7 +29,6 @@ import com.hlife.qcloud.tim.uikit.modules.chat.layout.inputmore.InputMoreFragmen
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.DraftInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
-import com.hlife.qcloud.tim.uikit.utils.FileUtil;
 import com.http.network.task.ObjectMapperFactory;
 import com.tencent.imsdk.v2.V2TIMCallback;
 import com.tencent.imsdk.v2.V2TIMConversation;
@@ -54,6 +51,7 @@ import com.tencent.imsdk.v2.V2TIMGroupAtInfo;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.work.util.SLog;
 import com.work.util.ToastUtil;
+import com.workstation.permission.PermissionsManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -301,36 +299,10 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
         mInputMoreFragment.startActivityForResult(intent,InputMoreFragment.REQUEST_CODE_PHOTO);
     }
 
-    private MessageInfo buildVideoMessage(String mUri) {
-        android.media.MediaMetadataRetriever mmr = new android.media.MediaMetadataRetriever();
-        try {
-            mmr.setDataSource(mUri);
-            String sDuration = mmr.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_DURATION);//时长(毫秒)
-            Bitmap bitmap = mmr.getFrameAtTime(0, android.media.MediaMetadataRetriever.OPTION_NEXT_SYNC);//缩略图
-
-            if (bitmap == null){
-                SLog.e("buildVideoMessage() bitmap is null");
-                return null;
-            }
-
-            String imgPath = FileUtil.saveBitmap("JCamera", bitmap);
-            int imgWidth = bitmap.getWidth();
-            int imgHeight = bitmap.getHeight();
-            long duration = Long.parseLong(sDuration);
-            return MessageInfoUtil.buildVideoMessage(imgPath, mUri, imgWidth, imgHeight, duration);
-        } catch (Exception ex){
-            SLog.e("MediaMetadataRetriever exception " + ex);
-        } finally {
-            mmr.release();
-        }
-
-        return null;
-    }
-
     @Override
     protected void startCapture() {
-        SLog.i("startCapture");
         if (!checkPermission(CAPTURE)) {
+            PermissionsManager.getInstance().requestPermissionsIfNecessaryForResult(mInputMoreFragment, InputLayoutUI.PERMISSIONS, null);
             SLog.i("startCapture checkPermission failed");
             return;
         }
@@ -357,9 +329,9 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
 
     @Override
     protected void startVideoRecord() {
-        SLog.i("startVideoRecord");
         if (!checkPermission(VIDEO_RECORD)) {
             SLog.i("startVideoRecord checkPermission failed");
+            PermissionsManager.getInstance().requestPermissionsIfNecessaryForResult(mInputMoreFragment, InputLayoutUI.PERMISSIONS, null);
             return;
         }
         Intent captureIntent = new Intent(getContext(), CameraActivity.class);
@@ -390,7 +362,6 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
 
     @Override
     protected void startSendFile() {
-        SLog.i("startSendFile");
         if (!checkPermission(SEND_FILE)) {
             SLog.i("startSendFile checkPermission failed");
             return;
@@ -414,10 +385,10 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
 
     @Override
     public void startAudioCall() {
-//        if (!PermissionUtils.checkPermission(mActivity, Manifest.permission.RECORD_AUDIO)) {
-//            SLog.i("startAudioCall checkPermission failed");
-//            return;
-//        }
+        if (!checkPermission(AUDIO_RECORD)) {
+            PermissionsManager.getInstance().requestPermissionsIfNecessaryForResult(mInputMoreFragment, InputLayoutUI.PERMISSIONS, null);
+            return;
+        }
         if (mChatLayout.getChatInfo().getType() == V2TIMConversation.V2TIM_C2C) {
             List<UserModel> contactList = new ArrayList<>();
             UserModel model = new UserModel();
@@ -433,11 +404,10 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
 
     @Override
     protected void startVideoCall() {
-//        if (!(PermissionUtils.checkPermission(mActivity, Manifest.permission.CAMERA)
-//                && PermissionUtils.checkPermission(mActivity, Manifest.permission.RECORD_AUDIO))) {
-//            SLog.i("startVideoCall checkPermission failed");
-//            return;
-//        }
+        if (!checkPermission(VIDEO_RECORD)) {
+            PermissionsManager.getInstance().requestPermissionsIfNecessaryForResult(mInputMoreFragment, InputLayoutUI.PERMISSIONS, null);
+            return;
+        }
         if (mChatLayout.getChatInfo().getType() == V2TIMConversation.V2TIM_C2C) {
             List<UserModel> contactList = new ArrayList<>();
             UserModel model = new UserModel();
