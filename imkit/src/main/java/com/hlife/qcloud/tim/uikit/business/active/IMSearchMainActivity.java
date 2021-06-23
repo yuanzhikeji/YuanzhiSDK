@@ -147,32 +147,7 @@ public class IMSearchMainActivity extends BaseActivity implements YzGroupFaceLis
             return;
         }
 
-//        final List<String> keywordList = new ArrayList<String>() {{
-//            add(keyWords);
-//        }};
-
-//        SearchFuntionUtils.SearchContact(keywordList, mContactRcSearchAdapter, mContactLayout, mMoreContactLayout, false, new V2TIMValueCallback<List<SearchDataBean>>() {
-//            @Override
-//            public void onSuccess(List<SearchDataBean> searchDataBeans) {
-//                mContactSearchData = searchDataBeans;
-//            }
 //
-//            @Override
-//            public void onError(int code, String desc) {
-//                if(SLog.debug)SLog.e(code+">>>"+desc);
-//            }
-//        });
-//        SearchFuntionUtils.SearchGroup(keywordList, mGroupRcSearchAdapter, mGroupLayout, mMoreGroupLayout, false, new V2TIMValueCallback<List<SearchDataBean>>() {
-//            @Override
-//            public void onSuccess(List<SearchDataBean> searchDataBeans) {
-//                mGroupSearchData = searchDataBeans;
-//            }
-//
-//            @Override
-//            public void onError(int code, String desc) {
-//                if(SLog.debug)SLog.e(code+">>>"+desc);
-//            }
-//        });
         searchConversation(keyWords);
     }
     private void searchConversation(String keyword) {
@@ -197,87 +172,7 @@ public class IMSearchMainActivity extends BaseActivity implements YzGroupFaceLis
                 ToastUtil.error(IMSearchMainActivity.this,code+">"+desc);
             }
         });
-        //search conversation
-//        final V2TIMMessageSearchParam v2TIMMessageSearchParam = new V2TIMMessageSearchParam();
-//        v2TIMMessageSearchParam.setKeywordList(keywordList);
-//        v2TIMMessageSearchParam.setPageSize(SearchDataUtils.CONVERSATION_MESSAGE_PAGE_SIZE);
-//        v2TIMMessageSearchParam.setPageIndex(0);
-//        V2TIMManager.getMessageManager().searchLocalMessages(v2TIMMessageSearchParam, new V2TIMValueCallback<V2TIMMessageSearchResult>() {
-//            @Override
-//            public void onSuccess(V2TIMMessageSearchResult v2TIMMessageSearchResult) {
-//                mConversationData.clear();
-//                mMsgsCountInConversationMap.clear();
-//                if (v2TIMMessageSearchResult == null || v2TIMMessageSearchResult.getTotalCount() == 0 || v2TIMMessageSearchResult.getMessageSearchResultItems().size() == 0){
-//                    mConversationLayout.setVisibility(View.GONE);
-//                    mConversationRcSearchAdapter.setDataSource(null, CONVERSATION_TYPE);
-//                    mConversationRcSearchAdapter.setTotalCount(0);
-//                    return;
-//                }
-//
-//                mConversationRcSearchAdapter.setTotalCount(v2TIMMessageSearchResult.getTotalCount());
-//                List<V2TIMMessageSearchResultItem> v2TIMMessageSearchResultItems = v2TIMMessageSearchResult.getMessageSearchResultItems();
-//                List<String> conversationIDList = new ArrayList<>();
-//                for(V2TIMMessageSearchResultItem v2TIMMessageSearchResultItem : v2TIMMessageSearchResultItems) {
-//                    conversationIDList.add(v2TIMMessageSearchResultItem.getConversationID());
-//                    mMsgsCountInConversationMap.put(v2TIMMessageSearchResultItem.getConversationID(), v2TIMMessageSearchResultItem);
-//                }
-//                V2TIMManager.getConversationManager().getConversationList(conversationIDList, new V2TIMValueCallback<List<V2TIMConversation>>() {
-//                    @Override
-//                    public void onSuccess(List<V2TIMConversation> v2TIMConversationList) {
-//                        if (v2TIMConversationList == null || v2TIMConversationList.size() == 0){
-//                            mConversationLayout.setVisibility(View.GONE);
-//                            mConversationRcSearchAdapter.setDataSource(null, CONVERSATION_TYPE);
-//                            mConversationRcSearchAdapter.setTotalCount(0);
-//                            return;
-//                        }
-//
-//                        for (V2TIMConversation v2TIMConversation : v2TIMConversationList) {
-//                            if (mConversationData != null) {
-//                                SearchDataMessage searchDataMessage = ConversationManagerKit.getInstance().TIMConversation2ConversationInfo(v2TIMConversation);
-//                                mConversationData.add(searchDataMessage);
-//                            }
-//                        }
-//
-//                        if (mConversationData != null && mConversationData.size() > 0) {
-//                            mConversationLayout.setVisibility(View.VISIBLE);
-//                            for (int i = 0; i < mConversationData.size(); i++) {
-//                                V2TIMMessageSearchResultItem v2TIMMessageSearchResultItem = mMsgsCountInConversationMap.get(mConversationData.get(i).getConversationId());
-//                                if (v2TIMMessageSearchResultItem != null) {
-//                                    int count = v2TIMMessageSearchResultItem.getMessageCount();
-//                                    if (count == 1) {
-//                                        mConversationData.get(i).setSubTitle(SearchDataUtils.getMessageText(v2TIMMessageSearchResultItem.getMessageList().get(0)));
-//                                        mConversationData.get(i).setSubTextMatch(1);
-//                                    } else if (count > 1) {
-//                                        mConversationData.get(i).setSubTitle(count + getString(R.string.chat_records));
-//                                        mConversationData.get(i).setSubTextMatch(0);
-//                                    }
-//                                }
-//                            }
-//
-//                            mConversationRcSearchAdapter.setDataSource(mConversationData, CONVERSATION_TYPE);
-//                            mConversationRcSearchAdapter.setIsShowAll(true);
-//                        } else {
-//                            mConversationLayout.setVisibility(View.GONE);
-//                            mConversationRcSearchAdapter.setDataSource(null, CONVERSATION_TYPE);
-//                            mConversationRcSearchAdapter.setTotalCount(0);
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onError(int code, String desc) {
-//                        SLog.e(code+">>>>"+desc);
-//                    }
-//                });
-//            }
-//
-//            @Override
-//            public void onError(int code, String desc) {
-//                SLog.e(code+">>>>"+desc);
-//                mConversationLayout.setVisibility(View.GONE);
-//                mConversationRcSearchAdapter.setDataSource(null, CONVERSATION_TYPE);
-//                mConversationRcSearchAdapter.setTotalCount(0);
-//            }
-//        });
+
     }
 
     /**
