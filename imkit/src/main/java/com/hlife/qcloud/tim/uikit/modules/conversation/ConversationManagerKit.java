@@ -101,7 +101,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
                         data.add(conversationInfo);
                     }
                 }
-                callBack.onConversationData(data,unRead,v2TIMConversationResult.isFinished()?-1:v2TIMConversationResult.getNextSeq());
+                callBack.onConversationData(sortConversations(data),unRead,v2TIMConversationResult.isFinished()?-1:v2TIMConversationResult.getNextSeq());
             }
         });
     }

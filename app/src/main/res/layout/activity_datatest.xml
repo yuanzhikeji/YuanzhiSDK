@@ -20,7 +20,7 @@
             android:layout_marginTop="@dimen/dp_20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
+            android:visibility="visible"
             android:text="获取单聊会话列表"/>
 
         <androidx.appcompat.widget.AppCompatButton
@@ -57,7 +57,7 @@
             android:layout_marginTop="@dimen/dp_20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
+            android:visibility="visible"
             android:text="启动单聊页面"/>
 
         <androidx.appcompat.widget.AppCompatButton

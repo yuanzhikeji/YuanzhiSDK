@@ -96,7 +96,10 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
             @Override
             public void onConversationData(List<ConversationInfo> data, long unRead, long nextSeq) {
                 conversationInfos = data;
-                ToastUtil.info(DataTestActivity.this,yzChatType+":"+conversationInfos.toString());
+//                ToastUtil.info(DataTestActivity.this,yzChatType+":"+conversationInfos.toString());
+                for (ConversationInfo info:data) {
+                    SLog.e(info.getTitle()+">"+info.getLastMessageTime());
+                }
             }
 
             @Override
@@ -133,6 +136,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
     @Override
     public void updateUnread(int count) {
         conversationUnRead();
+        loadConversation(YzChatType.C2C);
     }
 
     @Override
@@ -142,7 +146,6 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
 
     @Override
     public void updateConversion() {
-
     }
 
     @Override
