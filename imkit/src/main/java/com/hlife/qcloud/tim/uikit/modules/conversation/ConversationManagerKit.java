@@ -867,7 +867,9 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
      * 刷新全部会话
      */
     public void updateConversion(){
+        SLog.e("updateConversion:"+mUnreadWatchers.size());
         for (int i = 0; i < mUnreadWatchers.size(); i++) {
+            SLog.e(i+">"+mUnreadWatchers.get(i));
             mUnreadWatchers.get(i).updateConversion();
         }
     }
