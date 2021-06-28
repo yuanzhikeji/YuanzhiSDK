@@ -8,7 +8,6 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 
 import com.hlife.qcloud.tim.uikit.business.active.IMSearchMainActivity;
-import com.work.util.SLog;
 import com.yzcm.library.adapter.mm.BaseQuickAdapter;
 import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
