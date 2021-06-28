@@ -258,45 +258,6 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
             }
         });
     }
-
-    private ConversationProvider mSearchProvide;
-    public void searchConversation(final String keyword, final IUIKitCallBack callBack){
-        loadConversation(0,keyword,new ArrayList<ConversationInfo>(),callBack);
-    }
-    public void loadConversation(long nextSeq,final String keyword,final ArrayList<ConversationInfo> dataArray, final IUIKitCallBack callBack){
-        V2TIMManager.getConversationManager().getConversationList(nextSeq, 100, new V2TIMValueCallback<V2TIMConversationResult>() {
-            @Override
-            public void onError(int code, String desc) {
-                SLog.v( "loadConversation getConversationList error, code = " + code + ", desc = " + desc);
-            }
-
-            @Override
-            public void onSuccess(V2TIMConversationResult v2TIMConversationResult) {
-                List<V2TIMConversation> v2TIMConversationList = v2TIMConversationResult.getConversationList();
-                for (V2TIMConversation v2TIMConversation : v2TIMConversationList) {
-                    //将 imsdk v2TIMConversation 转换为 UIKit ConversationInfo
-                    ConversationInfo conversationInfo = TIMConversation2ConversationInfo(v2TIMConversation);
-                    if (conversationInfo != null && conversationInfo.getTitle().contains(keyword)) {
-                        conversationInfo.setType(ConversationInfo.TYPE_COMMON);
-                        dataArray.add(conversationInfo);
-                    }
-                }
-                if(mSearchProvide==null){
-                    mSearchProvide = new ConversationProvider();
-                }
-                if(v2TIMConversationResult.isFinished()){
-                    mSearchProvide.setDataSource(dataArray);
-                    //排序，imsdk加载处理的已按时间排序，但应用层有置顶会话操作，所有需根据置顶标识再次排序（置顶可考虑做到imsdk同步到服务器？）
-                    //更新消息未读总数
-                    if (callBack != null) {
-                        callBack.onSuccess(mSearchProvide);
-                    }
-                }else{
-                    loadConversation(v2TIMConversationResult.getNextSeq(),keyword,dataArray,callBack);
-                }
-            }
-        });
-    }
     /**
      * 部分会话刷新（包括多终端已读上报同步）
      *
@@ -561,9 +522,6 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
                 info.setIconUrlList(urlList);
                 if(mProvider!=null){
                     mProvider.updateAdapter(info.getConversationId());
-                }
-                if(mSearchProvide!=null){
-                    mSearchProvide.updateAdapter(info.getConversationId());
                 }
                 if(mGroupFaceListener.size()>0){
                     for (YzGroupFaceListener listener:mGroupFaceListener) {
@@ -868,13 +826,6 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         }
         mUnreadWatchers.clear();
         mGroupFaceListener.clear();
-    }
-
-    public void destroyConversationSearch(){
-        if(mSearchProvide!=null){
-            mSearchProvide.attachAdapter(null);
-            mSearchProvide = null;
-        }
     }
 
     public void addGroupFaceListener(YzGroupFaceListener listener){

@@ -143,7 +143,6 @@ public class SearchAddMoreActivity extends IMBaseActivity implements View.OnClic
             if(flag==0){
                 loadFriendListDataAsync();
             }else if(flag==1){
-                loadConversationAsync();
             }else{
                 if(mUserByParamReq == null){
                     mUserByParamReq = new GetUserByParamReq();
@@ -152,20 +151,6 @@ public class SearchAddMoreActivity extends IMBaseActivity implements View.OnClic
                 Yz.getSession().getUserByParam(mUserByParamReq,this);
             }
         }
-    }
-
-    private void loadConversationAsync(){
-        ConversationManagerKit.getInstance().searchConversation(mSearch.getText().toString().trim(),new IUIKitCallBack() {
-            @Override
-            public void onSuccess(Object data) {
-                mConversationAdapter.setDataProvider((ConversationProvider) data);
-            }
-
-            @Override
-            public void onError(String module, int errCode, String errMsg) {
-                ToastUtil.error(TUIKit.getAppContext(),"加载消息失败");
-            }
-        });
     }
 
     private void loadFriendListDataAsync() {
@@ -289,7 +274,6 @@ public class SearchAddMoreActivity extends IMBaseActivity implements View.OnClic
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ConversationManagerKit.getInstance().destroyConversationSearch();
     }
 
     public static void startSearchMore(Context context, int flag){

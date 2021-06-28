@@ -117,7 +117,7 @@ public class ConversationLayout extends RelativeLayout implements IConversationL
         ConversationManagerKit.getInstance().loadConversation(type,new IUIKitCallBack() {
             @Override
             public void onSuccess(Object data) {
-                SLog.e("loadConversation type:"+type+">"+((ConversationProvider) data).getDataSource().size());
+//                SLog.e("loadConversation type:"+type+">"+((ConversationProvider) data).getDataSource().size());
                 adapter.setDataProvider((ConversationProvider) data);
                 if(callBack!=null){
                     callBack.onSuccess(null);
