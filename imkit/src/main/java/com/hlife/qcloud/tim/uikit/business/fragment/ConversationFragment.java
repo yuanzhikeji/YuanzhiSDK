@@ -50,20 +50,24 @@ public class ConversationFragment extends BaseFragment implements GroupChatManag
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.fragment_im_conversation, container, false);
-        initView();
+        initView(savedInstanceState);
         return mBaseView;
     }
 
-    private void initView() {
+    private void initView(Bundle savedInstanceState) {
         Bundle bundle = getArguments();
+        String type = "";
         if(bundle!=null){
-            String type = bundle.getString(TYPE);
-            if(YzChatType.C2C.name().equals(type)){
-                this.mType = YzChatType.C2C;
-            }else if(YzChatType.GROUP.name().equals(type)){
-                this.mType = YzChatType.GROUP;
-            }
+            type = bundle.getString(TYPE);
             this.isShowSearchLayout = bundle.getBoolean(SEARCH);
+        }else if(savedInstanceState!=null){
+            type = savedInstanceState.getString(TYPE);
+            this.isShowSearchLayout = savedInstanceState.getBoolean(SEARCH);
+        }
+        if(YzChatType.C2C.name().equals(type)){
+            this.mType = YzChatType.C2C;
+        }else if(YzChatType.GROUP.name().equals(type)){
+            this.mType = YzChatType.GROUP;
         }
         ConversationManagerKit.getInstance().addMessageWatcher(this);
         // 从布局文件中获取会话列表面板
@@ -92,13 +96,13 @@ public class ConversationFragment extends BaseFragment implements GroupChatManag
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        SLog.e("onSaveInstanceState>>>>"+outState);
+        outState.putString(TYPE,mType.name());
+        outState.putBoolean(SEARCH,isShowSearchLayout);
     }
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        SLog.e("onViewStateRestored>>>"+savedInstanceState);
     }
 
     public void refreshData(){
