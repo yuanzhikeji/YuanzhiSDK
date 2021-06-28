@@ -212,6 +212,7 @@ public class TUIKitImpl {
 
             @Override
             public void onConversationChanged(List<V2TIMConversation> conversationList) {
+                SLog.e("im conversation change:"+conversationList.size());
                 ConversationManagerKit.getInstance().onRefreshConversation(conversationList);
                 for (IMEventListener listener : sIMEventListeners) {
                     listener.onRefreshConversation(conversationList);

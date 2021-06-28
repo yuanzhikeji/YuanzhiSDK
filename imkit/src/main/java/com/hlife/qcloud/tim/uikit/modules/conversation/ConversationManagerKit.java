@@ -750,6 +750,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
     }
     private int mTempUnreadTotal = 0;
     public void updateUnreadTotal(int unreadTotal) {
+        SLog.e(unreadTotal+">"+mTempUnreadTotal);
         if(unreadTotal==mTempUnreadTotal){//相同数量的时候不变
             return;
         }
@@ -824,6 +825,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         if (mProvider != null) {
             mProvider.attachAdapter(null);
         }
+        mProvider = null;
         mUnreadWatchers.clear();
         mGroupFaceListener.clear();
     }
