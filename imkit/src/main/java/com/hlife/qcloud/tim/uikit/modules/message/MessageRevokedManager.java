@@ -9,7 +9,7 @@ import java.util.List;
 public class MessageRevokedManager extends V2TIMAdvancedMsgListener {
 
     private static final MessageRevokedManager instance = new MessageRevokedManager();
-    private List<MessageRevokeHandler> mHandlers = new ArrayList<>();
+    private final List<MessageRevokeHandler> mHandlers = new ArrayList<>();
 
     private MessageRevokedManager() {
     }
