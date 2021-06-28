@@ -733,8 +733,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         V2TIMManager.getConversationManager().getTotalUnreadMessageCount(new V2TIMValueCallback<Long>() {
             @Override
             public void onSuccess(Long aLong) {
-                mUnreadTotal = aLong.intValue();
-                updateUnreadTotal(mUnreadTotal);
+                updateUnreadTotal(aLong.intValue());
             }
 
             @Override
@@ -745,8 +744,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         });
     }
     public void updateTotalUnreadMessageCount(long totalUnreadCount) {
-        mUnreadTotal = (int)totalUnreadCount;
-        updateUnreadTotal(mUnreadTotal);
+        updateUnreadTotal((int)totalUnreadCount);
     }
     private int mTempUnreadTotal = 0;
     public void updateUnreadTotal(int unreadTotal) {
