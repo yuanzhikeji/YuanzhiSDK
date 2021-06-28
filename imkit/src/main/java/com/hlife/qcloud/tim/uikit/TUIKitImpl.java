@@ -203,8 +203,9 @@ public class TUIKitImpl {
 
             @Override
             public void onNewConversation(List<V2TIMConversation> conversationList) {
-                SLog.e("impl onNewConversation");
+                SLog.e("impl conversation new");
                 ConversationManagerKit.getInstance().onRefreshConversation(conversationList);
+                ConversationManagerKit.getInstance().updateConversion();
                 for (IMEventListener listener : sIMEventListeners) {
                     listener.onRefreshConversation(conversationList);
                 }
@@ -214,6 +215,7 @@ public class TUIKitImpl {
             public void onConversationChanged(List<V2TIMConversation> conversationList) {
                 SLog.e("im conversation change:"+conversationList.size());
                 ConversationManagerKit.getInstance().onRefreshConversation(conversationList);
+                ConversationManagerKit.getInstance().updateConversion();
                 for (IMEventListener listener : sIMEventListeners) {
                     listener.onRefreshConversation(conversationList);
                 }

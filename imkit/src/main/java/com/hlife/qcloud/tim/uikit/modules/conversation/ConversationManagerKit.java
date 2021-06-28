@@ -748,8 +748,8 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
     }
     private int mTempUnreadTotal = 0;
     public void updateUnreadTotal(int unreadTotal) {
-        SLog.e(unreadTotal+">"+mTempUnreadTotal);
         if(unreadTotal==mTempUnreadTotal){//相同数量的时候不变
+            SLog.i("unread unchanged!");
             return;
         }
         mUnreadTotal = unreadTotal;
