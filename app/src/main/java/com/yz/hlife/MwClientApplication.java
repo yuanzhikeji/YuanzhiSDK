@@ -37,17 +37,17 @@ public class MwClientApplication extends MultiDexApplication {
         onChannel();
         MultiDex.install(this);
         //92c18a9516a366ceb291c0b7f37e3bf1一振通dev
+        //39edb4277058450f0eb6c8b1bddfbd00一振通正式环境
         //de241446a50499bb77a8684cf610fd04自己测试
         //7b9533618a47e947d4fd83b966081a52曹测试
 
-        YzIMKitAgent.init(this,"7b9533618a47e947d4fd83b966081a52",true);
+        YzIMKitAgent.init(this,"de241446a50499bb77a8684cf610fd04",false);
 
         //账号被踢出，或者失效
         YzIMKitAgent.instance().addStatusListener(new YzStatusListener() {
             @Override
             public void logout() {
                 super.logout();
-//                WemeetSdkHelper.logout();
                 Intent intent = new Intent(MwClientApplication.this, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);

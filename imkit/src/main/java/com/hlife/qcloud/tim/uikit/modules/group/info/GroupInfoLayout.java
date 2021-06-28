@@ -214,12 +214,17 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
         });
         // 是否置顶
         mTopSwitchView = findViewById(R.id.chat_to_top_switch);
-        mTopSwitchView.setCheckListener(new CompoundButton.OnCheckedChangeListener() {
+        mTopSwitchView.setCheckListener((buttonView, isChecked) -> mPresenter.setTopConversation(isChecked, new IUIKitCallBack() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mPresenter.setTopConversation(isChecked);
+            public void onSuccess(Object data) {
+
             }
-        });
+
+            @Override
+            public void onError(String module, int errCode, String errMsg) {
+                buttonView.setChecked(false);
+            }
+        }));
         // 退群
         mDissolveBtn = findViewById(R.id.group_dissolve_button);
         mDissolveBtn.setOnClickListener(this);

@@ -128,6 +128,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
             @Override
             public void onUnReadCount(long singleUnRead, long groupUnRead) {
                 super.onUnReadCount(singleUnRead, groupUnRead);
+                SLog.e("单聊："+singleUnRead+">群聊"+groupUnRead);
 //                ToastUtil.info(DataTestActivity.this,"单聊未读："+singleUnRead+"----群聊未读："+groupUnRead);
             }
         });
@@ -135,8 +136,8 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
 
     @Override
     public void updateUnread(int count) {
+        SLog.e("updateUnread>>>>"+count);
         conversationUnRead();
-        loadConversation(YzChatType.C2C);
     }
 
     @Override
@@ -146,6 +147,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
 
     @Override
     public void updateConversion() {
+        SLog.e("updateConversion");
     }
 
     @Override
@@ -188,19 +190,24 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 startActivity(new Intent(this,ChatDemoActivity.class).putExtra(ChatDemoActivity.class.getSimpleName(),1));
                 break;
             case R.id.start_chat:
-                if(conversationInfos!=null && conversationInfos.size()>0){
-                    ChatInfo chatInfo = new ChatInfo();
-                    chatInfo.setId(conversationInfos.get(0).getId());
-                    chatInfo.setChatName(conversationInfos.get(0).getTitle());
-                    chatInfo.setGroup(conversationInfos.get(0).isGroup());
-                    YzIMKitAgent.instance().startChat(chatInfo,null);
-                }else{
-                    ChatInfo chatInfo = new ChatInfo();
-                    chatInfo.setId("77777");
-                    chatInfo.setChatName("老胜");
-                    chatInfo.setGroup(false);
-                    YzIMKitAgent.instance().startChat(chatInfo,null);
-                }
+//                if(conversationInfos!=null && conversationInfos.size()>0){
+//                    ChatInfo chatInfo = new ChatInfo();
+//                    chatInfo.setId(conversationInfos.get(0).getId());
+//                    chatInfo.setChatName(conversationInfos.get(0).getTitle());
+//                    chatInfo.setGroup(conversationInfos.get(0).isGroup());
+//                    YzIMKitAgent.instance().startChat(chatInfo,null);
+//                }else{
+//                    ChatInfo chatInfo = new ChatInfo();
+//                    chatInfo.setId("@TGS#2536TCHHD");
+//                    chatInfo.setChatName("群聊");
+//                    chatInfo.setGroup(true);
+//                    YzIMKitAgent.instance().startChat(chatInfo,null);
+//                }
+                ChatInfo chatInfo1 = new ChatInfo();
+                chatInfo1.setId("@TGS#2536TCHHD");
+                chatInfo1.setChatName("群聊");
+                chatInfo1.setGroup(true);
+                YzIMKitAgent.instance().startChat(chatInfo1,null);
                 break;
             case R.id.send_custom:
                 if(conversationInfos!=null && conversationInfos.size()>0){

@@ -217,6 +217,12 @@ public class TUIKitImpl {
                     listener.onRefreshConversation(conversationList);
                 }
             }
+
+            @Override
+            public void onTotalUnreadMessageCountChanged(long totalUnreadCount) {
+                super.onTotalUnreadMessageCountChanged(totalUnreadCount);
+                ConversationManagerKit.getInstance().updateTotalUnreadMessageCount(totalUnreadCount);
+            }
         });
 
         V2TIMManager.getInstance().setGroupListener(new V2TIMGroupListener() {

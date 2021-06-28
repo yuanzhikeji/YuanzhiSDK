@@ -161,12 +161,17 @@ public class FriendProfileLayout extends LinearLayout implements View.OnClickLis
             }
             mChatTopView.setVisibility(View.VISIBLE);
             mChatTopView.setChecked(ConversationManagerKit.getInstance().isTopConversation(mId));
-            mChatTopView.setCheckListener(new CompoundButton.OnCheckedChangeListener() {
+            mChatTopView.setCheckListener((buttonView, isChecked) -> ConversationManagerKit.getInstance().setConversationTop(mId, isChecked, new IUIKitCallBack() {
                 @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    ConversationManagerKit.getInstance().setConversationTop(mId, isChecked);
+                public void onSuccess(Object data1) {
+
                 }
-            });
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    buttonView.setChecked(false);
+                }
+            }));
             mAddWordingLayout.setVisibility(GONE);
             mDepLayout.setVisibility(VISIBLE);
             mChatAudioVideo.setVisibility(VISIBLE);
@@ -373,7 +378,17 @@ public class FriendProfileLayout extends LinearLayout implements View.OnClickLis
         mChatTopView.setCheckListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                ConversationManagerKit.getInstance().setConversationTop(mId, isChecked);
+                ConversationManagerKit.getInstance().setConversationTop(mId, isChecked, new IUIKitCallBack() {
+                    @Override
+                    public void onSuccess(Object data) {
+
+                    }
+
+                    @Override
+                    public void onError(String module, int errCode, String errMsg) {
+                        buttonView.setChecked(false);
+                    }
+                });
             }
         });
         mId = bean.getId();

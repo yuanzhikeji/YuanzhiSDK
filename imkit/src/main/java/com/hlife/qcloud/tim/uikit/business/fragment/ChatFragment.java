@@ -1,6 +1,5 @@
 package com.hlife.qcloud.tim.uikit.business.fragment;
 
-import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -39,7 +38,6 @@ import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.imsdk.v2.V2TIMMessage;
 import com.tencent.imsdk.v2.V2TIMValueCallback;
 import com.work.util.SLog;
-import com.workstation.permission.PermissionsManager;
 
 import java.util.List;
 
@@ -162,55 +160,56 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
             }
 
         });
-        if (mChatInfo.getType() == V2TIMConversation.V2TIM_GROUP) {
-            V2TIMManager.getConversationManager().getConversation(mChatInfo.getId(), new V2TIMValueCallback<V2TIMConversation>() {
-                @Override
-                public void onError(int i, String s) {
-                    SLog.e("getConversation error:"+i+",desc:"+s);
-                }
-
-                @Override
-                public void onSuccess(V2TIMConversation v2TIMConversation) {
-                    if (v2TIMConversation == null){
-                        SLog.d("getConversation failed");
-                        return;
-                    }
-                    mChatInfo.setAtInfoList(v2TIMConversation.getGroupAtInfoList());
-
-                    final V2TIMMessage lastMessage = v2TIMConversation.getLastMessage();
-
-                    updateAtInfoLayout();
-                    mChatLayout.getAtInfoLayout().setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            final List<V2TIMGroupAtInfo> atInfoList = mChatInfo.getAtInfoList();
-                            if (atInfoList == null || atInfoList.isEmpty()) {
-                                mChatLayout.getAtInfoLayout().setVisibility(GONE);
-                            } else {
-                                mChatLayout.getChatManager().getAtInfoChatMessages(atInfoList.get(atInfoList.size() - 1).getSeq(), lastMessage, new IUIKitCallBack() {
-                                    @Override
-                                    public void onSuccess(Object data) {
-                                        mChatLayout.getMessageLayout().scrollToPosition((int) atInfoList.get(atInfoList.size() - 1).getSeq());
-                                        LinearLayoutManager mLayoutManager = (LinearLayoutManager) mChatLayout.getMessageLayout().getLayoutManager();
-                                        mLayoutManager.scrollToPositionWithOffset((int) atInfoList.get(atInfoList.size() - 1).getSeq(), 0);
-
-                                        atInfoList.remove(atInfoList.size() - 1);
-                                        mChatInfo.setAtInfoList(atInfoList);
-
-                                        updateAtInfoLayout();
-                                    }
-
-                                    @Override
-                                    public void onError(String module, int errCode, String errMsg) {
-                                        SLog.d("getAtInfoChatMessages failed");
-                                    }
-                                });
-                            }
-                        }
-                    });
-                }
-            });
-        }
+//        if (mChatInfo.getType() == V2TIMConversation.V2TIM_GROUP) {
+//            String cId = mChatInfo.getId();
+//            if(!cId.startsWith("group_")){
+//                cId = "group_"+cId;
+//            }
+//            V2TIMManager.getConversationManager().getConversation(cId, new V2TIMValueCallback<V2TIMConversation>() {
+//                @Override
+//                public void onError(int i, String s) {
+//                    SLog.e("getConversation error:"+i+",desc:"+s);
+//                }
+//
+//                @Override
+//                public void onSuccess(V2TIMConversation v2TIMConversation) {
+//                    if (v2TIMConversation == null){
+//                        SLog.d("getConversation failed");
+//                        return;
+//                    }
+//                    mChatInfo.setAtInfoList(v2TIMConversation.getGroupAtInfoList());
+//
+//                    final V2TIMMessage lastMessage = v2TIMConversation.getLastMessage();
+//
+//                    updateAtInfoLayout();
+//                    mChatLayout.getAtInfoLayout().setOnClickListener(v -> {
+//                        final List<V2TIMGroupAtInfo> atInfoList = mChatInfo.getAtInfoList();
+//                        if (atInfoList == null || atInfoList.isEmpty()) {
+//                            mChatLayout.getAtInfoLayout().setVisibility(GONE);
+//                        } else {
+//                            mChatLayout.getChatManager().getAtInfoChatMessages(atInfoList.get(atInfoList.size() - 1).getSeq(), lastMessage, new IUIKitCallBack() {
+//                                @Override
+//                                public void onSuccess(Object data) {
+//                                    mChatLayout.getMessageLayout().scrollToPosition((int) atInfoList.get(atInfoList.size() - 1).getSeq());
+//                                    LinearLayoutManager mLayoutManager = (LinearLayoutManager) mChatLayout.getMessageLayout().getLayoutManager();
+//                                    mLayoutManager.scrollToPositionWithOffset((int) atInfoList.get(atInfoList.size() - 1).getSeq(), 0);
+//
+//                                    atInfoList.remove(atInfoList.size() - 1);
+//                                    mChatInfo.setAtInfoList(atInfoList);
+//
+//                                    updateAtInfoLayout();
+//                                }
+//
+//                                @Override
+//                                public void onError(String module, int errCode, String errMsg) {
+//                                    SLog.d("getAtInfoChatMessages failed");
+//                                }
+//                            });
+//                        }
+//                    });
+//                }
+//            });
+//        }
     }
 
     private void updateAtInfoLayout(){

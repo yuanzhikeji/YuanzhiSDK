@@ -8,6 +8,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
@@ -15,7 +16,6 @@ import com.hlife.qcloud.tim.uikit.base.BaseFragment;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
-import com.hlife.qcloud.tim.uikit.component.action.PopActionClickListener;
 import com.hlife.qcloud.tim.uikit.component.action.PopDialogAdapter;
 import com.hlife.qcloud.tim.uikit.component.action.PopMenuAction;
 import com.hlife.qcloud.tim.uikit.modules.chat.GroupChatManagerKit;
@@ -25,15 +25,16 @@ import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationListLayout;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
 import com.hlife.qcloud.tim.uikit.utils.PopWindowUtil;
-import com.tencent.imsdk.v2.V2TIMConversation;
 import com.hlife.qcloud.tim.uikit.R;
+import com.work.util.SLog;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class ConversationFragment extends BaseFragment implements GroupChatManagerKit.GroupNotifyHandler, YzMessageWatcher {
-
+    private final static String TYPE="type";
+    private final static String SEARCH = "search";
     private View mBaseView;
     private ConversationLayout mConversationLayout;
     private PopupWindow mConversationPopWindow;
@@ -54,6 +55,16 @@ public class ConversationFragment extends BaseFragment implements GroupChatManag
     }
 
     private void initView() {
+        Bundle bundle = getArguments();
+        if(bundle!=null){
+            String type = bundle.getString(TYPE);
+            if(YzChatType.C2C.name().equals(type)){
+                this.mType = YzChatType.C2C;
+            }else if(YzChatType.GROUP.name().equals(type)){
+                this.mType = YzChatType.GROUP;
+            }
+            this.isShowSearchLayout = bundle.getBoolean(SEARCH);
+        }
         ConversationManagerKit.getInstance().addMessageWatcher(this);
         // 从布局文件中获取会话列表面板
         mConversationLayout = mBaseView.findViewById(R.id.conversation_layout);
@@ -64,26 +75,30 @@ public class ConversationFragment extends BaseFragment implements GroupChatManag
         if(mOnItemClickListener!=null){
             mConversationLayout.getConversationList().setOnItemClickListener(mOnItemClickListener);
         }else{
-            mConversationLayout.getConversationList().setOnItemClickListener(new ConversationListLayout.OnItemClickListener() {
-                @Override
-                public void onItemClick(View view, int position, ConversationInfo conversationInfo) {
-                    //此处为demo的实现逻辑，更根据会话类型跳转到相关界面，开发者可根据自己的应用场景灵活实现
-                    ChatInfo chatInfo = new ChatInfo();
-                    chatInfo.setGroup(conversationInfo.isGroup());
-                    chatInfo.setId(conversationInfo.getId());
-                    chatInfo.setDraft(conversationInfo.getDraft());
-                    chatInfo.setChatName(conversationInfo.getTitle());
-                    YzIMKitAgent.instance().startChat(chatInfo,null);
-                }
+            mConversationLayout.getConversationList().setOnItemClickListener((view, position, conversationInfo) -> {
+                //此处为demo的实现逻辑，更根据会话类型跳转到相关界面，开发者可根据自己的应用场景灵活实现
+                ChatInfo chatInfo = new ChatInfo();
+                chatInfo.setGroup(conversationInfo.isGroup());
+                chatInfo.setId(conversationInfo.getId());
+                chatInfo.setDraft(conversationInfo.getDraft());
+                chatInfo.setChatName(conversationInfo.getTitle());
+                YzIMKitAgent.instance().startChat(chatInfo,null);
             });
         }
-        mConversationLayout.getConversationList().setOnItemLongClickListener(new ConversationListLayout.OnItemLongClickListener() {
-            @Override
-            public void OnItemLongClick(View view, int position, ConversationInfo conversationInfo) {
-                startPopShow(view, position, conversationInfo);
-            }
-        });
+        mConversationLayout.getConversationList().setOnItemLongClickListener((view, position, conversationInfo) -> startPopShow(view, position, conversationInfo));
         initPopMenuAction();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        SLog.e("onSaveInstanceState>>>>"+outState);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        SLog.e("onViewStateRestored>>>"+savedInstanceState);
     }
 
     public void refreshData(){
@@ -109,20 +124,20 @@ public class ConversationFragment extends BaseFragment implements GroupChatManag
         List<PopMenuAction> conversationPopActions = new ArrayList<PopMenuAction>();
         PopMenuAction action = new PopMenuAction();
         action.setActionName(getResources().getString(R.string.chat_top));
-        action.setActionClickListener(new PopActionClickListener() {
+        action.setActionClickListener((position, data) -> mConversationLayout.setConversationTop((ConversationInfo) data, new IUIKitCallBack() {
             @Override
-            public void onActionClick(int position, Object data) {
-                mConversationLayout.setConversationTop(position, (ConversationInfo) data);
+            public void onSuccess(Object data) {
+
             }
-        });
+
+            @Override
+            public void onError(String module, int errCode, String errMsg) {
+                SLog.e(module + ", Error code = " + errCode + ", desc = " + errMsg);
+            }
+        }));
         conversationPopActions.add(action);
         action = new PopMenuAction();
-        action.setActionClickListener(new PopActionClickListener() {
-            @Override
-            public void onActionClick(int position, Object data) {
-                mConversationLayout.deleteConversation(position, (ConversationInfo) data);
-            }
-        });
+        action.setActionClickListener((position, data) -> mConversationLayout.deleteConversation(position, (ConversationInfo) data));
         action.setActionName(getResources().getString(R.string.chat_delete));
         conversationPopActions.add(action);
         mConversationPopActions.clear();
@@ -138,7 +153,7 @@ public class ConversationFragment extends BaseFragment implements GroupChatManag
      * @param locationY        长按时Y坐标
      */
     private void showItemPopMenu(final int index, final ConversationInfo conversationInfo, float locationX, float locationY) {
-        if (mConversationPopActions == null || mConversationPopActions.size() == 0)
+        if (mConversationPopActions.size() == 0)
             return;
         View itemPop = LayoutInflater.from(getActivity()).inflate(R.layout.pop_menu_layout, null);
         ListView mConversationPopList = itemPop.findViewById(R.id.pop_menu_list);
@@ -182,28 +197,19 @@ public class ConversationFragment extends BaseFragment implements GroupChatManag
         showItemPopMenu(position, info, view.getX(), view.getY() + view.getHeight() / 2);
     }
 
-    public void setType(YzChatType mType) {
-        this.mType = mType;
-    }
-
-    public void setShowSearchLayout(boolean showSearchLayout) {
-        isShowSearchLayout = showSearchLayout;
-    }
-
     public void setOnItemClickListener(ConversationListLayout.OnItemClickListener mOnItemClickListener) {
         this.mOnItemClickListener = mOnItemClickListener;
     }
 
     public static ConversationFragment newConversation(YzChatType type){
-        ConversationFragment fragment = new ConversationFragment();
-        fragment.setType(type);
-        fragment.setShowSearchLayout(false);
-        return fragment;
+        return newConversation(type,false);
     }
     public static ConversationFragment newConversation(YzChatType type,boolean showSearch){
         ConversationFragment fragment = new ConversationFragment();
-        fragment.setType(type);
-        fragment.setShowSearchLayout(showSearch);
+        Bundle bundle = new Bundle();
+        bundle.putString(TYPE,type.name());
+        bundle.putBoolean(SEARCH,showSearch);
+        fragment.setArguments(bundle);
         return fragment;
     }
     @Override

@@ -189,7 +189,6 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
 
     protected void onReceiveMessage(final V2TIMMessage msg) {
         if (!safetyCall()) {
-            SLog.w("onReceiveMessage unSafetyCall");
             return;
         }
         addMessage(msg);

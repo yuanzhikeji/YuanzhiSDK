@@ -164,12 +164,16 @@ public class ConversationLayout extends RelativeLayout implements IConversationL
     }
 
     @Override
-    public void setConversationTop(int position, ConversationInfo conversation) {
-        ConversationManagerKit.getInstance().setConversationTop(position, conversation);
+    public void setConversationTop(ConversationInfo conversation, IUIKitCallBack callBack) {
+        ConversationManagerKit.getInstance().setConversationTop(conversation, callBack);
     }
 
     @Override
     public void deleteConversation(int position, ConversationInfo conversation) {
         ConversationManagerKit.getInstance().deleteConversation(position, conversation);
+    }
+    @Override
+    public void clearConversationMessage(int position, ConversationInfo conversation) {
+        ConversationManagerKit.getInstance().clearConversationMessage(position, conversation);
     }
 }

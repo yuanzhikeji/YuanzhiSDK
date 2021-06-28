@@ -17,12 +17,9 @@ import android.widget.TextView;
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.base.BaseActivity;
 import com.hlife.qcloud.tim.uikit.business.inter.YzStatusListener;
-import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
 import com.http.network.model.RequestWork;
 import com.http.network.model.ResponseWork;
 import com.jaeger.library.StatusBarUtil;
-import com.work.api.open.Yz;
-import com.work.api.open.model.LoginReq;
 import com.work.api.open.model.LoginResp;
 import com.work.api.open.model.SysUserReq;
 import com.work.api.open.model.client.OpenData;
@@ -113,10 +110,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     protected void onResume() {
         super.onResume();
         mPhone.setText(SharedUtils.getString("userid"));
-        mPhone.setText("4298188853822114691");
+//        mPhone.setText("3080783285118258748");
         mPassword.setText(SharedUtils.getString("nickname"));
         mMobile.setText(SharedUtils.getString("mobile"));
-        mMobile.setText("18612207651");
+//        mMobile.setText("13263338398");
     }
 
     @Override

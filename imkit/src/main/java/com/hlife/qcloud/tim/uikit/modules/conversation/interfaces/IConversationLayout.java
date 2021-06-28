@@ -1,6 +1,7 @@
 package com.hlife.qcloud.tim.uikit.modules.conversation.interfaces;
 
 import com.hlife.qcloud.tim.uikit.base.ILayout;
+import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.component.TitleBarLayout;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationLayout;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationListLayout;
@@ -25,7 +26,7 @@ public interface IConversationLayout extends ILayout {
      * @param position     该item在列表的索引
      * @param conversation 会话内容
      */
-    void setConversationTop(int position, ConversationInfo conversation);
+    void setConversationTop(ConversationInfo conversation, IUIKitCallBack callBack);
 
     /**
      * 删除会话
@@ -34,4 +35,12 @@ public interface IConversationLayout extends ILayout {
      * @param conversation 会话内容
      */
     void deleteConversation(int position, ConversationInfo conversation);
+
+    /**
+     * 清空会话
+     *
+     * @param position     该item在列表的索引
+     * @param conversation 会话内容
+     */
+    void clearConversationMessage(int position, ConversationInfo conversation);
 }
