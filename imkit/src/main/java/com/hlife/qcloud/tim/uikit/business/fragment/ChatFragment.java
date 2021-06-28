@@ -34,10 +34,6 @@ import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 import com.tencent.imsdk.v2.V2TIMConversation;
 import com.hlife.qcloud.tim.uikit.R;
 import com.tencent.imsdk.v2.V2TIMGroupAtInfo;
-import com.tencent.imsdk.v2.V2TIMManager;
-import com.tencent.imsdk.v2.V2TIMMessage;
-import com.tencent.imsdk.v2.V2TIMValueCallback;
-import com.work.util.SLog;
 
 import java.util.List;
 

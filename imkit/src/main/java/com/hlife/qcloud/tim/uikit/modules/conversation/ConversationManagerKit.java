@@ -311,7 +311,9 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         for (int i = 0; i < v2TIMConversationList.size(); i++) {
             V2TIMConversation v2TIMConversation = v2TIMConversationList.get(i);
             ConversationInfo conversationInfo = TIMConversation2ConversationInfo(v2TIMConversation);
-            if (conversationInfo != null && !V2TIMManager.GROUP_TYPE_AVCHATROOM.equals(v2TIMConversation.getGroupType())) {
+            if((mType== YzChatType.GROUP && conversationInfo.isGroup())
+                    || (mType == YzChatType.C2C && !conversationInfo.isGroup())
+                    || (mType == YzChatType.ALL)){
                 infos.add(conversationInfo);
             }
         }
@@ -519,7 +521,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
     }
 
     private void fillConversationUrlForGroup(final V2TIMConversation conversation, final ConversationInfo info) {
-//        SLog.e(conversation.getShowName()+":"+conversation.getFaceUrl());
+//        SLog.e(conversation.getGroupID()+">"+conversation.getShowName()+":"+conversation.getFaceUrl());
         if (TextUtils.isEmpty(conversation.getFaceUrl())) {
             String savedIcon = getGroupConversationAvatar(conversation.getConversationID());
             if (TextUtils.isEmpty(savedIcon)) {

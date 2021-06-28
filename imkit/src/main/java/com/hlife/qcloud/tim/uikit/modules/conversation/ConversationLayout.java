@@ -8,6 +8,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 
 import com.hlife.qcloud.tim.uikit.business.active.IMSearchMainActivity;
+import com.work.util.SLog;
 import com.yzcm.library.adapter.mm.BaseQuickAdapter;
 import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
@@ -116,6 +117,7 @@ public class ConversationLayout extends RelativeLayout implements IConversationL
         ConversationManagerKit.getInstance().loadConversation(type,new IUIKitCallBack() {
             @Override
             public void onSuccess(Object data) {
+                SLog.e("loadConversation type:"+type+">"+((ConversationProvider) data).getDataSource().size());
                 adapter.setDataProvider((ConversationProvider) data);
                 if(callBack!=null){
                     callBack.onSuccess(null);

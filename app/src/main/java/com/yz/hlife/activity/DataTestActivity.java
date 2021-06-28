@@ -1,7 +1,6 @@
 package com.yz.hlife.activity;
 
 import android.content.Intent;
-import android.text.TextUtils;
 import android.view.View;
 
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
@@ -13,9 +12,7 @@ import com.hlife.qcloud.tim.uikit.business.inter.YzDeleteConversationListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
 import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
-import com.hlife.qcloud.tim.uikit.modules.chat.C2CChatManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
-import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
 import com.hlife.qcloud.tim.uikit.modules.group.apply.GroupApplyInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
@@ -23,9 +20,6 @@ import com.http.network.listener.OnResultDataListener;
 import com.http.network.model.RequestWork;
 import com.http.network.model.ResponseWork;
 import com.http.network.task.ObjectMapperFactory;
-import com.tencent.imsdk.v2.V2TIMCallback;
-import com.tencent.imsdk.v2.V2TIMFriendInfo;
-import com.tencent.imsdk.v2.V2TIMManager;
 import com.work.api.open.Yz;
 import com.work.api.open.model.CreateGroupReq;
 import com.work.api.open.model.CreateGroupResp;
@@ -244,6 +238,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
 //                CreateGroupReq createGroupReq1 = new CreateGroupReq();
 //                createGroupReq1.GroupId = "@TGS#2ZTF2CGHX";
 //                createGroupReq1.Name = "我改一个名字";
+//                createGroupReq1.FaceUrl = "https://cdns4.91helife.com/groupManage/1624867591297.IMG_2950.JPG";
 //                Yz.getSession().updateGroup(createGroupReq1, new OnResultDataListener() {
 //                    @Override
 //                    public void onResult(RequestWork req, ResponseWork resp) throws Exception {
