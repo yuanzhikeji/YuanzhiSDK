@@ -20,6 +20,7 @@
             android:layout_marginTop="@dimen/dp_20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="visible"
             android:text="获取单聊会话列表"/>
 
         <androidx.appcompat.widget.AppCompatButton
@@ -37,8 +38,16 @@
             android:text="获取指定用户的会话"/>
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/del_conversation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
+            android:text="删除一个指定会话"/>
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/get_unread"
             android:layout_marginTop="@dimen/dp_20"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="获取未读消息"/>
@@ -48,6 +57,7 @@
             android:layout_marginTop="@dimen/dp_20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="visible"
             android:text="启动单聊页面"/>
 
         <androidx.appcompat.widget.AppCompatButton
@@ -84,6 +94,7 @@
             android:text="更新一个群的昵称"/>
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/add_group"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_20"
@@ -92,6 +103,7 @@
             android:id="@+id/delete_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:layout_marginTop="@dimen/dp_20"
             android:text="指定成员退出公开群"/>
         <androidx.appcompat.widget.AppCompatButton
@@ -103,6 +115,7 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/send_message"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_20"
@@ -113,7 +126,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_20"
+            android:visibility="visible"
             android:text="发送一个指定群消息"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/chat_history"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
+            android:text="获取一个聊天的历史记录"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/c2c_receiver_opt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
+            android:text="设置单聊免打扰"/>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/start_auto"

@@ -1,5 +1,6 @@
 package com.hlife.qcloud.tim.uikit.business.message;
 
+import com.hlife.qcloud.tim.uikit.base.IBaseInfo;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 
 import java.io.Serializable;
@@ -7,7 +8,7 @@ import java.io.Serializable;
 /**
  * 自定义消息的bean实体，用来与json的相互转化
  */
-public class CustomMessage implements Serializable {
+public class CustomMessage implements Serializable, IBaseInfo {
     private String businessID = "";
     private String title = "";
     private String desc = "";

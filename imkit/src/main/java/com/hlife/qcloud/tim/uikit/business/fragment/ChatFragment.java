@@ -1,6 +1,5 @@
 package com.hlife.qcloud.tim.uikit.business.fragment;
 
-import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -35,11 +34,6 @@ import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 import com.tencent.imsdk.v2.V2TIMConversation;
 import com.hlife.qcloud.tim.uikit.R;
 import com.tencent.imsdk.v2.V2TIMGroupAtInfo;
-import com.tencent.imsdk.v2.V2TIMManager;
-import com.tencent.imsdk.v2.V2TIMMessage;
-import com.tencent.imsdk.v2.V2TIMValueCallback;
-import com.work.util.SLog;
-import com.workstation.permission.PermissionsManager;
 
 import java.util.List;
 
@@ -48,9 +42,6 @@ import static android.view.View.VISIBLE;
 
 
 public class ChatFragment extends BaseFragment implements YzMessageWatcher {
-    public static String[] PERMISSIONS = new String[]{
-            Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.CAMERA};
     private View mBaseView;
     private ChatLayout mChatLayout;
     private ChatInfo mChatInfo;
@@ -63,13 +54,17 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.fragment_im_chat, container, false);
         initView();
+        if(helper == null){
+            helper = new ChatLayoutHelper(getActivity());
+        }
+        if(mConfig==null){
+            mConfig = new ChatViewConfig();
+        }
+        helper.customizeChatLayout(mChatLayout,mConfig,mYzCustomMessageDrawListener);
         return mBaseView;
     }
 
     private void initView() {
-        if(!PermissionsManager.getInstance().hasAllPermissions(getContext(),PERMISSIONS)){
-            PermissionsManager.getInstance().requestPermissionsIfNecessaryForResult(this, PERMISSIONS, null);
-        }
         ConversationManagerKit.getInstance().addMessageWatcher(this);
         final Bundle bundle = getArguments();
         if(mChatInfo==null){
@@ -96,9 +91,7 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
         TitleBarLayout mTitleBar = mChatLayout.getTitleBar();
 
         //单聊面板标记栏返回按钮点击事件，这里需要开发者自行控制
-        mTitleBar.setOnLeftClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        mTitleBar.setOnLeftClickListener(view -> {
 //                if(bundle.getBoolean(Constants.CHAT_TO_CONVERSATION,true)){
 //                    if(MwWorkActivity.instance==null){
 //                        Intent intent = new Intent(getActivity(),MwWorkActivity.class);
@@ -106,8 +99,7 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
 //                        startActivity(intent);
 //                    }
 //                }
-                getActivity().finish();
-            }
+            getActivity().finish();
         });
         if (mChatInfo.getType() == V2TIMConversation.V2TIM_C2C) {
             mTitleBar.setOnRightClickListener(new View.OnClickListener() {
@@ -121,7 +113,7 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
                 }
             });
         }
-        mChatLayout.getMessageLayout().setOnItemClickListener(new MessageLayout.OnItemClickListener() {
+        mChatLayout.getMessageLayout().setOnItemClickListener(new MessageLayout.OnItemLongClickListener() {
             @Override
             public void onMessageLongClick(View view, int position, MessageInfo messageInfo) {
                 //因为adapter中第一条为加载条目，位置需减1
@@ -164,55 +156,56 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
             }
 
         });
-        if (mChatInfo.getType() == V2TIMConversation.V2TIM_GROUP) {
-            V2TIMManager.getConversationManager().getConversation(mChatInfo.getId(), new V2TIMValueCallback<V2TIMConversation>() {
-                @Override
-                public void onError(int i, String s) {
-                    SLog.e("getConversation error:"+i+",desc:"+s);
-                }
-
-                @Override
-                public void onSuccess(V2TIMConversation v2TIMConversation) {
-                    if (v2TIMConversation == null){
-                        SLog.d("getConversation failed");
-                        return;
-                    }
-                    mChatInfo.setAtInfoList(v2TIMConversation.getGroupAtInfoList());
-
-                    final V2TIMMessage lastMessage = v2TIMConversation.getLastMessage();
-
-                    updateAtInfoLayout();
-                    mChatLayout.getAtInfoLayout().setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            final List<V2TIMGroupAtInfo> atInfoList = mChatInfo.getAtInfoList();
-                            if (atInfoList == null || atInfoList.isEmpty()) {
-                                mChatLayout.getAtInfoLayout().setVisibility(GONE);
-                            } else {
-                                mChatLayout.getChatManager().getAtInfoChatMessages(atInfoList.get(atInfoList.size() - 1).getSeq(), lastMessage, new IUIKitCallBack() {
-                                    @Override
-                                    public void onSuccess(Object data) {
-                                        mChatLayout.getMessageLayout().scrollToPosition((int) atInfoList.get(atInfoList.size() - 1).getSeq());
-                                        LinearLayoutManager mLayoutManager = (LinearLayoutManager) mChatLayout.getMessageLayout().getLayoutManager();
-                                        mLayoutManager.scrollToPositionWithOffset((int) atInfoList.get(atInfoList.size() - 1).getSeq(), 0);
-
-                                        atInfoList.remove(atInfoList.size() - 1);
-                                        mChatInfo.setAtInfoList(atInfoList);
-
-                                        updateAtInfoLayout();
-                                    }
-
-                                    @Override
-                                    public void onError(String module, int errCode, String errMsg) {
-                                        SLog.d("getAtInfoChatMessages failed");
-                                    }
-                                });
-                            }
-                        }
-                    });
-                }
-            });
-        }
+//        if (mChatInfo.getType() == V2TIMConversation.V2TIM_GROUP) {
+//            String cId = mChatInfo.getId();
+//            if(!cId.startsWith("group_")){
+//                cId = "group_"+cId;
+//            }
+//            V2TIMManager.getConversationManager().getConversation(cId, new V2TIMValueCallback<V2TIMConversation>() {
+//                @Override
+//                public void onError(int i, String s) {
+//                    SLog.e("getConversation error:"+i+",desc:"+s);
+//                }
+//
+//                @Override
+//                public void onSuccess(V2TIMConversation v2TIMConversation) {
+//                    if (v2TIMConversation == null){
+//                        SLog.d("getConversation failed");
+//                        return;
+//                    }
+//                    mChatInfo.setAtInfoList(v2TIMConversation.getGroupAtInfoList());
+//
+//                    final V2TIMMessage lastMessage = v2TIMConversation.getLastMessage();
+//
+//                    updateAtInfoLayout();
+//                    mChatLayout.getAtInfoLayout().setOnClickListener(v -> {
+//                        final List<V2TIMGroupAtInfo> atInfoList = mChatInfo.getAtInfoList();
+//                        if (atInfoList == null || atInfoList.isEmpty()) {
+//                            mChatLayout.getAtInfoLayout().setVisibility(GONE);
+//                        } else {
+//                            mChatLayout.getChatManager().getAtInfoChatMessages(atInfoList.get(atInfoList.size() - 1).getSeq(), lastMessage, new IUIKitCallBack() {
+//                                @Override
+//                                public void onSuccess(Object data) {
+//                                    mChatLayout.getMessageLayout().scrollToPosition((int) atInfoList.get(atInfoList.size() - 1).getSeq());
+//                                    LinearLayoutManager mLayoutManager = (LinearLayoutManager) mChatLayout.getMessageLayout().getLayoutManager();
+//                                    mLayoutManager.scrollToPositionWithOffset((int) atInfoList.get(atInfoList.size() - 1).getSeq(), 0);
+//
+//                                    atInfoList.remove(atInfoList.size() - 1);
+//                                    mChatInfo.setAtInfoList(atInfoList);
+//
+//                                    updateAtInfoLayout();
+//                                }
+//
+//                                @Override
+//                                public void onError(String module, int errCode, String errMsg) {
+//                                    SLog.d("getAtInfoChatMessages failed");
+//                                }
+//                            });
+//                        }
+//                    });
+//                }
+//            });
+//        }
     }
 
     private void updateAtInfoLayout(){
@@ -320,21 +313,26 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
     public void onResume() {
         super.onResume();
         // TODO 通过api设置ChatLayout各种属性的样例
-        if(helper == null){
-            helper = new ChatLayoutHelper(getActivity());
-        }
-        if(mConfig==null){
-            mConfig = new ChatViewConfig();
-        }
-        helper.customizeChatLayout(mChatLayout,mConfig,mYzCustomMessageDrawListener);
         if(mChatLayout!=null){
             mChatLayout.loadApplyList();
+        }
+        if (mChatLayout != null && mChatLayout.getChatManager() != null) {
+            mChatLayout.getChatManager().setChatFragmentShow(true);
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        if (mChatLayout != null) {
+            if (mChatLayout.getInputLayout() != null) {
+                mChatLayout.getInputLayout().setDraft();
+            }
+
+            if (mChatLayout.getChatManager() != null) {
+                mChatLayout.getChatManager().setChatFragmentShow(false);
+            }
+        }
         AudioPlayer.getInstance().stopPlay();
     }
 

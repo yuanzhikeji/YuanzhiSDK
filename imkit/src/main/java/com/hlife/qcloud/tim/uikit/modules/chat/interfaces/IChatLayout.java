@@ -67,7 +67,7 @@ public interface IChatLayout extends ILayout {
     /**
      * 加载聊天消息
      */
-    void loadMessages();
+    void loadMessages(int type);
 
     /**
      * 发送消息

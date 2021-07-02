@@ -147,7 +147,6 @@ public class GroupInfoProvider {
                     if (v2TIMGroupInfoResults.size() > 0) {
                         V2TIMGroupInfoResult infoResult = v2TIMGroupInfoResults.get(0);
                         // TODO toString打印
-                        SLog.i("loadGroupPublicInfo infoResult:>"+infoResult.toString());
                         callBack.onSuccess(infoResult);
                     }
                 }
@@ -256,8 +255,8 @@ public class GroupInfoProvider {
         return null;
     }
 
-    public void setTopConversation(boolean flag) {
-        ConversationManagerKit.getInstance().setConversationTop(mGroupInfo.getId(), flag);
+    public void setTopConversation(boolean flag, IUIKitCallBack callBack) {
+        ConversationManagerKit.getInstance().setConversationTop(mGroupInfo.getId(), flag, callBack);
     }
 
     public void quitGroup(final IUIKitCallBack callBack) {
@@ -392,14 +391,12 @@ public class GroupInfoProvider {
         V2TIMManager.getGroupManager().getGroupApplicationList(new V2TIMValueCallback<V2TIMGroupApplicationResult>() {
             @Override
             public void onError(int code, String desc) {
-                SLog.e("getGroupPendencyList failed, code: " + code + "|desc: " + desc);
                 callBack.onError("SLog",code, desc);
             }
 
             @Override
             public void onSuccess(V2TIMGroupApplicationResult v2TIMGroupApplicationResult) {
                 List<V2TIMGroupApplication> v2TIMGroupApplicationList = v2TIMGroupApplicationResult.getGroupApplicationList();
-                SLog.e("getGroupPendencyList success: " +v2TIMGroupApplicationResult.toString());
                 for (int i = 0; i < v2TIMGroupApplicationList.size(); i++) {
                     GroupApplyInfo info = new GroupApplyInfo(v2TIMGroupApplicationList.get(i));
                     info.setStatus(0);

@@ -203,8 +203,9 @@ public class TUIKitImpl {
 
             @Override
             public void onNewConversation(List<V2TIMConversation> conversationList) {
-                SLog.e("impl onNewConversation");
+                SLog.e("impl conversation new");
                 ConversationManagerKit.getInstance().onRefreshConversation(conversationList);
+                ConversationManagerKit.getInstance().updateConversion();
                 for (IMEventListener listener : sIMEventListeners) {
                     listener.onRefreshConversation(conversationList);
                 }
@@ -212,10 +213,18 @@ public class TUIKitImpl {
 
             @Override
             public void onConversationChanged(List<V2TIMConversation> conversationList) {
+                SLog.e("im conversation change:"+conversationList.size());
                 ConversationManagerKit.getInstance().onRefreshConversation(conversationList);
+                ConversationManagerKit.getInstance().updateConversion();
                 for (IMEventListener listener : sIMEventListeners) {
                     listener.onRefreshConversation(conversationList);
                 }
+            }
+
+            @Override
+            public void onTotalUnreadMessageCountChanged(long totalUnreadCount) {
+                super.onTotalUnreadMessageCountChanged(totalUnreadCount);
+                ConversationManagerKit.getInstance().updateTotalUnreadMessageCount(totalUnreadCount);
             }
         });
 
@@ -431,14 +440,12 @@ public class TUIKitImpl {
     }
 
     public static void addIMEventListener(IMEventListener listener) {
-        SLog.i("addIMEventListener:" + sIMEventListeners.size() + "|l:" + listener);
         if (listener != null && !sIMEventListeners.contains(listener)) {
             sIMEventListeners.add(listener);
         }
     }
 
     public static void removeIMEventListener(IMEventListener listener) {
-        SLog.i("removeIMEventListener:" + sIMEventListeners.size() + "|l:" + listener);
         if (listener == null) {
             sIMEventListeners.clear();
         } else {

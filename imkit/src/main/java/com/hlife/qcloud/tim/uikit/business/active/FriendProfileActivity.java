@@ -7,7 +7,6 @@ import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.contact.ContactItemBean;
 import com.hlife.qcloud.tim.uikit.modules.contact.FriendProfileLayout;
-import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 import com.hlife.qcloud.tim.uikit.R;
 

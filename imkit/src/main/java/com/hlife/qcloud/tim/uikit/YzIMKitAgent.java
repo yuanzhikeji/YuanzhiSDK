@@ -2,23 +2,39 @@ package com.hlife.qcloud.tim.uikit;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
+import android.text.TextUtils;
 
 import com.hlife.qcloud.tim.uikit.base.IMEventListener;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
+import com.hlife.qcloud.tim.uikit.base.TUIKitListenerManager;
 import com.hlife.qcloud.tim.uikit.business.Constants;
 import com.hlife.qcloud.tim.uikit.business.active.ChatActivity;
 import com.hlife.qcloud.tim.uikit.business.active.MwWorkActivity;
-import com.hlife.qcloud.tim.uikit.business.active.SelectMessageActivity;
+import com.hlife.qcloud.tim.uikit.business.active.OSSFileActivity;
+import com.hlife.qcloud.tim.uikit.business.helper.CustomChatController;
+import com.hlife.qcloud.tim.uikit.business.inter.YzChatHistoryMessageListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatType;
 import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzDeleteConversationListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupChangeListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzGroupDataListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupInfoListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupJoinListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupMemberListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageSendCallback;
 import com.hlife.qcloud.tim.uikit.business.inter.YzMessageWatcher;
+import com.hlife.qcloud.tim.uikit.business.inter.YzReceiveMessageOptListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzSearchMessageListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzStatusListener;
 import com.hlife.qcloud.tim.uikit.business.inter.YzWorkAppItemClickListener;
+import com.hlife.qcloud.tim.uikit.business.message.CustomFileMessage;
 import com.hlife.qcloud.tim.uikit.business.message.MessageNotification;
+import com.hlife.qcloud.tim.uikit.business.modal.SearchDataMessage;
+import com.hlife.qcloud.tim.uikit.business.modal.SearchParam;
 import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
+import com.hlife.qcloud.tim.uikit.business.modal.VideoFile;
 import com.hlife.qcloud.tim.uikit.business.thirdpush.HUAWEIHmsMessageService;
 import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.config.GeneralConfig;
@@ -29,17 +45,29 @@ import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.conversation.ConversationManagerKit;
 import com.hlife.qcloud.tim.uikit.modules.group.apply.GroupApplyInfo;
 import com.hlife.qcloud.tim.uikit.modules.group.info.GroupInfo;
+import com.hlife.qcloud.tim.uikit.modules.group.member.GroupMemberInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
 import com.hlife.qcloud.tim.uikit.utils.BrandUtil;
+import com.hlife.qcloud.tim.uikit.utils.SearchDataUtils;
 import com.http.network.listener.OnResultDataListener;
 import com.http.network.model.RequestWork;
 import com.http.network.model.ResponseWork;
+import com.http.network.task.ObjectMapperFactory;
 import com.tencent.imsdk.v2.V2TIMCallback;
+import com.tencent.imsdk.v2.V2TIMConversation;
 import com.tencent.imsdk.v2.V2TIMGroupApplication;
 import com.tencent.imsdk.v2.V2TIMGroupApplicationResult;
+import com.tencent.imsdk.v2.V2TIMGroupInfo;
+import com.tencent.imsdk.v2.V2TIMGroupInfoResult;
+import com.tencent.imsdk.v2.V2TIMGroupMemberFullInfo;
+import com.tencent.imsdk.v2.V2TIMGroupMemberInfoResult;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.imsdk.v2.V2TIMMessage;
+import com.tencent.imsdk.v2.V2TIMMessageSearchParam;
+import com.tencent.imsdk.v2.V2TIMMessageSearchResult;
+import com.tencent.imsdk.v2.V2TIMMessageSearchResultItem;
+import com.tencent.imsdk.v2.V2TIMReceiveMessageOptInfo;
 import com.tencent.imsdk.v2.V2TIMValueCallback;
 import com.tencent.smtt.export.external.TbsCoreSettings;
 import com.tencent.smtt.sdk.QbSdk;
@@ -55,8 +83,10 @@ import com.work.util.ToastUtil;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by tangyx
@@ -101,6 +131,7 @@ public final class YzIMKitAgent {
     private YzStatusListener mIMKitStatusListener;
     private YzWorkAppItemClickListener mWorkAppItemClickListener;
     private int functionPrem;
+    private static boolean isDev;
 
     private YzIMKitAgent(Context context, String mYzAppId) {
         this.mContext = context;
@@ -109,10 +140,16 @@ public final class YzIMKitAgent {
         UserApi userApi = UserApi.instance();
         userApi.setStore("im sdk");
         //配置网络相关
-        ApiClient.setApiConfig(new ApiClient.ApiConfig().setHostName("https://dev1-imapi.yzmetax.com/").setParamObj(userApi));
+        //ApiClient.setApiConfig(new ApiClient.ApiConfig().setHostName("https://dev1-imapi.yzmetax.com/").setParamObj(userApi));
+        ApiClient.setApiConfig(new ApiClient.ApiConfig().setHostName(isDev?"https://dev1-imapi.yzmetax.com/":"https://imapi.yzmetax.com/").setParamObj(userApi));
     }
 
     public static void init(Context context,String appId){
+        init(context,appId,false);
+    }
+
+    public static void init(Context context,String appId,boolean dev){
+        isDev = dev;
         if(singleton==null){
             singleton = new YzIMKitAgent(context,appId);
         }
@@ -137,7 +174,7 @@ public final class YzIMKitAgent {
     private void loadConfig(){
         SharedUtils.init(mContext);
         //初始化im
-        TUIKit.init(mContext,1400432221,getConfigs());
+        TUIKit.init(mContext,isDev?1400433756:1400432221,getConfigs());
         //加载腾讯x5的浏览器引擎
         HashMap<String,Object> map = new HashMap<>();
         map.put(TbsCoreSettings.TBS_SETTINGS_USE_SPEEDY_CLASSLOADER, true);
@@ -158,6 +195,7 @@ public final class YzIMKitAgent {
         QbSdk.initX5Environment(mContext,cb);
         //注册消息通知离线登录
         registerPush();
+        TUIKitListenerManager.getInstance().addChatListener(new CustomChatController());
     };
 
     public int getFunctionPrem() {
@@ -252,55 +290,51 @@ public final class YzIMKitAgent {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         TUIKit.getAppContext().startActivity(intent);
     }
-    /**
-     * 分享卡片消息
-     */
-    public void startCustomMessage(String customMessage){
-        startCustomMessage(null,customMessage);
+    public void sendCustomMessage(final ChatInfo chatInfo, String customMessage,YzMessageSendCallback callback){
+        this.sendCustomMessage(chatInfo,customMessage,customMessage,callback);
     }
-    public void startCustomMessage(final ChatInfo chatInfo, String customMessage){
+    public void sendCustomMessage(final ChatInfo chatInfo, String customMessage,String desc,YzMessageSendCallback callback){
         if(chatInfo==null){
-            SelectMessageActivity.sendCustomMessage(mContext,customMessage);
+            return;
+        }
+        if(chatInfo.isGroup()){
+            MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage,desc);
+            groupChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
         }else{
-            if(chatInfo.isGroup()){
-                GroupChatManagerKit groupChatManagerKit = GroupChatManagerKit.getInstance();
-                GroupInfo groupInfo = new GroupInfo();
-                groupInfo.setId(chatInfo.getId());
-                groupInfo.setGroupName(chatInfo.getChatName());
-                groupChatManagerKit.setCurrentChatInfo(groupInfo);
-                MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
-                groupChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
-                    @Override
-                    public void onSuccess(Object data) {
-                        YzIMKitAgent.instance().startChat(chatInfo,null);
+            MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage,customMessage);
+            c2CChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
                     }
+                }
 
-                    @Override
-                    public void onError(String module, int errCode, String errMsg) {
-                        ToastUtil.warning(mContext,errCode+">"+errMsg);
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
                     }
-                });
-            }else{
-                C2CChatManagerKit c2CChatManagerKit = C2CChatManagerKit.getInstance();
-                c2CChatManagerKit.setCurrentChatInfo(chatInfo);
-                MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
-                c2CChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
-                    @Override
-                    public void onSuccess(Object data) {
-                        SLog.e("custom message send success:"+data);
-                        YzIMKitAgent.instance().startChat(chatInfo,null);
-                    }
-
-                    @Override
-                    public void onError(String module, int errCode, String errMsg) {
-                        ToastUtil.warning(mContext,errCode+">"+errMsg);
-                    }
-                });
-            }
+                }
+            });
         }
     }
     public void sendCustomMessage(String customMessage, YzMessageSendCallback callback){
-        MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage);
+        MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage,customMessage);
         C2CChatManagerKit c2CChatManagerKit = C2CChatManagerKit.getInstance();
         if(c2CChatManagerKit.getCurrentChatInfo()!=null){
             c2CChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
@@ -340,6 +374,392 @@ public final class YzIMKitAgent {
         }
     }
     /**
+     * 文本消息
+     */
+    public void sendTextMessage(ChatInfo chatInfo,String message,YzMessageSendCallback callback){
+        if(chatInfo==null){
+            return;
+        }
+        MessageInfo info = MessageInfoUtil.buildTextMessage(message);
+        if(chatInfo.isGroup()){
+            groupChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+        else{
+            c2CChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+    }
+    /**
+     * 图片消息
+     */
+    public void sendImageMessage(ChatInfo chatInfo,final Uri uri,YzMessageSendCallback callback){
+        if(chatInfo==null){
+            return;
+        }
+        MessageInfo info = MessageInfoUtil.buildImageMessage(uri,true);
+        if(chatInfo.isGroup()){
+            groupChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+        else{
+            c2CChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+    }
+    /**
+     * 视频消息
+     */
+    public void sendVideoMessage(ChatInfo chatInfo,String imgPath, String videoPath, int width, int height, long duration,YzMessageSendCallback callback){
+        if(chatInfo==null){
+            return;
+        }
+        MessageInfo info = MessageInfoUtil.buildVideoMessage(imgPath,videoPath,width,height,duration);
+        if(chatInfo.isGroup()){
+            groupChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+        else{
+            c2CChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+    }
+    /**
+     * 语音消息
+     */
+    public void sendAudioMessage(ChatInfo chatInfo,String recordPath, int duration,YzMessageSendCallback callback){
+        if(chatInfo==null){
+            return;
+        }
+        MessageInfo info = MessageInfoUtil.buildAudioMessage(recordPath,duration);
+        if(chatInfo.isGroup()){
+            groupChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+        else{
+            c2CChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+    }
+    /**
+     * 发送文件
+     */
+    public void sendFile(ChatInfo chatInfo,Uri uri,YzMessageSendCallback callback){
+        if(chatInfo==null){
+            return;
+        }
+        OSSFileActivity.uploadFileSDK(uri, new IUIKitCallBack() {
+            @Override
+            public void onSuccess(Object data) {
+                if(data instanceof Uri){
+                    sendImageMessage(chatInfo,(Uri) data,callback);
+                }else if(data instanceof VideoFile){
+                    VideoFile videoFile = (VideoFile) data;
+                    sendVideoMessage(chatInfo,videoFile.imagePath,videoFile.filePath,videoFile.firstFrame.getWidth(),videoFile.firstFrame.getHeight(),videoFile.duration,callback);
+                }else if(data instanceof CustomFileMessage){
+                    String custom = ObjectMapperFactory.getObjectMapper().model2JsonStr(data);
+                    sendCustomMessage(chatInfo,custom,callback);
+                }
+            }
+
+            @Override
+            public void onError(String module, int errCode, String errMsg) {
+                if(callback!=null){
+                    callback.error(errCode,errMsg);
+                }
+            }
+        });
+    }
+    /**
+     * 定位
+     */
+    public void sendLocationMessage(ChatInfo chatInfo,String data,double longitude,double latitude,YzMessageSendCallback callback){
+        if(chatInfo==null){
+            return;
+        }
+        MessageInfo info = MessageInfoUtil.buildLocationMessage(data,longitude,latitude);
+        if(chatInfo.isGroup()){
+            groupChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+        else{
+            c2CChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(callback!=null){
+                        callback.success();
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if(callback!=null){
+                        callback.error(errCode,errMsg);
+                    }
+                }
+            });
+        }
+    }
+    /**
+     * 封装发送体
+     */
+    private GroupChatManagerKit groupChatManagerKit(ChatInfo chatInfo){
+        GroupChatManagerKit groupChatManagerKit = GroupChatManagerKit.getInstance();
+        GroupInfo groupInfo = new GroupInfo();
+        groupInfo.setId(chatInfo.getId());
+        groupInfo.setGroupName(chatInfo.getChatName());
+        groupChatManagerKit.setCurrentChatInfo(groupInfo);
+        return groupChatManagerKit;
+    }
+    private C2CChatManagerKit c2CChatManagerKit(ChatInfo chatInfo){
+        C2CChatManagerKit c2CChatManagerKit = C2CChatManagerKit.getInstance();
+        c2CChatManagerKit.setCurrentChatInfo(chatInfo);
+        return c2CChatManagerKit;
+    }
+    /**
+     * 搜索本地消息
+     */
+    public void searchMessage(SearchParam searchParam, YzSearchMessageListener listener){
+        final V2TIMMessageSearchParam param = new V2TIMMessageSearchParam();
+        List<String> keywords = new ArrayList<>();
+        keywords.add(searchParam.getKeyword());
+        param.setPageSize(searchParam.getPageSize());
+        param.setPageIndex(searchParam.getPageIndex());
+        param.setKeywordList(keywords);
+        if(!TextUtils.isEmpty(searchParam.getConversationId())){
+            param.setConversationID(searchParam.getConversationId());
+        }
+        V2TIMManager.getMessageManager().searchLocalMessages(param, new V2TIMValueCallback<V2TIMMessageSearchResult>() {
+            @Override
+            public void onSuccess(V2TIMMessageSearchResult v2TIMMessageSearchResult) {
+                List<SearchDataMessage> dataMessages = new ArrayList<>();
+                if (v2TIMMessageSearchResult == null || v2TIMMessageSearchResult.getTotalCount() == 0 ||
+                        v2TIMMessageSearchResult.getMessageSearchResultItems() == null ||
+                        v2TIMMessageSearchResult.getMessageSearchResultItems().size() == 0) {
+                    if(listener!=null){
+                        listener.success(dataMessages);
+                    }
+                    return;
+                }
+                if(TextUtils.isEmpty(searchParam.getConversationId())){
+                    final Map<String, V2TIMMessageSearchResultItem> mMsgsCountInConversationMap = new HashMap<>();
+                    List<V2TIMMessageSearchResultItem> v2TIMMessageSearchResultItems = v2TIMMessageSearchResult.getMessageSearchResultItems();
+                    List<String> conversationIDList = new ArrayList<>();
+                    for(V2TIMMessageSearchResultItem v2TIMMessageSearchResultItem : v2TIMMessageSearchResultItems) {
+                        conversationIDList.add(v2TIMMessageSearchResultItem.getConversationID());
+                        mMsgsCountInConversationMap.put(v2TIMMessageSearchResultItem.getConversationID(), v2TIMMessageSearchResultItem);
+                    }
+                    V2TIMManager.getConversationManager().getConversationList(conversationIDList, new V2TIMValueCallback<List<V2TIMConversation>>() {
+                        @Override
+                        public void onSuccess(List<V2TIMConversation> v2TIMConversationList) {
+                            if (v2TIMConversationList == null || v2TIMConversationList.size() == 0){
+                                if(listener!=null){
+                                    listener.success(dataMessages);
+                                }
+                                return;
+                            }
+
+                            for (V2TIMConversation v2TIMConversation : v2TIMConversationList) {
+                                SearchDataMessage searchDataMessage = ConversationManagerKit.getInstance().TIMConversation2ConversationInfo(v2TIMConversation);
+                                dataMessages.add(searchDataMessage);
+                            }
+                            if (dataMessages.size() > 0) {
+                                for (int i = 0; i < dataMessages.size(); i++) {
+                                    V2TIMMessageSearchResultItem v2TIMMessageSearchResultItem = mMsgsCountInConversationMap.get(dataMessages.get(i).getConversationId());
+                                    if (v2TIMMessageSearchResultItem != null) {
+                                        int count = v2TIMMessageSearchResultItem.getMessageCount();
+                                        SearchDataMessage searchDataMessage = dataMessages.get(i);
+                                        searchDataMessage.setCount(count);
+                                        if (count == 1) {
+                                            searchDataMessage.setSubTitle(SearchDataUtils.getMessageText(v2TIMMessageSearchResultItem.getMessageList().get(0)));
+                                            searchDataMessage.setSubTextMatch(1);
+                                            searchDataMessage.setLocateTimMessage(v2TIMMessageSearchResultItem.getMessageList().get(0));
+                                        } else if (count > 1) {
+                                            searchDataMessage.setSubTitle(count + TUIKit.getAppContext().getString(R.string.chat_records));
+                                            searchDataMessage.setSubTextMatch(0);
+                                        }
+                                    }
+                                }
+                            }
+                            if(listener!=null){
+                                listener.success(dataMessages);
+                            }
+                        }
+
+                        @Override
+                        public void onError(int code, String desc) {
+                            if(listener!=null){
+                                listener.success(dataMessages);
+                            }
+                        }
+                    });
+                }
+                else{
+                    List<V2TIMMessage> v2TIMMessages = v2TIMMessageSearchResult.getMessageSearchResultItems().get(0).getMessageList();
+                    if (v2TIMMessages != null && !v2TIMMessages.isEmpty()) {
+                        for (V2TIMMessage v2TIMMessage:v2TIMMessages) {
+                            SearchDataMessage searchDataMessage = new SearchDataMessage();
+                            searchDataMessage.setConversationId(searchParam.getConversationId());
+                            String title;
+                            if (!TextUtils.isEmpty(v2TIMMessage.getFriendRemark())) {
+                                title = v2TIMMessage.getFriendRemark();
+                            } else if (!TextUtils.isEmpty(v2TIMMessage.getNameCard())) {
+                                title = v2TIMMessage.getNameCard();
+                            } else if (!TextUtils.isEmpty(v2TIMMessage.getNickName())) {
+                                title = v2TIMMessage.getNickName();
+                            } else {
+                                title = v2TIMMessage.getUserID()== null ? v2TIMMessage.getGroupID() : v2TIMMessage.getUserID();
+                            }
+                            if(v2TIMMessage.getSender().equals(UserApi.instance().getUserId())){//是自己
+                                searchDataMessage.setTitle(UserApi.instance().getNickName());
+                                searchDataMessage.setIconUrlList(new ArrayList<Object>(){{
+                                    add(UserApi.instance().getUserIcon());
+                                }});
+                            }else{
+                                searchDataMessage.setTitle(title);
+                                searchDataMessage.setIconUrlList(new ArrayList<Object>(){{
+                                    add(v2TIMMessage.getFaceUrl());
+                                }});
+                            }
+                            searchDataMessage.setId(v2TIMMessage.getSender());
+                            String subTitle = SearchDataUtils.getMessageText(v2TIMMessage);
+                            searchDataMessage.setSubTitle(subTitle);
+                            searchDataMessage.setLocateTimMessage(v2TIMMessage);
+                            dataMessages.add(searchDataMessage);
+                        }
+                    }
+                    if(listener!=null){
+                        listener.success(dataMessages);
+                    }
+                }
+            }
+
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+        });
+    }
+    /**
      * 获取所有的聊天会话
      */
     public void loadConversation(int nextSeq, YzChatType type, final YzConversationDataListener callBack){
@@ -357,79 +777,87 @@ public final class YzIMKitAgent {
     public void removeMessageWatcher(YzMessageWatcher watcher){
         ConversationManagerKit.getInstance().removeMessageWatcher(watcher);
     }
+    public void deleteConversation(String id, YzDeleteConversationListener listener){
+        if(TextUtils.isEmpty(id)){
+            if(listener!=null){
+                listener.error(-1,"ID cannot be empty");
+            }
+            return;
+        }
+        ConversationManagerKit.getInstance().deleteConversation(id,listener);
+    }
     /**
-     * 更改群信息
+     * 获取历史会话记录
      */
-//    public void updateGroup(String groupId,String name,final YzGroupDataListener listener){
-//        CreateGroupReq createGroupReq = new CreateGroupReq();
-//        createGroupReq.Name = name;
-//        createGroupReq.GroupId = groupId;
-//        Yz.getSession().updateGroupName(createGroupReq, new OnResultDataListener() {
-//            @Override
-//            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
-//                if(listener==null){
-//                    return;
-//                }
-//                if(resp instanceof CreateGroupResp){
-//                    listener.update(((CreateGroupResp) resp).getCode(),resp.getMessage());
-//                }
-//            }
-//        });
-//    }
+    public void getHistoryMessage(ChatInfo chatInfo,int pageSize,MessageInfo lastMessageInfo, YzChatHistoryMessageListener listener){
+        V2TIMMessage v2TIMMessage = null;
+        if(lastMessageInfo!=null){
+            v2TIMMessage = lastMessageInfo.getTimMessage();
+        }
+        if(chatInfo.isGroup()){
+            V2TIMManager.getMessageManager().getGroupHistoryMessageList(chatInfo.getId(), pageSize, v2TIMMessage, new V2TIMValueCallback<List<V2TIMMessage>>() {
+                @Override
+                public void onError(int code, String desc) {
+                    if(listener!=null){
+                        listener.onError(code,desc);
+                    }
+                }
+
+                @Override
+                public void onSuccess(List<V2TIMMessage> v2TIMMessages) {
+                    processHistoryMsgs(v2TIMMessages, chatInfo, listener);
+                }
+            });
+        }
+        else{
+            V2TIMManager.getMessageManager().getC2CHistoryMessageList(chatInfo.getId(), pageSize, v2TIMMessage, new V2TIMValueCallback<List<V2TIMMessage>>() {
+                @Override
+                public void onError(int code, String desc) {
+                    if(listener!=null){
+                        listener.onError(code,desc);
+                    }
+                }
+
+                @Override
+                public void onSuccess(List<V2TIMMessage> v2TIMMessages) {
+                    processHistoryMsgs(v2TIMMessages, chatInfo, listener);
+                }
+            });
+        }
+    }
+    private void processHistoryMsgs(List<V2TIMMessage> v2TIMMessages, ChatInfo chatInfo, YzChatHistoryMessageListener listener) {
+        ArrayList<V2TIMMessage> messages = new ArrayList<>(v2TIMMessages);
+        Collections.reverse(messages);
+        List<MessageInfo> msgInfos = MessageInfoUtil.TIMMessages2MessageInfos(v2TIMMessages, chatInfo.isGroup());
+        if(listener!=null){
+            listener.onChatMessageHistory(msgInfos);
+        }
+    }
     /**
-     * 添加群成员
+     * 申请加群
      */
-//    public void addGroupMember(String groupId,List<String> member,final YzGroupDataListener listener){
-//        CreateGroupReq createGroupReq = new CreateGroupReq();
-//        createGroupReq.GroupId = groupId;
-//        if(member!=null && member.size()>0){
-//            List<OpenGroupMember> members = new ArrayList<>();
-//            for (String s:member) {
-//                OpenGroupMember openGroupMember = new OpenGroupMember();
-//                openGroupMember.Member_Account = s;
-//                members.add(openGroupMember);
-//            }
-//            createGroupReq.MemberList = members;
-//        }
-//        Yz.getSession().addGroupUser(createGroupReq, new OnResultDataListener() {
-//            @Override
-//            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
-//                if(listener==null){
-//                    return;
-//                }
-//                if(resp instanceof GroupMemberResp){
-//                    listener.addMember(((GroupMemberResp) resp).getCode(),((GroupMemberResp) resp).getData());
-//                }
-//            }
-//        });
-//    }
-    /**
-     * 指定人退出
-     */
-//    public void deleteGroupMember(String groupId,List<String> member,final YzGroupDataListener listener){
-//        CreateGroupReq createGroupReq = new CreateGroupReq();
-//        createGroupReq.GroupId = groupId;
-//        createGroupReq.MemberToDel_Account = member;
-//        Yz.getSession().deleteGroupUser(createGroupReq, new OnResultDataListener() {
-//            @Override
-//            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
-//                if(listener==null){
-//                    return;
-//                }
-//                if(resp instanceof GroupMemberResp){
-//                    listener.deleteMember(((GroupMemberResp) resp).getCode(),((GroupMemberResp) resp).getData());
-//                }
-//            }
-//        });
-//    }
-    /**
-     * 获取群申请信息
-     */
+    public void joinGroup(String groupId, String message, YzGroupJoinListener listener){
+        V2TIMManager.getInstance().joinGroup(groupId, message, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+        });
+    }
     public void groupApplicationList(YzGroupDataListener listener){
         V2TIMManager.getGroupManager().getGroupApplicationList(new V2TIMValueCallback<V2TIMGroupApplicationResult>() {
             @Override
             public void onError(int code, String desc) {
-                if(listener==null){
+                if(listener==null || code==6015){//频繁调用
                     return;
                 }
                 listener.joinMember(new ArrayList<>());
@@ -448,6 +876,253 @@ public final class YzIMKitAgent {
                     applies.add(info);
                 }
                 listener.joinMember(applies);
+            }
+        });
+    }
+    /**
+     * 修改群头像
+     */
+    public void changeGroupFaceUrl(String groupId, String url, YzGroupChangeListener listener){
+        V2TIMGroupInfo v2TIMGroupInfo = new V2TIMGroupInfo();
+        v2TIMGroupInfo.setGroupID(groupId);
+        v2TIMGroupInfo.setFaceUrl(url);
+        V2TIMManager.getGroupManager().setGroupInfo(v2TIMGroupInfo, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+        });
+    }
+    /**
+     * 修改群名字
+     */
+    public void changeGroupName(String groupId, String name, YzGroupChangeListener listener){
+        V2TIMGroupInfo v2TIMGroupInfo = new V2TIMGroupInfo();
+        v2TIMGroupInfo.setGroupID(groupId);
+        v2TIMGroupInfo.setGroupName(name);
+        V2TIMManager.getGroupManager().setGroupInfo(v2TIMGroupInfo, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+        });
+    }
+    /**
+     * 全体是否禁言
+     */
+    public void changeGroupMuted(String groupId,boolean muted,YzGroupChangeListener listener){
+        V2TIMGroupInfo v2TIMGroupInfo = new V2TIMGroupInfo();
+        v2TIMGroupInfo.setGroupID(groupId);
+        v2TIMGroupInfo.setAllMuted(muted);
+        V2TIMManager.getGroupManager().setGroupInfo(v2TIMGroupInfo, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+        });
+    }
+    /**
+     * 是否消息免打扰
+     */
+    public void changeReceiveMessageOpt(String groupId,boolean opt,YzGroupChangeListener listener){
+        V2TIMManager.getMessageManager().setGroupReceiveMessageOpt(groupId, opt ? V2TIMMessage.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE : V2TIMMessage.V2TIM_RECEIVE_MESSAGE, new V2TIMCallback() {
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+        });
+    }
+    public void changeC2CReceiveMessageOpt(List<String> ids,boolean opt,YzGroupChangeListener listener){
+        V2TIMManager.getMessageManager().setC2CReceiveMessageOpt(ids, opt ? V2TIMMessage.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE : V2TIMMessage.V2TIM_RECEIVE_MESSAGE, new V2TIMCallback() {
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+        });
+    }
+    public void getC2CReceiveMessageOpt(List<String> ids, YzReceiveMessageOptListener listener){
+        V2TIMManager.getMessageManager().getC2CReceiveMessageOpt(ids, new V2TIMValueCallback<List<V2TIMReceiveMessageOptInfo>>() {
+            @Override
+            public void onSuccess(List<V2TIMReceiveMessageOptInfo> v2TIMReceiveMessageOptInfos) {
+                HashMap<String,Boolean> result = new HashMap<>();
+                for (V2TIMReceiveMessageOptInfo v2TIMReceiveMessageOptInfo:v2TIMReceiveMessageOptInfos) {
+                    result.put(v2TIMReceiveMessageOptInfo.getUserID(),v2TIMReceiveMessageOptInfo.getC2CReceiveMessageOpt() == V2TIMMessage.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE);
+                }
+                if(listener!=null){
+                    listener.result(result);
+                }
+            }
+
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+        });
+    }
+    /**
+     * 修改群公告
+     */
+    public void changeGroupNotice(String groupId,String content,YzGroupChangeListener listener){
+        V2TIMGroupInfo v2TIMGroupInfo = new V2TIMGroupInfo();
+        v2TIMGroupInfo.setGroupID(groupId);
+        v2TIMGroupInfo.setNotification(content);
+        V2TIMManager.getGroupManager().setGroupInfo(v2TIMGroupInfo, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+        });
+    }
+    /**
+     * 修改群简介
+     */
+    public void changeGroupIntroduction(String groupId,String content,YzGroupChangeListener listener){
+        V2TIMGroupInfo v2TIMGroupInfo = new V2TIMGroupInfo();
+        v2TIMGroupInfo.setGroupID(groupId);
+        v2TIMGroupInfo.setIntroduction(content);
+        V2TIMManager.getGroupManager().setGroupInfo(v2TIMGroupInfo, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+        });
+    }
+    /**
+     * 设置管理员
+     */
+    public void changeGroupMemberRole(String groupId,String userid,boolean isAdd,YzGroupChangeListener listener){
+        V2TIMManager.getGroupManager().setGroupMemberRole(groupId, userid,isAdd?V2TIMGroupMemberFullInfo.V2TIM_GROUP_MEMBER_ROLE_ADMIN : V2TIMGroupMemberFullInfo.V2TIM_GROUP_MEMBER_ROLE_MEMBER, new V2TIMCallback() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.success();
+                }
+            }
+        });
+    }
+    /**
+     * 获取成员
+     * V2TIMGroupMemberFullInfo.V2TIM_GROUP_MEMBER_FILTER_ADMIN
+     * V2TIM_GROUP_MEMBER_FILTER_COMMON
+     * V2TIM_GROUP_MEMBER_FILTER_ALL
+     */
+    public void groupMember(String groupId, int filter, long nextSeq, YzGroupMemberListener listener){
+        V2TIMManager.getGroupManager().getGroupMemberList(groupId, filter, nextSeq, new V2TIMValueCallback<V2TIMGroupMemberInfoResult>() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess(V2TIMGroupMemberInfoResult v2TIMGroupMemberInfoResult) {
+                List<GroupMemberInfo> members = new ArrayList<>();
+                for (int i = 0; i < v2TIMGroupMemberInfoResult.getMemberInfoList().size(); i++) {
+                    GroupMemberInfo member = new GroupMemberInfo();
+                    members.add(member.covertTIMGroupMemberInfo(v2TIMGroupMemberInfoResult.getMemberInfoList().get(i)));
+                }
+                if(listener!=null){
+                    listener.groupMember(members);
+                }
+            }
+        });
+    }
+    /**
+     * 获取群资料
+     */
+    public void getGroupInfo(List<String> groupList, YzGroupInfoListener listener){
+        V2TIMManager.getGroupManager().getGroupsInfo(groupList, new V2TIMValueCallback<List<V2TIMGroupInfoResult>>() {
+            @Override
+            public void onError(int code, String desc) {
+                if(listener!=null){
+                    listener.error(code,desc);
+                }
+            }
+
+            @Override
+            public void onSuccess(List<V2TIMGroupInfoResult> v2TIMGroupInfoResults) {
+                List<GroupInfo> groupInfos = new ArrayList<>();
+                for (V2TIMGroupInfoResult v2TIMGroupInfoResult:v2TIMGroupInfoResults) {
+                    GroupInfo groupInfo = new GroupInfo();
+                    groupInfo.covertTIMGroupDetailInfo(v2TIMGroupInfoResult);
+                    groupInfos.add(groupInfo);
+                }
+                if(listener!=null){
+                    listener.success(groupInfos);
+                }
             }
         });
     }

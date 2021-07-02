@@ -73,7 +73,7 @@ public final class ModeApi {
     /**
      * 更新群资料
      */
-    public final static String updateGroup="group/updateGroup";
+    public final static String updateGroup="newgroup/updateGroup";
     /**
      * 解散群组
      */

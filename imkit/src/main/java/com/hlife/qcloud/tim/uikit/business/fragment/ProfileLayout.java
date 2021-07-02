@@ -148,7 +148,7 @@ public class ProfileLayout extends LinearLayout implements View.OnClickListener 
             message.setTitle("元讯IM生态工具元讯IM生态工具元讯IM生态工具元讯IM生态工具元讯IM生态工具");
             message.setLink("http://yzmsri.com/");
             message.setBusinessID(IMKitConstants.BUSINESS_ID_CUSTOM_CARD);
-            YzIMKitAgent.instance().startCustomMessage(new Gson().toJson(message));
+//            YzIMKitAgent.instance().sendCustomMessage(new Gson().toJson(message));
         }else if(v.getId() == R.id.modify_scan){
             getContext().startActivity(new Intent(getContext(), ScanIMQRCodeActivity.class));
         }else if(v.getId() == R.id.modify_agreement){

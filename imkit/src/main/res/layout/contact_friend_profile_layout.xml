@@ -132,6 +132,12 @@
                 app:isSwitch="true"
                 app:name="@string/chat_to_top" />
             <com.hlife.qcloud.tim.uikit.component.LineControllerView
+                android:id="@+id/chat_rev_opt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:isSwitch="true"
+                app:name="@string/chat_rev_opt" />
+            <com.hlife.qcloud.tim.uikit.component.LineControllerView
                 android:id="@+id/blackList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

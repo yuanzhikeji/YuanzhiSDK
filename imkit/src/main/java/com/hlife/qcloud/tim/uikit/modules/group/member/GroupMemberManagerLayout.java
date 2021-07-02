@@ -150,7 +150,7 @@ public class GroupMemberManagerLayout extends LinearLayout implements IGroupMemb
                 }
             });
             Button deleteBtn = moreActionView.findViewById(R.id.remove_group_member);
-            if (!mGroupInfo.isOwner()) {
+            if (!mGroupInfo.isOwner() && !mGroupInfo.isRole()) {
                 deleteBtn.setVisibility(View.GONE);
             }
             deleteBtn.setOnClickListener(new View.OnClickListener() {

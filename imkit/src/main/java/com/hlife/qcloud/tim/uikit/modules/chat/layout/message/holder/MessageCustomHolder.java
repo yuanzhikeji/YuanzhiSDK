@@ -9,16 +9,23 @@ import android.widget.TextView;
 
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.R;
+import com.work.util.SLog;
 
 public class MessageCustomHolder extends MessageContentHolder implements YzCustomMessageViewGroup {
 
     private MessageInfo mMessageInfo;
     private int mPosition;
     private TextView msgBodyText;
+    private boolean isShowMutiSelect = false;
 
     public MessageCustomHolder(View itemView) {
         super(itemView);
     }
+
+    public void setShowMutiSelect(boolean showMutiSelect) {
+        isShowMutiSelect = showMutiSelect;
+    }
+
 
     @Override
     public int getVariableLayout() {
@@ -81,14 +88,14 @@ public class MessageCustomHolder extends MessageContentHolder implements YzCusto
         hideAll();
         if (view != null) {
             ((RelativeLayout) rootView).removeView(view);
-            ((RelativeLayout) rootView).addView(view);
+            ((RelativeLayout) rootView).addView(view,new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
     }
 
     @Override
     public void addMessageContentView(View view) {
         // item有可能被复用，因为不能确定是否存在其他自定义view，这里把所有的view都隐藏之后重新layout
-        hideAll();
+//        hideAll();
         super.layoutViews(mMessageInfo, mPosition);
 
         if (view != null) {

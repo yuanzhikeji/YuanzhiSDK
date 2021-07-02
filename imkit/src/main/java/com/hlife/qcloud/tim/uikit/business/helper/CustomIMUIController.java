@@ -1,6 +1,5 @@
 package com.hlife.qcloud.tim.uikit.business.helper;
 
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -9,15 +8,12 @@ import android.widget.TextView;
 import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.business.active.OSSFileActivity;
 import com.hlife.qcloud.tim.uikit.business.active.WebActivity;
-import com.hlife.qcloud.tim.uikit.business.active.X5FileOpenActivity;
 import com.hlife.qcloud.tim.uikit.business.message.CustomFileMessage;
 import com.hlife.qcloud.tim.uikit.business.message.CustomMessage;
 import com.hlife.qcloud.tim.uikit.component.picture.imageEngine.impl.GlideEngine;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageViewGroup;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.utils.FileUtil;
-
-import java.io.File;
 
 public class CustomIMUIController {
 

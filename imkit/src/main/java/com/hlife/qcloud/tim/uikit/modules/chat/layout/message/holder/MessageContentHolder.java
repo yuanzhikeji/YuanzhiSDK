@@ -14,6 +14,7 @@ import com.tencent.imsdk.v2.V2TIMMessage;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.component.gatherimage.UserIconView;
 import com.hlife.qcloud.tim.uikit.config.TUIKitConfigs;
+import com.work.util.SLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,18 +119,9 @@ public abstract class MessageContentHolder extends MessageEmptyHolder {
         } else {
             usernameText.setText(timMessage.getSender());
         }
-
         if (!TextUtils.isEmpty(timMessage.getFaceUrl())) {
             List<Object> urllist = new ArrayList<>();
             urllist.add(timMessage.getFaceUrl());
-            if (msg.isSelf()) {
-                rightUserIcon.setIconUrls(urllist);
-            } else {
-                leftUserIcon.setIconUrls(urllist);
-            }
-        }else{
-            List<Object> urllist = new ArrayList<>();
-            urllist.add(R.drawable.default_head);
             if (msg.isSelf()) {
                 rightUserIcon.setIconUrls(urllist);
             } else {
@@ -167,24 +159,24 @@ public abstract class MessageContentHolder extends MessageEmptyHolder {
         }
 
         //// 聊天气泡的点击事件处理
-        if (onItemClickListener != null) {
+        if (onItemLongClickListener != null) {
             msgContentFrame.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    onItemClickListener.onMessageLongClick(v, position, msg);
+                    onItemLongClickListener.onMessageLongClick(v, position, msg);
                     return true;
                 }
             });
             leftUserIcon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    onItemClickListener.onUserIconClick(view, position, msg);
+                    onItemLongClickListener.onUserIconClick(view, position, msg);
                 }
             });
             rightUserIcon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    onItemClickListener.onUserIconClick(view, position, msg);
+                    onItemLongClickListener.onUserIconClick(view, position, msg);
                 }
             });
         }
@@ -195,7 +187,7 @@ public abstract class MessageContentHolder extends MessageEmptyHolder {
             msgContentFrame.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (onItemClickListener != null) {
+                    if (onItemLongClickListener != null) {
 //                        onItemClickListener.onMessageLongClick(msgContentFrame, position, msg);
                     }
                 }

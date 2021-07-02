@@ -16,6 +16,7 @@ import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 import com.hlife.qcloud.tim.uikit.utils.ThreadHelper;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.component.picture.imageEngine.impl.GlideEngine;
+import com.work.util.SLog;
 
 import java.io.File;
 import java.util.List;
@@ -302,43 +303,30 @@ public class TeamHeadSynthesizer implements Synthesizer {
         mColumnCount = gridParam[1];
         targetImageSize = (maxWidth - (mColumnCount + 1) * mGap) / (mColumnCount == 1 ? 2 : mColumnCount);//图片尺寸
         //imageView.setImageResource(multiImageData.getDefaultImageResId());
-        ThreadHelper.INST.execute(new Runnable() {
-            @Override
-            public void run() {
-                //根据id获取存储的文件路径
-                final File file = new File(IMKitConstants.IMAGE_BASE_DIR + TeamHeadSynthesizer.this.currentTargetID);
-                boolean cacheBitmapExists = false;
-                if (file.exists() && file.isFile()) {
-                    //文件存在，加载到内存
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inJustDecodeBounds = true;
-                    BitmapFactory.decodeFile(file.getPath(), options);
-                    if (options.outWidth > 0 && options.outHeight > 0) {
-                        //当前文件是图片
-                        cacheBitmapExists = true;
-                    }
+        ThreadHelper.INST.execute(() -> {
+            //根据id获取存储的文件路径
+            final File file = new File(IMKitConstants.IMAGE_BASE_DIR + TeamHeadSynthesizer.this.currentTargetID);
+            boolean cacheBitmapExists = false;
+            if (file.exists() && file.isFile()) {
+                //文件存在，加载到内存
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(file.getPath(), options);
+                if (options.outWidth > 0 && options.outHeight > 0) {
+                    //当前文件是图片
+                    cacheBitmapExists = true;
                 }
-                if (!cacheBitmapExists) {
-                    // 收集图片
-                    asyncLoadImageList();
-                    // 合成图片
-                    final Bitmap bitmap = synthesizeImageList();
-                    ImageUtil.storeBitmap(file, bitmap);
-                    ConversationManagerKit.getInstance().setGroupConversationAvatar(mImageId, file.getAbsolutePath());
-                    imageView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onCall(bitmap, currentTargetID, true);
-                        }
-                    });
-                } else {
-                    imageView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onCall(file, currentTargetID, true);
-                        }
-                    });
-                }
+            }
+            ConversationManagerKit.getInstance().setGroupConversationAvatar(mImageId, file.getAbsolutePath());
+            if (!cacheBitmapExists) {
+                // 收集图片
+                asyncLoadImageList();
+                // 合成图片
+                final Bitmap bitmap = synthesizeImageList();
+                ImageUtil.storeBitmap(file, bitmap);
+                imageView.post(() -> callback.onCall(bitmap, currentTargetID, true));
+            } else {
+                imageView.post(() -> callback.onCall(file, currentTargetID, true));
             }
         });
     }

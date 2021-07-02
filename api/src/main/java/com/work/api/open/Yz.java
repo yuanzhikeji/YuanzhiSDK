@@ -20,6 +20,7 @@ import com.work.api.open.model.GetCityListResp;
 import com.work.api.open.model.GetFriendByMobileResp;
 import com.work.api.open.model.GetGroupMsgReq;
 import com.work.api.open.model.GetGroupMsgResp;
+import com.work.api.open.model.GetTenantGroupListResp;
 import com.work.api.open.model.GetToolListByUserIdResp;
 import com.work.api.open.model.GetToolTokenReq;
 import com.work.api.open.model.GetToolTokenResp;
@@ -28,6 +29,7 @@ import com.work.api.open.model.GetUserByParamResp;
 import com.work.api.open.model.GetUserListByMobilesReq;
 import com.work.api.open.model.GetUserListByMobilesResp;
 import com.work.api.open.model.GetVersionResp;
+import com.work.api.open.model.GroupMemberResp;
 import com.work.api.open.model.InviteUserReq;
 import com.work.api.open.model.LoginReq;
 import com.work.api.open.model.LoginResp;
@@ -141,9 +143,9 @@ public class Yz extends ApiClient {
     /**
      * 移除群组的人员
      */
-//    public void deleteGroupUser(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
-//        requestPost(ModeApi.deleteGroupUser,createGroupReq,new GroupMemberResp(),onResultDataListener);
-//    }
+    public void deleteGroupUser(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
+        requestPost(ModeApi.deleteGroupUser,createGroupReq,new GroupMemberResp(),onResultDataListener);
+    }
     /**
      * 解散群组
      */
@@ -156,12 +158,12 @@ public class Yz extends ApiClient {
     public void getGroupMsg(GetGroupMsgReq getGroupMsgReq, OnResultDataListener onResultDataListener){
         requestPost(ModeApi.getGroupMsg,getGroupMsgReq,new GetGroupMsgResp(),onResultDataListener);
     }
-    /**
-     * 修改群信息
-     */
-    public void updateGroup(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
-        requestPost(ModeApi.updateGroup,createGroupReq,new BaseResp(),onResultDataListener);
-    }
+//    /**
+//     * 修改群信息
+//     */
+//    public void updateGroup(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
+//        requestPost(ModeApi.updateGroup,createGroupReq,new BaseResp(),onResultDataListener);
+//    }
     /**
      * 获取版本信息
      */
@@ -238,7 +240,7 @@ public class Yz extends ApiClient {
      * 全部群组
      */
     public void getTenantGroupList(GetTenantGroupListReq getTenantGroupListReq,OnResultDataListener onResultDataListener){
-        requestPost(ModeApi.getTenantGroupList,getTenantGroupListReq,new BaseResp(),onResultDataListener);
+        requestPost(ModeApi.getTenantGroupList,getTenantGroupListReq,new GetTenantGroupListResp(),onResultDataListener);
     }
     /**
      * 获取打车链接

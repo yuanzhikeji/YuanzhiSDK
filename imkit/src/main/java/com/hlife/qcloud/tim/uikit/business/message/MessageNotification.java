@@ -16,23 +16,27 @@ import android.text.TextUtils;
 
 import com.hlife.liteav.model.CallModel;
 import com.hlife.qcloud.tim.uikit.TUIKit;
-import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
+import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.business.Constants;
 import com.hlife.qcloud.tim.uikit.business.active.ChatActivity;
 import com.hlife.qcloud.tim.uikit.business.active.MwWorkActivity;
+import com.hlife.qcloud.tim.uikit.business.inter.YzConversationDataListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupInfoListener;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
-import com.hlife.qcloud.tim.uikit.modules.group.info.GroupInfoProvider;
+import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
+import com.hlife.qcloud.tim.uikit.modules.group.info.GroupInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
 import com.hlife.qcloud.tim.uikit.utils.TUIKitUtils;
 import com.tencent.imsdk.v2.V2TIMConversation;
-import com.tencent.imsdk.v2.V2TIMGroupInfoResult;
 import com.tencent.imsdk.v2.V2TIMMessage;
 import com.tencent.imsdk.v2.V2TIMOfflinePushInfo;
 import com.hlife.qcloud.tim.uikit.R;
 import com.work.util.SLog;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MessageNotification {
 
@@ -44,13 +48,12 @@ public class MessageNotification {
 
     private static final int DIALING_DURATION = 30 * 1000;
 
-    private static MessageNotification sNotification = new MessageNotification();
+    private static MessageNotification sNotification = null;
 
-    private NotificationManager mManager;
-    private Handler mHandler = new Handler();
-    private Context mContext = TUIKit.getAppContext();
-    private HashMap<String,String> mGroupNameMaps = new HashMap<>();
-    private GroupInfoProvider mGroupProvider;
+    private final NotificationManager mManager;
+    private final Handler mHandler = new Handler();
+    private final Context mContext = TUIKit.getAppContext();
+    private final HashMap<String,String> mGroupNameMaps = new HashMap<>();
 
     private MessageNotification() {
         mManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -63,6 +66,9 @@ public class MessageNotification {
     }
 
     public static MessageNotification getInstance() {
+        if(sNotification==null){
+            sNotification = new MessageNotification();
+        }
         return sNotification;
     }
 
@@ -95,6 +101,25 @@ public class MessageNotification {
         if (TUIKitUtils.ignoreNotification(msg)) {
             return;
         }
+        String id = msg.getGroupID();
+        if(TextUtils.isEmpty(id)){
+            id = msg.getUserID();
+        }
+        YzIMKitAgent.instance().getConversation(id, new YzConversationDataListener() {
+            @Override
+            public void onConversationData(ConversationInfo data) {
+                super.onConversationData(data);
+                if(data!=null){
+                    if(!data.isRevOpt()){
+                        showNotice(msg);
+                    }
+                }
+            }
+        });
+
+    }
+
+    void showNotice(V2TIMMessage msg){
         mHandler.removeCallbacksAndMessages(null);
         V2TIMOfflinePushInfo v2TIMOfflinePushInfo = msg.getOfflinePushInfo();
         String title = null;
@@ -103,6 +128,7 @@ public class MessageNotification {
             title = v2TIMOfflinePushInfo.getTitle();
             desc = v2TIMOfflinePushInfo.getDesc();
         }
+
         if (TextUtils.isEmpty(title)) {
             if (TextUtils.isEmpty(msg.getGroupID())) {
                 if (!TextUtils.isEmpty(msg.getFriendRemark())) {
@@ -127,20 +153,18 @@ public class MessageNotification {
     }
 
     private void loadGroupInfo(String groupId, final V2TIMMessage msg, final String desc){
-        if(mGroupProvider==null){
-            mGroupProvider = new GroupInfoProvider();
-        }
-        mGroupProvider.loadGroupPublicInfo(groupId, new IUIKitCallBack() {
+        YzIMKitAgent.instance().getGroupInfo(new ArrayList<String>() {{
+            add(groupId);
+        }}, new YzGroupInfoListener() {
             @Override
-            public void onSuccess(Object data) {
-                V2TIMGroupInfoResult result = (V2TIMGroupInfoResult) data;
-                if(result!=null){
-                    loadNotification(msg,result.getGroupInfo().getGroupName(),desc);
+            public void success(List<GroupInfo> groupInfoList) {
+                if(groupInfoList!=null && groupInfoList.size()>0){
+                    GroupInfo groupInfo = groupInfoList.get(0);
+                    loadNotification(msg,groupInfo.getGroupName(),desc);
                 }
             }
-
             @Override
-            public void onError(String module, int errCode, String errMsg) {
+            public void error(int code, String desc) {
 
             }
         });
@@ -152,8 +176,6 @@ public class MessageNotification {
         if (callModel != null && callModel.action == CallModel.VIDEO_CALL_ACTION_DIALING) {
             isDialing = true;
         }
-        SLog.e("isDialing: " + isDialing);
-
         final String tag;
         final int id;
         if (isDialing) {

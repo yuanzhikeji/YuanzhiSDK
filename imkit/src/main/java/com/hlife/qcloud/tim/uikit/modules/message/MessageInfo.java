@@ -3,15 +3,17 @@ package com.hlife.qcloud.tim.uikit.modules.message;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.hlife.qcloud.tim.uikit.base.IBaseInfo;
 import com.tencent.imsdk.v2.V2TIMCallback;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.imsdk.v2.V2TIMMessage;
 import com.work.util.SLog;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 
-public class MessageInfo {
+public class MessageInfo implements IBaseInfo,Serializable {
 
     public static final int MSG_TYPE_MIME = 0x1;
 
@@ -48,7 +50,10 @@ public class MessageInfo {
      * 自定义消息
      */
     public static final int MSG_TYPE_CUSTOM = 0x80;
-
+    /**
+     * 转发消息
+     */
+    public static final int MSG_TYPE_MERGE = 0x81;
     /**
      * 提示类信息
      */
@@ -144,7 +149,7 @@ public class MessageInfo {
     private int imgHeight;
     private boolean peerRead;
     private int callType;
-
+    private boolean isIgnoreShow = false;
     private V2TIMMessage timMessage;
 
     /**
@@ -477,5 +482,13 @@ public class MessageInfo {
 
     public int getCallType() {
         return callType;
+    }
+
+    public void setIgnoreShow(boolean ignoreShow) {
+        isIgnoreShow = ignoreShow;
+    }
+
+    public boolean getIsIgnoreShow() {
+        return isIgnoreShow;
     }
 }

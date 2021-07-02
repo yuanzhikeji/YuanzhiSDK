@@ -21,8 +21,6 @@ import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.MessageLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageViewGroup;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.message.holder.YzCustomMessageDrawListener;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
-import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
-import com.hlife.qcloud.tim.uikit.utils.ToastUtil;
 import com.http.network.task.ObjectMapperFactory;
 import com.tencent.imsdk.v2.V2TIMCustomElem;
 import com.tencent.imsdk.v2.V2TIMMessage;
@@ -192,28 +190,26 @@ public class ChatLayoutHelper {
             btn1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ToastUtil.toastShortMessage("自定义的按钮1");
-                    if (getChatLayout() != null) {
-                        Gson gson = new Gson();
-                        CustomMessage customHelloMessage = new CustomMessage();
-                        String data = gson.toJson(customHelloMessage);
-                        MessageInfo info = MessageInfoUtil.buildCustomMessage(data);
-                        getChatLayout().sendMessage(info, false);
-                    }
+//                    if (getChatLayout() != null) {
+//                        Gson gson = new Gson();
+//                        CustomMessage customHelloMessage = new CustomMessage();
+//                        String data = gson.toJson(customHelloMessage);
+//                        MessageInfo info = MessageInfoUtil.buildCustomMessage(data);
+//                        getChatLayout().sendMessage(info, false);
+//                    }
                 }
             });
             Button btn2 = baseView.findViewById(R.id.test_send_message_btn2);
             btn2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ToastUtil.toastShortMessage("自定义的按钮2");
-                    if (getChatLayout() != null) {
-                        Gson gson = new Gson();
-                        CustomMessage customHelloMessage = new CustomMessage();
-                        String data = gson.toJson(customHelloMessage);
-                        MessageInfo info = MessageInfoUtil.buildCustomMessage(data);
-                        getChatLayout().sendMessage(info, false);
-                    }
+//                    if (getChatLayout() != null) {
+//                        Gson gson = new Gson();
+//                        CustomMessage customHelloMessage = new CustomMessage();
+//                        String data = gson.toJson(customHelloMessage);
+//                        MessageInfo info = MessageInfoUtil.buildCustomMessage(data);
+//                        getChatLayout().sendMessage(info, false);
+//                    }
                 }
             });
             return baseView;
@@ -242,13 +238,16 @@ public class ChatLayoutHelper {
                 return;
             }
             V2TIMCustomElem elem = info.getTimMessage().getCustomElem();
-            String elemStr = new String(elem.getData());
+            String elemStr = "";
+            if(elem.getData()!=null){
+                elemStr = new String(elem.getData());
+            }
             // 自定义的json数据，需要解析成bean实例
             CustomMessage data = null;
             try {
                 data = ObjectMapperFactory.getObjectMapper().json2Model(elemStr,CustomMessage.class);
             } catch (Exception e) {
-                SLog.w("invalid json: " + new String(elem.getData()) + " " + e.getMessage());
+                SLog.w("invalid json: " + elemStr + " " + e.getMessage());
             }
             if (data!=null) {
                 if(data.getBusinessID().equals(BUSINESS_ID_CUSTOM_CARD)){

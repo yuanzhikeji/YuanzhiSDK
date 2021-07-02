@@ -72,6 +72,43 @@ public class ConversationInfo implements Serializable, Comparable<ConversationIn
      * 会话界面显示的@提示消息
      */
     private String atInfoText;
+    /**
+     * 会话界面显示消息免打扰图标
+     */
+    private boolean isRevOpt;
+
+    /**
+     * 草稿
+     */
+    private DraftInfo draft;
+    /**
+     * 群类型
+     */
+    private String groupType;
+
+    public void setRevOpt(boolean revOpt) {
+        isRevOpt = revOpt;
+    }
+
+    public boolean isRevOpt() {
+        return isRevOpt;
+    }
+
+    public void setDraft(DraftInfo draft) {
+        this.draft = draft;
+    }
+
+    public DraftInfo getDraft() {
+        return draft;
+    }
+
+    public void setGroupType(String groupType) {
+        this.groupType = groupType;
+    }
+
+    public String getGroupType() {
+        return groupType;
+    }
 
     public ConversationInfo() {
 

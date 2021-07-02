@@ -19,6 +19,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupChangeListener;
+import com.hlife.qcloud.tim.uikit.business.inter.YzReceiveMessageOptListener;
 import com.http.network.listener.OnResultDataListener;
 import com.http.network.model.RequestWork;
 import com.http.network.model.ResponseWork;
@@ -63,6 +66,7 @@ import com.work.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class FriendProfileLayout extends LinearLayout implements View.OnClickListener {
@@ -79,6 +83,7 @@ public class FriendProfileLayout extends LinearLayout implements View.OnClickLis
     private LineControllerView mRemarkView;
     private LineControllerView mAddBlackView;
     private LineControllerView mChatTopView;
+    private LineControllerView mChatRevOpt;
     private TextView mDeleteView;
     private TextView mChatView;
     private TextView mChatAudioVideo;
@@ -136,10 +141,10 @@ public class FriendProfileLayout extends LinearLayout implements View.OnClickLis
         mDepLayout = findViewById(R.id.dep_layout);
         mAddWordingLayout = findViewById(R.id.add_wording_layout);
         mAddGroupMember = findViewById(R.id.add_group_member);
+        mChatRevOpt = findViewById(R.id.chat_rev_opt);
     }
     private boolean isShowAddGroup;
     public void initData(Object data) {
-        SLog.e("friendProfile data:"+data);
         if (data instanceof ChatInfo) {
             ChatInfo mChatInfo = (ChatInfo) data;
             mId = mChatInfo.getId();
@@ -156,12 +161,17 @@ public class FriendProfileLayout extends LinearLayout implements View.OnClickLis
             }
             mChatTopView.setVisibility(View.VISIBLE);
             mChatTopView.setChecked(ConversationManagerKit.getInstance().isTopConversation(mId));
-            mChatTopView.setCheckListener(new CompoundButton.OnCheckedChangeListener() {
+            mChatTopView.setCheckListener((buttonView, isChecked) -> ConversationManagerKit.getInstance().setConversationTop(mId, isChecked, new IUIKitCallBack() {
                 @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    ConversationManagerKit.getInstance().setConversationTop(mId, isChecked);
+                public void onSuccess(Object data1) {
+
                 }
-            });
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    buttonView.setChecked(false);
+                }
+            }));
             mAddWordingLayout.setVisibility(GONE);
             mDepLayout.setVisibility(VISIBLE);
             mChatAudioVideo.setVisibility(VISIBLE);
@@ -232,19 +242,9 @@ public class FriendProfileLayout extends LinearLayout implements View.OnClickLis
             mRemarkView.setVisibility(GONE);
             mAddBlackView.setVisibility(GONE);
             mDeleteView.setText(R.string.refuse);
-            mDeleteView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    refuseApply(info);
-                }
-            });
+            mDeleteView.setOnClickListener(v -> refuseApply(info));
             mChatView.setText(R.string.accept);
-            mChatView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    acceptApply(info);
-                }
-            });
+            mChatView.setOnClickListener(v -> acceptApply(info));
         } else if (data instanceof OpenData) {
             mId = ((OpenData) data).getUserId();
             if(isSelf()){
@@ -280,56 +280,53 @@ public class FriendProfileLayout extends LinearLayout implements View.OnClickLis
         mAddWordingLayout.setVisibility(VISIBLE);
         mChatView.setVisibility(VISIBLE);
         mChatView.setText(R.string.user_add_friends);
-        mChatView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                V2TIMFriendAddApplication v2TIMFriendAddApplication = new V2TIMFriendAddApplication(mId);
-                v2TIMFriendAddApplication.setAddWording(mAddWordingView.getText().toString());
-                v2TIMFriendAddApplication.setAddSource("android");
-                V2TIMManager.getFriendshipManager().addFriend(v2TIMFriendAddApplication, new V2TIMValueCallback<V2TIMFriendOperationResult>() {
-                    @Override
-                    public void onError(int code, String desc) {
-                        SLog.e("addFriend err code = " + code + ", desc = " + desc);
-                    }
+        mChatView.setOnClickListener(view -> {
+            V2TIMFriendAddApplication v2TIMFriendAddApplication = new V2TIMFriendAddApplication(mId);
+            v2TIMFriendAddApplication.setAddWording(mAddWordingView.getText().toString());
+            v2TIMFriendAddApplication.setAddSource("android");
+            V2TIMManager.getFriendshipManager().addFriend(v2TIMFriendAddApplication, new V2TIMValueCallback<V2TIMFriendOperationResult>() {
+                @Override
+                public void onError(int code, String desc) {
+                    SLog.e("addFriend err code = " + code + ", desc = " + desc);
+                }
 
-                    @Override
-                    public void onSuccess(V2TIMFriendOperationResult v2TIMFriendOperationResult) {
-                        SLog.i("addFriend success");
-                        switch (v2TIMFriendOperationResult.getResultCode()) {
-                            case BaseConstants.ERR_SUCC:
-                                ToastUtil.success(getContext(), "成功");
+                @Override
+                public void onSuccess(V2TIMFriendOperationResult v2TIMFriendOperationResult) {
+                    SLog.i("addFriend success");
+                    switch (v2TIMFriendOperationResult.getResultCode()) {
+                        case BaseConstants.ERR_SUCC:
+                            ToastUtil.success(getContext(), "成功");
+                            break;
+                        case BaseConstants.ERR_SVR_FRIENDSHIP_INVALID_PARAMETERS:
+                            if (TextUtils.equals(v2TIMFriendOperationResult.getResultInfo(), "Err_SNS_FriendAdd_Friend_Exist")) {
+                                ToastUtil.info(getContext(), "对方已是您的好友");
                                 break;
-                            case BaseConstants.ERR_SVR_FRIENDSHIP_INVALID_PARAMETERS:
-                                if (TextUtils.equals(v2TIMFriendOperationResult.getResultInfo(), "Err_SNS_FriendAdd_Friend_Exist")) {
-                                    ToastUtil.info(getContext(), "对方已是您的好友");
-                                    break;
-                                }
-                            case BaseConstants.ERR_SVR_FRIENDSHIP_COUNT_LIMIT:
-                                ToastUtil.info(getContext(), "您的好友数已达系统上限");
-                                break;
-                            case BaseConstants.ERR_SVR_FRIENDSHIP_PEER_FRIEND_LIMIT:
-                                ToastUtil.info(getContext(), "对方的好友数已达系统上限");
-                                break;
-                            case BaseConstants.ERR_SVR_FRIENDSHIP_IN_SELF_BLACKLIST:
-                                ToastUtil.info(getContext(), "被加好友在自己的黑名单中");
-                                break;
-                            case BaseConstants.ERR_SVR_FRIENDSHIP_ALLOW_TYPE_DENY_ANY:
-                                ToastUtil.info(getContext(), "对方已禁止加好友");
-                                break;
-                            case BaseConstants.ERR_SVR_FRIENDSHIP_IN_PEER_BLACKLIST:
-                                ToastUtil.info(getContext(), "您已被对方设置为黑名单");
-                                break;
-                            case BaseConstants.ERR_SVR_FRIENDSHIP_ALLOW_TYPE_NEED_CONFIRM:
-                                ToastUtil.info(getContext(), "等待好友审核同意");
-                                break;
-                            default:
-                                ToastUtil.info(getContext(), v2TIMFriendOperationResult.getResultCode() + " " + v2TIMFriendOperationResult.getResultInfo());
-                                break;
-                        }
-                        ((Activity) getContext()).finish();
+                            }
+                        case BaseConstants.ERR_SVR_FRIENDSHIP_COUNT_LIMIT:
+                            ToastUtil.info(getContext(), "您的好友数已达系统上限");
+                            break;
+                        case BaseConstants.ERR_SVR_FRIENDSHIP_PEER_FRIEND_LIMIT:
+                            ToastUtil.info(getContext(), "对方的好友数已达系统上限");
+                            break;
+                        case BaseConstants.ERR_SVR_FRIENDSHIP_IN_SELF_BLACKLIST:
+                            ToastUtil.info(getContext(), "被加好友在自己的黑名单中");
+                            break;
+                        case BaseConstants.ERR_SVR_FRIENDSHIP_ALLOW_TYPE_DENY_ANY:
+                            ToastUtil.info(getContext(), "对方已禁止加好友");
+                            break;
+                        case BaseConstants.ERR_SVR_FRIENDSHIP_IN_PEER_BLACKLIST:
+                            ToastUtil.info(getContext(), "您已被对方设置为黑名单");
+                            break;
+                        case BaseConstants.ERR_SVR_FRIENDSHIP_ALLOW_TYPE_NEED_CONFIRM:
+                            ToastUtil.info(getContext(), "等待好友审核同意");
+                            break;
+                        default:
+                            ToastUtil.info(getContext(), v2TIMFriendOperationResult.getResultCode() + " " + v2TIMFriendOperationResult.getResultInfo());
+                            break;
                     }
-                });
-            }
+                    ((Activity) getContext()).finish();
+                }
+            });
         });
     }
 
@@ -381,12 +378,21 @@ public class FriendProfileLayout extends LinearLayout implements View.OnClickLis
         mChatTopView.setCheckListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                ConversationManagerKit.getInstance().setConversationTop(mId, isChecked);
+                ConversationManagerKit.getInstance().setConversationTop(mId, isChecked, new IUIKitCallBack() {
+                    @Override
+                    public void onSuccess(Object data) {
+
+                    }
+
+                    @Override
+                    public void onError(String module, int errCode, String errMsg) {
+                        buttonView.setChecked(false);
+                    }
+                });
             }
         });
         mId = bean.getId();
         mNickname = bean.getNickname();
-        SLog.e("isFriend:"+bean.isFriend()+">"+isShowAddGroup);
         mAddBlackView.setCheckListener(null);
         mAddBlackView.setChecked(bean.isBlackList());
         mAddBlackView.setCheckListener(new CompoundButton.OnCheckedChangeListener() {
@@ -397,6 +403,33 @@ public class FriendProfileLayout extends LinearLayout implements View.OnClickLis
                 }else{
                     deleteBlack();
                 }
+            }
+        });
+        final List<String> userId = new ArrayList<String>(){{
+            add(mId);
+        }};
+        YzIMKitAgent.instance().getC2CReceiveMessageOpt(userId, new YzReceiveMessageOptListener() {
+            @Override
+            public void result(HashMap<String, Boolean> optMap) {
+                Boolean opt = optMap.get(mId);
+                if(opt!=null){
+                    mChatRevOpt.setChecked(opt);
+                }
+                mChatRevOpt.setCheckListener((compoundButton, b) -> YzIMKitAgent.instance().changeC2CReceiveMessageOpt(userId, b, new YzGroupChangeListener() {
+                    @Override
+                    public void success() {
+
+                    }
+
+                    @Override
+                    public void error(int code, String desc) {
+                    }
+                }));
+            }
+
+            @Override
+            public void error(int code, String desc) {
+
             }
         });
         if (bean.isFriend()) {

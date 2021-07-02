@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:name=".MwClientApplication"
-        android:theme="@style/Theme.AppCompat.Slider">
+        android:theme="@style/Theme.AppCompat.Slider"
+        tools:replace="android:allowBackup">
         <!-- 地图 -->
         <meta-data
             android:name="com.amap.api.v2.apikey"
@@ -44,6 +45,7 @@
         <activity android:name=".activity.DataTestActivity"/>
         <activity android:name=".activity.ChatDemoActivity"/>
         <activity android:name=".activity.ConversationListActivity"/>
+        <activity android:name=".activity.GroupListDemoActivity"/>
     </application>
 
 </manifest>

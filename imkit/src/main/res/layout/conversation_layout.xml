@@ -28,8 +28,9 @@
     </RelativeLayout>
     
     <LinearLayout
+        android:id="@+id/search_layout"
         android:background="@color/white"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <androidx.appcompat.widget.AppCompatEditText

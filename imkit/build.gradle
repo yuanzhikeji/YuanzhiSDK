@@ -60,7 +60,7 @@ dependencies {
 //    implementation 'com.tencent.liteav:LiteAVSDK_TRTC:8.2.9809'
     implementation 'com.tencent.liteav:LiteAVSDK_Professional:8.3.9882'
     //im
-    api 'com.tencent.imsdk:imsdk-smart:5.1.138'
+    api 'com.tencent.imsdk:imsdk-plus:5.4.666'
 
     //底部菜单选项
     api 'com.ashokvarma.android:bottom-navigation-bar:2.2.0'
@@ -70,7 +70,7 @@ dependencies {
     implementation 'com.tencent.tbs.tbssdk:sdk:43939'
     //地图相关
     api 'com.amap.api:3dmap:7.8.0'
-    api 'com.amap.api:location:4.7.2'
+    api 'com.amap.api:location:5.3.1'
     api 'com.amap.api:search:7.7.0'
     //各大平台推送
     // 小米

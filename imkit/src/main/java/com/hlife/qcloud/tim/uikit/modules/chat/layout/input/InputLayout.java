@@ -3,7 +3,6 @@ package com.hlife.qcloud.tim.uikit.modules.chat.layout.input;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -13,7 +12,6 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.MimeTypeMap;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -25,12 +23,14 @@ import com.hlife.qcloud.tim.uikit.business.active.ListStopMapActivity;
 import com.hlife.qcloud.tim.uikit.business.active.OSSFileActivity;
 import com.hlife.qcloud.tim.uikit.business.message.CustomFileMessage;
 import com.hlife.qcloud.tim.uikit.business.modal.VideoFile;
+import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.chat.interfaces.IChatLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.layout.inputmore.InputMoreFragment;
+import com.hlife.qcloud.tim.uikit.modules.conversation.base.DraftInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfoUtil;
-import com.hlife.qcloud.tim.uikit.utils.FileUtil;
 import com.http.network.task.ObjectMapperFactory;
+import com.tencent.imsdk.v2.V2TIMCallback;
 import com.tencent.imsdk.v2.V2TIMConversation;
 import com.hlife.liteav.SelectContactActivity;
 import com.hlife.liteav.login.UserModel;
@@ -48,8 +48,10 @@ import com.hlife.qcloud.tim.uikit.config.TUIKitConfigs;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.BaseInputFragment;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 import com.tencent.imsdk.v2.V2TIMGroupAtInfo;
+import com.tencent.imsdk.v2.V2TIMManager;
 import com.work.util.SLog;
 import com.work.util.ToastUtil;
+import com.workstation.permission.PermissionsManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -285,25 +287,7 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
                     SLog.e( "uri is empty");
                     return;
                 }
-
-                String videoPath = FileUtil.getPathFromUri((Uri) data);
-                String fileExtension = MimeTypeMap.getFileExtensionFromUrl(videoPath);
-                String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
-                if (mimeType != null && mimeType.contains("video")){
-                    MessageInfo msg = buildVideoMessage(FileUtil.getPathFromUri((Uri) data));
-                    if (msg == null){
-                        SLog.e("start send video error data: " + data);
-                    } else if (mMessageHandler != null) {
-                        mMessageHandler.sendMessage(msg);
-                        hideSoftInput();
-                    }
-                } else {
-                    MessageInfo info = MessageInfoUtil.buildImageMessage((Uri) data, true);
-                    if (mMessageHandler != null) {
-                        mMessageHandler.sendMessage(info);
-                        hideSoftInput();
-                    }
-                }
+                OSSFileActivity.uploadFile(mInputMoreFragment,(Uri)data,REQUEST_CODE_OSS_UPLOAD);
             }
 
             @Override
@@ -315,36 +299,10 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
         mInputMoreFragment.startActivityForResult(intent,InputMoreFragment.REQUEST_CODE_PHOTO);
     }
 
-    private MessageInfo buildVideoMessage(String mUri) {
-        android.media.MediaMetadataRetriever mmr = new android.media.MediaMetadataRetriever();
-        try {
-            mmr.setDataSource(mUri);
-            String sDuration = mmr.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_DURATION);//时长(毫秒)
-            Bitmap bitmap = mmr.getFrameAtTime(0, android.media.MediaMetadataRetriever.OPTION_NEXT_SYNC);//缩略图
-
-            if (bitmap == null){
-                SLog.e("buildVideoMessage() bitmap is null");
-                return null;
-            }
-
-            String imgPath = FileUtil.saveBitmap("JCamera", bitmap);
-            int imgWidth = bitmap.getWidth();
-            int imgHeight = bitmap.getHeight();
-            long duration = Long.parseLong(sDuration);
-            return MessageInfoUtil.buildVideoMessage(imgPath, mUri, imgWidth, imgHeight, duration);
-        } catch (Exception ex){
-            SLog.e("MediaMetadataRetriever exception " + ex);
-        } finally {
-            mmr.release();
-        }
-
-        return null;
-    }
-
     @Override
     protected void startCapture() {
-        SLog.i("startCapture");
         if (!checkPermission(CAPTURE)) {
+            PermissionsManager.getInstance().requestPermissionsIfNecessaryForResult(mInputMoreFragment, InputLayoutUI.PERMISSIONS, null);
             SLog.i("startCapture checkPermission failed");
             return;
         }
@@ -371,9 +329,9 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
 
     @Override
     protected void startVideoRecord() {
-        SLog.i("startVideoRecord");
         if (!checkPermission(VIDEO_RECORD)) {
             SLog.i("startVideoRecord checkPermission failed");
+            PermissionsManager.getInstance().requestPermissionsIfNecessaryForResult(mInputMoreFragment, InputLayoutUI.PERMISSIONS, null);
             return;
         }
         Intent captureIntent = new Intent(getContext(), CameraActivity.class);
@@ -404,7 +362,6 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
 
     @Override
     protected void startSendFile() {
-        SLog.i("startSendFile");
         if (!checkPermission(SEND_FILE)) {
             SLog.i("startSendFile checkPermission failed");
             return;
@@ -416,40 +373,6 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
             @Override
             public void onSuccess(Object data) {
                 OSSFileActivity.uploadFile(mInputMoreFragment,(Uri)data,REQUEST_CODE_OSS_UPLOAD);
-//                if(getContext() instanceof BaseActivity){
-//                    ((BaseActivity) getContext()).showProgressLoading(R.string.toast_upload_file);
-//                }
-//                MessageInfoUtil.buildFileMessage((Uri) data, new IUIKitCallBack() {
-//                    @Override
-//                    public void onSuccess(Object data) {
-//                        MessageInfo info = (MessageInfo) data;
-//                        String path = info.getDataPath();
-//                        OSSHelper ossHelper = new OSSHelper((BaseActivity) getContext());
-//                        ossHelper.setOnOSSUploadFileListener(new OSSHelper.OnOSSUploadFileListener() {
-//                            @Override
-//                            public void onSuccess(String fileUrl, String filePath) {
-//                            }
-//
-//                            @Override
-//                            public void onProgress(int progress) {
-//                            }
-//
-//                            @Override
-//                            public void onError() {
-//                            }
-//                        });
-//                        ossHelper.asyncPut(path);
-////                        if (mMessageHandler != null && info!=null) {
-////                            mMessageHandler.sendMessage(info);
-////                            hideSoftInput();
-////                        }
-//                    }
-//
-//                    @Override
-//                    public void onError(String module, int errCode, String errMsg) {
-//
-//                    }
-//                });
             }
 
             @Override
@@ -457,46 +380,15 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
                 ToastUtil.error(getContext(),errMsg);
             }
         });
-        mInputMoreFragment.setOSSCallback(new IUIKitCallBack() {
-            @Override
-            public void onSuccess(Object data) {
-                if(data instanceof Uri){
-                    MessageInfo imgInfo = MessageInfoUtil.buildImageMessage((Uri) data,true);
-                    if (mMessageHandler != null) {
-                        mMessageHandler.sendMessage(imgInfo);
-                        hideSoftInput();
-                    }
-                }else if(data instanceof VideoFile){
-                    VideoFile videoFile = (VideoFile) data;
-                    MessageInfo videoInfo = MessageInfoUtil.buildVideoMessage(videoFile.imagePath,videoFile.filePath,videoFile.firstFrame.getWidth(),videoFile.firstFrame.getHeight(),videoFile.duration);
-                    if (mMessageHandler != null) {
-                        mMessageHandler.sendMessage(videoInfo);
-                        hideSoftInput();
-                    }
-                }else if(data instanceof CustomFileMessage){
-                    String custom = ObjectMapperFactory.getObjectMapper().model2JsonStr(data);
-                    MessageInfo customInfo = MessageInfoUtil.buildCustomMessage(custom);
-                    if (mMessageHandler != null) {
-                        mMessageHandler.sendMessage(customInfo);
-                        hideSoftInput();
-                    }
-                }
-            }
-
-            @Override
-            public void onError(String module, int errCode, String errMsg) {
-
-            }
-        });
         mInputMoreFragment.startActivityForResult(intent, InputMoreFragment.REQUEST_CODE_FILE);
     }
 
     @Override
     public void startAudioCall() {
-//        if (!PermissionUtils.checkPermission(mActivity, Manifest.permission.RECORD_AUDIO)) {
-//            SLog.i("startAudioCall checkPermission failed");
-//            return;
-//        }
+        if (!checkPermission(AUDIO_RECORD)) {
+            PermissionsManager.getInstance().requestPermissionsIfNecessaryForResult(mInputMoreFragment, InputLayoutUI.PERMISSIONS, null);
+            return;
+        }
         if (mChatLayout.getChatInfo().getType() == V2TIMConversation.V2TIM_C2C) {
             List<UserModel> contactList = new ArrayList<>();
             UserModel model = new UserModel();
@@ -512,11 +404,10 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
 
     @Override
     protected void startVideoCall() {
-//        if (!(PermissionUtils.checkPermission(mActivity, Manifest.permission.CAMERA)
-//                && PermissionUtils.checkPermission(mActivity, Manifest.permission.RECORD_AUDIO))) {
-//            SLog.i("startVideoCall checkPermission failed");
-//            return;
-//        }
+        if (!checkPermission(VIDEO_RECORD)) {
+            PermissionsManager.getInstance().requestPermissionsIfNecessaryForResult(mInputMoreFragment, InputLayoutUI.PERMISSIONS, null);
+            return;
+        }
         if (mChatLayout.getChatInfo().getType() == V2TIMConversation.V2TIM_C2C) {
             List<UserModel> contactList = new ArrayList<>();
             UserModel model = new UserModel();
@@ -786,12 +677,42 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
     }
 
     private void showInputMoreLayout() {
-        SLog.i("showInputMoreLayout");
         if (mFragmentManager == null) {
             mFragmentManager = mActivity.getSupportFragmentManager();
         }
         if (mInputMoreFragment == null) {
             mInputMoreFragment = new InputMoreFragment();
+            mInputMoreFragment.setOSSCallback(new IUIKitCallBack() {
+                @Override
+                public void onSuccess(Object data) {
+                    if(data instanceof Uri){
+                        MessageInfo imgInfo = MessageInfoUtil.buildImageMessage((Uri) data,true);
+                        if (mMessageHandler != null) {
+                            mMessageHandler.sendMessage(imgInfo);
+                            hideSoftInput();
+                        }
+                    }else if(data instanceof VideoFile){
+                        VideoFile videoFile = (VideoFile) data;
+                        MessageInfo videoInfo = MessageInfoUtil.buildVideoMessage(videoFile.imagePath,videoFile.filePath,videoFile.firstFrame.getWidth(),videoFile.firstFrame.getHeight(),videoFile.duration);
+                        if (mMessageHandler != null) {
+                            mMessageHandler.sendMessage(videoInfo);
+                            hideSoftInput();
+                        }
+                    }else if(data instanceof CustomFileMessage){
+                        String custom = ObjectMapperFactory.getObjectMapper().model2JsonStr(data);
+                        MessageInfo customInfo = MessageInfoUtil.buildCustomMessage(custom,((CustomFileMessage) data).getFileName());
+                        if (mMessageHandler != null) {
+                            mMessageHandler.sendMessage(customInfo);
+                            hideSoftInput();
+                        }
+                    }
+                }
+
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+
+                }
+            });
         }
 
         assembleActions();
@@ -865,6 +786,41 @@ public class InputLayout extends InputLayoutUI implements View.OnClickListener, 
             }
             if (!TextUtils.equals(mInputContent, mTextInput.getText().toString())) {
                 FaceManager.handlerEmojiText(mTextInput, mTextInput.getText().toString(), true,0,null);
+            }
+        }
+    }
+
+
+    public void setDraft() {
+        if (mChatInfo == null) {
+            return;
+        }
+        if (mTextInput == null) {
+            return;
+        }
+        String conversationIdPrefix = mChatInfo.getType() == V2TIMConversation.V2TIM_C2C ? "c2c_" : "group_";
+        String conversationId = conversationIdPrefix + mChatInfo.getId();
+        final String content = mTextInput.getText().toString();
+        V2TIMManager.getConversationManager().setConversationDraft(conversationId, content, new V2TIMCallback() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onError(int code, String desc) {
+                SLog.e("set drafts error : " + code + " " + desc);
+            }
+        });
+    }
+
+    @Override
+    public void setChatInfo(ChatInfo chatInfo) {
+        super.setChatInfo(chatInfo);
+        if (chatInfo != null) {
+            DraftInfo draftInfo = chatInfo.getDraft();
+            if (draftInfo != null && !TextUtils.isEmpty(draftInfo.getDraftText()) && mTextInput != null) {
+                mTextInput.setText(draftInfo.getDraftText());
+                mTextInput.setSelection(mTextInput.getText().length());
             }
         }
     }

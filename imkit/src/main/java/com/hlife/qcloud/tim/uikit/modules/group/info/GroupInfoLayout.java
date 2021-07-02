@@ -13,9 +13,11 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 
+import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.base.BaseActivity;
 import com.hlife.qcloud.tim.uikit.business.dialog.ConfirmDialog;
 import com.hlife.qcloud.tim.uikit.business.dialog.GroupJoinTypeDialog;
+import com.hlife.qcloud.tim.uikit.business.inter.YzGroupChangeListener;
 import com.hlife.qcloud.tim.uikit.modules.group.interfaces.IGroupMemberLayout;
 import com.hlife.qcloud.tim.uikit.modules.group.member.GroupMemberInfo;
 import com.hlife.qcloud.tim.uikit.modules.group.member.GroupMemberRemindActivity;
@@ -31,6 +33,7 @@ import com.hlife.qcloud.tim.uikit.component.LineControllerView;
 import com.hlife.qcloud.tim.uikit.component.SelectionActivity;
 import com.hlife.qcloud.tim.uikit.component.TitleBarLayout;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
+import com.tencent.imsdk.v2.V2TIMMessage;
 import com.tencent.imsdk.v2.V2TIMValueCallback;
 import com.work.util.SLog;
 import com.work.util.ToastUtil;
@@ -166,20 +169,19 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
                 if(mGroupInfo==null){
                     return;
                 }
-                V2TIMManager.getGroupManager().setReceiveMessageOpt(mGroupInfo.getId(), b ? V2TIMGroupInfo.V2TIM_GROUP_NOT_RECEIVE_MESSAGE : V2TIMGroupInfo.V2TIM_GROUP_RECEIVE_MESSAGE, new V2TIMCallback() {
+                YzIMKitAgent.instance().changeReceiveMessageOpt(mGroupInfo.getId(), b, new YzGroupChangeListener() {
                     @Override
-                    public void onError(int i, String s) {
-                        SLog.e("消息免打扰:" + i + "|desc:" + s);
+                    public void success() {
+                        if(b){
+                            mGroupInfo.setRevOpt(V2TIMMessage.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE);
+                        }else{
+                            mGroupInfo.setRevOpt(V2TIMMessage.V2TIM_RECEIVE_MESSAGE);
+                        }
                     }
 
                     @Override
-                    public void onSuccess() {
-                        SLog.e("消息免打扰设置:"+b);
-                        if(b){
-                            mGroupInfo.setRevOpt(V2TIMGroupInfo.V2TIM_GROUP_NOT_RECEIVE_MESSAGE);
-                        }else{
-                            mGroupInfo.setRevOpt(V2TIMGroupInfo.V2TIM_GROUP_RECEIVE_MESSAGE);
-                        }
+                    public void error(int code, String desc) {
+                        SLog.e("changeReceiveMessageOpt:" + code + "|desc:" + desc);
                     }
                 });
             }
@@ -199,6 +201,7 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
                     @Override
                     public void onError(int code, String desc) {
                         SLog.e("全员禁言:" + code + "|desc:" + desc);
+                        ToastUtil.error(getContext(),desc);
                     }
 
                     @Override
@@ -211,12 +214,17 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
         });
         // 是否置顶
         mTopSwitchView = findViewById(R.id.chat_to_top_switch);
-        mTopSwitchView.setCheckListener(new CompoundButton.OnCheckedChangeListener() {
+        mTopSwitchView.setCheckListener((buttonView, isChecked) -> mPresenter.setTopConversation(isChecked, new IUIKitCallBack() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mPresenter.setTopConversation(isChecked);
+            public void onSuccess(Object data) {
+
             }
-        });
+
+            @Override
+            public void onError(String module, int errCode, String errMsg) {
+                buttonView.setChecked(false);
+            }
+        }));
         // 退群
         mDissolveBtn = findViewById(R.id.group_dissolve_button);
         mDissolveBtn.setOnClickListener(this);
@@ -236,6 +244,10 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
                 mMemberPreviewListener.forwardListMember(mGroupInfo);
             }
         } else if (v.getId() == R.id.group_name) {
+            if(!mGroupInfo.isOwner() && !mGroupInfo.isRole()){
+                ToastUtil.info(getContext(),"您没有权限修改");
+                return;
+            }
             Bundle bundle = new Bundle();
             bundle.putString(IMKitConstants.Selection.TITLE, getResources().getString(R.string.modify_group_name));
             bundle.putString(IMKitConstants.Selection.INIT_CONTENT, mGroupNameView.getContent());
@@ -265,7 +277,7 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
                 }
             });
         } else if (v.getId() == R.id.group_notice) {
-            if(!mGroupInfo.isOwner()){
+            if(!mGroupInfo.isOwner() && !mGroupInfo.isRole()){
                 if(!TextUtils.isEmpty(mGroupNotice.getContent())){
                     new ConfirmDialog().setContent(mGroupNotice.getContent())
                             .setHiddenCancel(true)
@@ -376,24 +388,32 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
         mNickView.setContent(mPresenter.getNickName());
         mMutedSwitchView.setChecked(mGroupInfo.isMuted());
         mTopSwitchView.setChecked(mGroupInfo.isTopChat());
-        mRevOptView.setChecked(mGroupInfo.getRevOpt()==V2TIMGroupInfo.V2TIM_GROUP_NOT_RECEIVE_MESSAGE);
+        mRevOptView.setChecked(mGroupInfo.isRevOpt());
         mDissolveBtn.setText(R.string.dissolve);
-        if (mGroupInfo.isOwner()) {
 //            mJoinTypeView.setVisibility(VISIBLE);
-            if (mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_WORK)
-                    || mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_PRIVATE)) {
-                mDissolveBtn.setText(R.string.dissolve);
-                mMutedSwitchView.setVisibility(GONE);
-            }else if(mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_PUBLIC)){
-                mMemberAdminView.setVisibility(VISIBLE);
-                memberAdminList.setVisibility(VISIBLE);
-                loadAdmin();
+        if (mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_WORK)
+                || mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_PRIVATE)) {
+            mDissolveBtn.setText(R.string.dissolve);
+            mMutedSwitchView.setVisibility(GONE);
+            if(!mGroupInfo.isOwner()){
+                mOwnerLayout.setVisibility(GONE);
+                mDissolveBtn.setText(R.string.exit_group);
             }
-        } else {
-            mOwnerLayout.setVisibility(GONE);
-//            mJoinTypeView.setVisibility(GONE);
-            mDissolveBtn.setText(R.string.exit_group);
+        }else if(mGroupInfo.getGroupType().equals(IMKitConstants.GroupType.TYPE_PUBLIC)){
+            mMemberAdminView.setVisibility(VISIBLE);
+            memberAdminList.setVisibility(VISIBLE);
+            if(!mGroupInfo.isRole() && !mGroupInfo.isOwner()){
+                mMutedSwitchView.setVisibility(GONE);
+            }
+            if(!mGroupInfo.isOwner()){
+                mOwnerLayout.setVisibility(GONE);
+                mDissolveBtn.setText(R.string.exit_group);
+            }
+            loadAdmin();
         }
+
+//            mJoinTypeView.setVisibility(GONE);
+
     }
 
     public void loadAdmin(){
@@ -479,6 +499,7 @@ public class GroupInfoLayout extends LinearLayout implements IGroupMemberLayout,
                             @Override
                             public void onError(int i, String s) {
                                 SLog.e(i+">>"+s);
+                                ToastUtil.error(getContext(),"不能设置群主为管理员或权限不足");
                             }
 
                             @Override

@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
+import com.hlife.qcloud.tim.uikit.business.active.IMSearchMainActivity;
 import com.yzcm.library.adapter.mm.BaseQuickAdapter;
 import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
@@ -34,6 +35,7 @@ public class ConversationLayout extends RelativeLayout implements IConversationL
     private ConversationListLayout mConversationList;
     private NoticeLayout mNoticeLayout;
     private MorePopWindow mMenu;
+    private View mSearchLayout;
 
     public ConversationLayout(Context context) {
         super(context);
@@ -56,58 +58,53 @@ public class ConversationLayout extends RelativeLayout implements IConversationL
     private void init() {
         inflate(getContext(), R.layout.conversation_layout, this);
         EditText mSearch = findViewById(R.id.search);
-        mSearch.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SearchAddMoreActivity.startSearchMore(getContext(),1);
-            }
-        });
+        mSearch.setOnClickListener(view -> getContext().startActivity(new Intent(getContext(), IMSearchMainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)));
+        mSearchLayout = findViewById(R.id.search_layout);
         mConversationList = findViewById(R.id.conversation_list);
         mNoticeLayout = findViewById(R.id.chat_group_apply_layout);
-        mNoticeLayout.setOnNoticeClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getContext().startActivity(new Intent(getContext(), GroupApplyManagerActivity.class));
-            }
-        });
+        mNoticeLayout.setOnNoticeClickListener(view -> getContext().startActivity(new Intent(getContext(), GroupApplyManagerActivity.class)));
     }
     private IConversationAdapter adapter;
-    public void initDefault(YzChatType type) {
+
+    public void setShowSearchLayout(boolean showSearchLayout) {
+        if(mSearchLayout!=null){
+            mSearchLayout.setVisibility(showSearchLayout?VISIBLE:GONE);
+        }
+    }
+
+    public void initDefault(YzChatType type, IUIKitCallBack callBack) {
         final View mAddMore = findViewById(R.id.add_more);
         int functionPrem = YzIMKitAgent.instance().getFunctionPrem();
         if((functionPrem & 2)>0){
             mAddMore.setVisibility(VISIBLE);
-            mAddMore.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(mMenu==null){
-                        List<String> item = new ArrayList<>();
-                        item.add(getContext().getResources().getString(R.string.add_friend));
-                        item.add(getContext().getResources().getString(R.string.add_group));
-                        item.add(getContext().getResources().getString(R.string.scan_qr_code));
-                        mMenu = new MorePopWindow(getContext(),item , new BaseQuickAdapter.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                                mMenu.dismiss();
-                                switch (position){
-                                    case 0:
-                                        getContext().startActivity(new Intent(getContext(), SearchAddMoreActivity.class));
-                                        break;
-                                    case 1:
-                                        Intent intent = new Intent(getContext(), StartGroupChatActivity.class);
-                                        intent.putExtra(IMKitConstants.GroupType.TYPE, IMKitConstants.GroupType.PUBLIC);
-                                        getContext().startActivity(intent);
-                                        break;
-                                    case 2:
-                                        getContext().startActivity(new Intent(getContext(), ScanIMQRCodeActivity.class));
-                                        break;
-                                }
+            mAddMore.setOnClickListener(view -> {
+                if(mMenu==null){
+                    List<String> item = new ArrayList<>();
+                    item.add(getContext().getResources().getString(R.string.add_friend));
+                    item.add(getContext().getResources().getString(R.string.add_group));
+                    item.add(getContext().getResources().getString(R.string.scan_qr_code));
+                    mMenu = new MorePopWindow(getContext(),item , new BaseQuickAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                            mMenu.dismiss();
+                            switch (position){
+                                case 0:
+                                    getContext().startActivity(new Intent(getContext(), SearchAddMoreActivity.class));
+                                    break;
+                                case 1:
+                                    Intent intent = new Intent(getContext(), StartGroupChatActivity.class);
+                                    intent.putExtra(IMKitConstants.GroupType.TYPE, IMKitConstants.GroupType.PUBLIC);
+                                    getContext().startActivity(intent);
+                                    break;
+                                case 2:
+                                    getContext().startActivity(new Intent(getContext(), ScanIMQRCodeActivity.class));
+                                    break;
                             }
-                        });
-                    }
-                    mMenu.showPopupWindow(mAddMore);
-
+                        }
+                    });
                 }
+                mMenu.showPopupWindow(mAddMore);
+
             });
         }else{
             mAddMore.setVisibility(GONE);
@@ -119,7 +116,11 @@ public class ConversationLayout extends RelativeLayout implements IConversationL
         ConversationManagerKit.getInstance().loadConversation(type,new IUIKitCallBack() {
             @Override
             public void onSuccess(Object data) {
+//                SLog.e("loadConversation type:"+type+">"+((ConversationProvider) data).getDataSource().size());
                 adapter.setDataProvider((ConversationProvider) data);
+                if(callBack!=null){
+                    callBack.onSuccess(null);
+                }
             }
 
             @Override
@@ -164,12 +165,16 @@ public class ConversationLayout extends RelativeLayout implements IConversationL
     }
 
     @Override
-    public void setConversationTop(int position, ConversationInfo conversation) {
-        ConversationManagerKit.getInstance().setConversationTop(position, conversation);
+    public void setConversationTop(ConversationInfo conversation, IUIKitCallBack callBack) {
+        ConversationManagerKit.getInstance().setConversationTop(conversation, callBack);
     }
 
     @Override
     public void deleteConversation(int position, ConversationInfo conversation) {
         ConversationManagerKit.getInstance().deleteConversation(position, conversation);
+    }
+    @Override
+    public void clearConversationMessage(int position, ConversationInfo conversation) {
+        ConversationManagerKit.getInstance().clearConversationMessage(position, conversation);
     }
 }

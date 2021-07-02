@@ -20,11 +20,15 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.hlife.qcloud.tim.uikit.R;
+import com.hlife.qcloud.tim.uikit.TUIKit;
+import com.hlife.qcloud.tim.uikit.TUIKitImpl;
 import com.hlife.qcloud.tim.uikit.base.BaseActivity;
+import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.business.dialog.ConfirmDialog;
 import com.hlife.qcloud.tim.uikit.business.message.CustomFileMessage;
 import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
 import com.hlife.qcloud.tim.uikit.business.modal.VideoFile;
+import com.hlife.qcloud.tim.uikit.component.video.VideoViewActivity;
 import com.hlife.qcloud.tim.uikit.utils.FileUtil;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 import com.hlife.qcloud.tim.uikit.utils.OSSHelper;
@@ -32,9 +36,12 @@ import com.work.util.ToastUtil;
 
 import java.io.File;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 public class OSSFileActivity extends BaseActivity {
 
     private final static String UPLOAD_FILE="UPLOAD_FILE";
+    public static IUIKitCallBack mCallback;
     private ImageView fileIconImage;
     private TextView mName;
     private TextView mSize;
@@ -86,7 +93,16 @@ public class OSSFileActivity extends BaseActivity {
                     mOpenBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            X5FileOpenActivity.openX5File(OSSFileActivity.this,filePath,customFileMessage.getFileName());
+                            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(filePath);
+                            String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+                            if(mimeType!=null && mimeType.contains("video")){//是视频
+                                Intent intent = new Intent(TUIKit.getAppContext(), VideoViewActivity.class);
+                                intent.putExtra(IMKitConstants.CAMERA_VIDEO_PATH, Uri.parse(filePath));
+                                intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
+                                TUIKit.getAppContext().startActivity(intent);
+                            }else{
+                                X5FileOpenActivity.openX5File(OSSFileActivity.this,filePath,customFileMessage.getFileName());
+                            }
                         }
                     });
                 }
@@ -115,6 +131,7 @@ public class OSSFileActivity extends BaseActivity {
         if(mOSS!=null){
             mOSS.cancel();
         }
+        mCallback = null;
     }
 
     @Override
@@ -138,37 +155,48 @@ public class OSSFileActivity extends BaseActivity {
             Uri fileUri = uris[0];
             String filePath = FileUtil.getPathFromUri(fileUri);
             File file = new File(filePath);
+            long fileLength = file.length();
             if (file.exists()) {
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inJustDecodeBounds = true;
-                BitmapFactory.decodeFile(filePath,options);
-                if(options.outWidth != -1){//是图片
-                    return fileUri;
+                if(fileLength>20 * 1024 * 1024){//大于20m走oss
+                    CustomFileMessage customFileMessage = new CustomFileMessage();
+                    customFileMessage.setFileName(file.getName());
+                    customFileMessage.setFilePath(filePath);
+                    customFileMessage.setFileSize(fileLength);
+                    customFileMessage.setSendUserId(UserApi.instance().getUserId());
+                    return customFileMessage;
+                }else{
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inJustDecodeBounds = true;
+                    BitmapFactory.decodeFile(filePath,options);
+                    if(options.outWidth != -1){//是图片
+                        return fileUri;
+                    }
+                    String fileExtension = MimeTypeMap.getFileExtensionFromUrl(filePath);
+                    String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+                    if(mimeType!=null && mimeType.contains("video")){//是视频
+                        Bitmap firstFrame = ThumbnailUtils.createVideoThumbnail(filePath, MediaStore.Video.Thumbnails.MINI_KIND);
+                        String imagePath = FileUtil.saveBitmap("JCamera", firstFrame);
+                        long duration = 0;
+                        try {
+                            MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+                            mediaMetadataRetriever.setDataSource(filePath);
+                            duration = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+                        }catch (Exception ignore){}
+                        VideoFile videoFile = new VideoFile();
+                        videoFile.imagePath = imagePath;
+                        videoFile.filePath = filePath;
+                        videoFile.firstFrame = firstFrame;
+                        videoFile.duration = duration;
+                        return videoFile;
+                    }else{
+                        CustomFileMessage customFileMessage = new CustomFileMessage();
+                        customFileMessage.setFileName(file.getName());
+                        customFileMessage.setFilePath(filePath);
+                        customFileMessage.setFileSize(fileLength);
+                        customFileMessage.setSendUserId(UserApi.instance().getUserId());
+                        return customFileMessage;
+                    }
                 }
-                String fileExtension = MimeTypeMap.getFileExtensionFromUrl(filePath);
-                String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
-                if(mimeType!=null && mimeType.contains("video")){//是视频
-                    Bitmap firstFrame = ThumbnailUtils.createVideoThumbnail(filePath, MediaStore.Video.Thumbnails.MINI_KIND);
-                    String imagePath = FileUtil.saveBitmap("JCamera", firstFrame);
-                    long duration = 0;
-                    try {
-                        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-                        mediaMetadataRetriever.setDataSource(filePath);
-                        duration = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
-                    }catch (Exception ignore){}
-                    VideoFile videoFile = new VideoFile();
-                    videoFile.imagePath = imagePath;
-                    videoFile.filePath = filePath;
-                    videoFile.firstFrame = firstFrame;
-                    videoFile.duration = duration;
-                    return videoFile;
-                }
-                CustomFileMessage customFileMessage = new CustomFileMessage();
-                customFileMessage.setFileName(file.getName());
-                customFileMessage.setFilePath(filePath);
-                customFileMessage.setFileSize(file.length());
-                customFileMessage.setSendUserId(UserApi.instance().getUserId());
-                return customFileMessage;
             }
             return null;
         }
@@ -183,11 +211,17 @@ public class OSSFileActivity extends BaseActivity {
                     bundle.putParcelable(OSSFileActivity.class.getSimpleName(),(Uri)o);
                     intent.putExtras(bundle);
                     setResult(200,intent);
+                    if(mCallback!=null){
+                        mCallback.onSuccess(o);
+                    }
                     finish();
                 }else if(o instanceof VideoFile){
-                    bundle.putSerializable(OSSFileActivity.class.getSimpleName(),(VideoFile)o);
+                    bundle.putParcelable(OSSFileActivity.class.getSimpleName(),(VideoFile)o);
                     intent.putExtras(bundle);
                     setResult(200,intent);
+                    if(mCallback!=null){
+                        mCallback.onSuccess(o);
+                    }
                     finish();
                 }else if(o instanceof CustomFileMessage){
                     CustomFileMessage customFileMessage = (CustomFileMessage) o;
@@ -218,6 +252,9 @@ public class OSSFileActivity extends BaseActivity {
                             bundle.putSerializable(OSSFileActivity.class.getSimpleName(),customFileMessage);
                             intent.putExtras(bundle);
                             setResult(200,intent);
+                            if(mCallback!=null){
+                                mCallback.onSuccess(o);
+                            }
                             finish();
                         }
 
@@ -247,6 +284,7 @@ public class OSSFileActivity extends BaseActivity {
         intent.putExtra(UPLOAD_FILE,true);
         intent.putExtra(OSSFileActivity.class.getSimpleName(),uri);
         fragment.startActivityForResult(intent,requestCode);
+        OSSFileActivity.mCallback = null;
     }
     public static void downloadFile(Context context,CustomFileMessage customFileMessage){
         Intent intent = new Intent(context,OSSFileActivity.class);
@@ -254,5 +292,13 @@ public class OSSFileActivity extends BaseActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(OSSFileActivity.class.getSimpleName(),customFileMessage);
         context.startActivity(intent);
+        OSSFileActivity.mCallback = null;
+    }
+    public static void uploadFileSDK(Uri uri, IUIKitCallBack callBack){
+        Intent intent = new Intent(TUIKitImpl.getAppContext(),OSSFileActivity.class);
+        intent.putExtra(UPLOAD_FILE,true);
+        intent.putExtra(OSSFileActivity.class.getSimpleName(),uri);
+        TUIKitImpl.getAppContext().startActivity(intent);
+        OSSFileActivity.mCallback = callBack;
     }
 }

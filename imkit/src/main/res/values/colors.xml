@@ -5,7 +5,7 @@
     <color name="conversation_top_color">#F2F2F2</color>
     <color name="navigation_bar_color">#F7F7F7</color>
     <color name="slide_bar_hint_color">#CCCCCC</color>
-    <color name="chat_background_color">#F4F4F4</color>
+    <color name="chat_background_color">#c7f6f9ff</color>
 
     <!-- 黑色字体-->
     <color name="black_font_color">#000000</color>

@@ -9,12 +9,14 @@ import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.hlife.qcloud.tim.uikit.base.TUIKitListenerManager;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.AbsChatLayout;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
 import com.hlife.qcloud.tim.uikit.modules.group.apply.GroupApplyInfo;
 import com.hlife.qcloud.tim.uikit.modules.group.apply.GroupApplyManagerActivity;
 import com.hlife.qcloud.tim.uikit.modules.group.info.GroupInfo;
 import com.hlife.qcloud.tim.uikit.modules.group.info.GroupInfoActivity;
+import com.hlife.qcloud.tim.uikit.utils.TUIKitConstants;
 import com.tencent.imsdk.v2.V2TIMConversation;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
@@ -62,7 +64,8 @@ public class ChatLayout extends AbsChatLayout implements GroupChatManagerKit.Gro
             groupInfo.setChatName(chatInfo.getChatName());
             mGroupChatManager.setCurrentChatInfo(groupInfo);
             mGroupInfo = groupInfo;
-            loadChatMessages(null);
+            loadChatMessages(chatInfo.getLocateTimMessage(), chatInfo.getLocateTimMessage() == null ? TUIKitConstants.GET_MESSAGE_FORWARD : TUIKitConstants.GET_MESSAGE_TWO_WAY);
+            getConversationLastMessage("group_" + chatInfo.getId());
             getTitleBar().getRightIcon().setImageResource(R.drawable.icon_more);
             getTitleBar().setOnRightClickListener(new View.OnClickListener() {
                 @Override
@@ -85,12 +88,15 @@ public class ChatLayout extends AbsChatLayout implements GroupChatManagerKit.Gro
                 }
             });
             SharedUtils.removeData(groupInfo.getId());
+            TUIKitListenerManager.getInstance().setMessageSender(mGroupChatManager);
         } else {
             getTitleBar().getRightIcon().setImageResource(R.drawable.icon_more);
             mC2CChatManager = C2CChatManagerKit.getInstance();
             mC2CChatManager.setCurrentChatInfo(chatInfo);
             mC2CChatManager.setChat2C2Handler(this);
-            loadChatMessages(null);
+            loadChatMessages(chatInfo.getLocateTimMessage(), chatInfo.getLocateTimMessage() == null ? TUIKitConstants.GET_MESSAGE_FORWARD : TUIKitConstants.GET_MESSAGE_TWO_WAY);
+            getConversationLastMessage("c2c_" + chatInfo.getId());
+            TUIKitListenerManager.getInstance().setMessageSender(mC2CChatManager);
         }
     }
 
@@ -121,7 +127,7 @@ public class ChatLayout extends AbsChatLayout implements GroupChatManagerKit.Gro
 
             @Override
             public void onError(String module, int errCode, String errMsg) {
-                ToastUtil.error(getContext(),"loadApplyList onError: " +errCode + ">" + errMsg);
+//                ToastUtil.error(getContext(),"loadApplyList onError: " +errCode + ">" + errMsg);
             }
         });
     }

@@ -1,7 +1,9 @@
 package com.hlife.qcloud.tim.uikit.modules.chat.base;
 
+import com.hlife.qcloud.tim.uikit.modules.conversation.base.DraftInfo;
 import com.tencent.imsdk.v2.V2TIMConversation;
 import com.tencent.imsdk.v2.V2TIMGroupAtInfo;
+import com.tencent.imsdk.v2.V2TIMMessage;
 
 import java.io.Serializable;
 import java.util.List;
@@ -15,12 +17,43 @@ public class ChatInfo implements Serializable {
     private int type = V2TIMConversation.V2TIM_C2C;
     private boolean isGroup;
     private String id;
+    private String groupType;
     private boolean isTopChat;
+    private V2TIMMessage mLocateTimMessage;
     private List<V2TIMGroupAtInfo> atInfoList;
     private boolean showAddGroup;
 
+    /**
+     * 草稿
+     */
+    private DraftInfo draft;
+
     public ChatInfo() {
 
+    }
+
+    public DraftInfo getDraft() {
+        return draft;
+    }
+
+    public void setDraft(DraftInfo draft) {
+        this.draft = draft;
+    }
+
+    public void setGroupType(String groupType) {
+        this.groupType = groupType;
+    }
+
+    public String getGroupType() {
+        return groupType;
+    }
+
+    public void setLocateTimMessage(V2TIMMessage mLocateTimMessage) {
+        this.mLocateTimMessage = mLocateTimMessage;
+    }
+
+    public V2TIMMessage getLocateTimMessage() {
+        return mLocateTimMessage;
     }
 
     /**
@@ -57,6 +90,7 @@ public class ChatInfo implements Serializable {
      */
     public void setType(int type) {
         this.type = type;
+        this.isGroup = type == V2TIMConversation.V2TIM_GROUP;
     }
 
     /**

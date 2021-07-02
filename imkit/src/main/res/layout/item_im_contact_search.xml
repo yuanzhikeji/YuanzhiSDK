@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#FFFFFF"
+    android:paddingTop="12dp"
+    android:paddingLeft="14.85dp"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/conversation_avatar_height" >
+
+        <com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationIconView
+            android:id="@+id/ivAvatar"
+            android:layout_width="@dimen/conversation_avatar_width"
+            android:layout_height="@dimen/conversation_avatar_height" />
+
+        <RelativeLayout
+            android:layout_toEndOf="@id/ivAvatar"
+            android:layout_width="match_parent"
+            android:paddingTop="2dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="18.11dp"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/conversation_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textColor="@color/black_font_color"
+                android:text="@string/app_name"
+                android:textSize="16sp" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:layout_alignParentEnd="true"/>
+            <TextView
+                android:id="@+id/conversation_sub_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="48dp"
+                android:layout_marginBottom="2dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="@string/app_name"
+                android:textColor="@color/list_bottom_text_bg"
+                android:textSize="12sp" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/view_line"
+        android:layout_marginTop="12dp"
+        android:layout_marginLeft="60dp"
+        android:layout_width="match_parent"
+        android:layout_height="0.3dp"
+        android:background="@color/split_lint_color" />
+
+</LinearLayout>

@@ -3,8 +3,10 @@ package com.hlife.qcloud.tim.uikit.modules.group.info;
 import com.hlife.qcloud.tim.uikit.modules.group.member.GroupMemberInfo;
 import com.tencent.imsdk.v2.V2TIMConversation;
 import com.tencent.imsdk.v2.V2TIMGroupInfoResult;
+import com.tencent.imsdk.v2.V2TIMGroupMemberFullInfo;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
+import com.tencent.imsdk.v2.V2TIMMessage;
 import com.work.util.SLog;
 
 import java.util.List;
@@ -20,6 +22,7 @@ public class GroupInfo extends ChatInfo {
     private List<GroupMemberInfo> memberAdminDetails;
     private int joinType;
     private String owner;
+    private int role;
     private boolean isMuted;
     private int revOpt;
 
@@ -164,6 +167,14 @@ public class GroupInfo extends ChatInfo {
         this.owner = owner;
     }
 
+    public void setRole(int role) {
+        this.role = role;
+    }
+
+    public boolean isRole(){
+        return this.role == V2TIMGroupMemberFullInfo.V2TIM_GROUP_MEMBER_ROLE_ADMIN;
+    }
+
     public void setMuted(boolean muted) {
         isMuted = muted;
     }
@@ -174,6 +185,10 @@ public class GroupInfo extends ChatInfo {
 
     public int getRevOpt() {
         return revOpt;
+    }
+
+    public boolean isRevOpt(){
+        return revOpt == V2TIMMessage.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE;
     }
 
     public void setRevOpt(int revOpt) {
@@ -187,10 +202,10 @@ public class GroupInfo extends ChatInfo {
      * @return
      */
     public GroupInfo covertTIMGroupDetailInfo(V2TIMGroupInfoResult infoResult) {
-        SLog.e("infoResult.getResultCode():"+infoResult.getResultCode());
         if (infoResult.getResultCode() != 0) {
             return this;
         }
+        if(SLog.debug)SLog.i("getGroupID():"+infoResult.getGroupInfo().getGroupID());
         setChatName(infoResult.getGroupInfo().getGroupName());
         setGroupName(infoResult.getGroupInfo().getGroupName());
         setId(infoResult.getGroupInfo().getGroupID());
@@ -198,6 +213,7 @@ public class GroupInfo extends ChatInfo {
         setMemberCount(infoResult.getGroupInfo().getMemberCount());
         setGroupType(infoResult.getGroupInfo().getGroupType());
         setOwner(infoResult.getGroupInfo().getOwner());
+        setRole(infoResult.getGroupInfo().getRole());
         setJoinType(infoResult.getGroupInfo().getGroupAddOpt());
         setMuted(infoResult.getGroupInfo().isAllMuted());
         setRevOpt(infoResult.getGroupInfo().getRecvOpt());

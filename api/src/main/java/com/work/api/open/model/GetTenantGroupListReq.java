@@ -2,7 +2,7 @@ package com.work.api.open.model;
 
 public class GetTenantGroupListReq extends BaseReq{
     private int pageNo=1;
-    private int pageSize = 20;
+    private int pageSize = 1000;
 
     public int getPageNo() {
         return pageNo;

@@ -173,6 +173,11 @@
             android:theme="@style/Theme.AppCompat.Slider"/>
         <activity android:name=".business.active.OSSFileActivity"
             android:theme="@style/Theme.AppCompat.Slider"/>
+        <activity android:name=".business.active.IMSearchMainActivity"
+            android:theme="@style/Theme.AppCompat.Slider"
+            android:windowSoftInputMode="stateAlwaysVisible"/>
+        <activity android:name=".business.active.IMSearchMoreMsgListActivity"
+            android:theme="@style/Theme.AppCompat.Slider"/>
         <provider
             android:name="com.hlife.qcloud.tim.uikit.utils.TUIKitFileProvider"
             android:authorities="${applicationId}.uikit.fileprovider"

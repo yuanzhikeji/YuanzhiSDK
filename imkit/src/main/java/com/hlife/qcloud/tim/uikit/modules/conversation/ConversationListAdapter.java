@@ -22,9 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConversationListAdapter extends IConversationAdapter {
-
+    public static int mItemAvatarRadius = ScreenUtil.getPxByDp(50);
     private boolean mHasShowUnreadDot = true;
-    private int mItemAvatarRadius = ScreenUtil.getPxByDp(50);
     private int mTopTextSize;
     private int mBottomTextSize;
     private int mDateTextSize;
@@ -87,20 +86,12 @@ public class ConversationListAdapter extends IConversationAdapter {
 
         } else {//设置点击和长按事件
             if (mOnItemClickListener != null) {
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        mOnItemClickListener.onItemClick(view, position, conversationInfo);
-                    }
-                });
+                holder.itemView.setOnClickListener(view -> mOnItemClickListener.onItemClick(view, position, conversationInfo));
             }
             if (mOnItemLongClickListener != null) {
-                holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View view) {
-                        mOnItemLongClickListener.OnItemLongClick(view, position, conversationInfo);
-                        return true;
-                    }
+                holder.itemView.setOnLongClickListener(view -> {
+                    mOnItemLongClickListener.OnItemLongClick(view, position, conversationInfo);
+                    return true;
                 });
             }
         }

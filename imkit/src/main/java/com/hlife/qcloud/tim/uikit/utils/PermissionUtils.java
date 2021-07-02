@@ -13,8 +13,6 @@ import androidx.core.app.ActivityCompat;
 
 public class PermissionUtils {
 
-    private static final String TAG = PermissionUtils.class.getSimpleName();
-
     private static AlertDialog mPermissionDialog;
 
     public static boolean checkPermission(Context context, String permission) {
@@ -22,7 +20,7 @@ public class PermissionUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int result = ActivityCompat.checkSelfPermission(context, permission);
             if (PackageManager.PERMISSION_GRANTED != result) {
-                showPermissionDialog(context);
+//                showPermissionDialog(context);
                 flag = false;
             }
         }
