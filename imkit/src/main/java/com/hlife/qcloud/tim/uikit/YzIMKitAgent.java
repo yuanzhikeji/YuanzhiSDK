@@ -218,36 +218,33 @@ public final class YzIMKitAgent {
     }
 
     public void register(final SysUserReq userReq, final YzStatusListener listener) {
-        Yz.getSession().sysUser(userReq, new OnResultDataListener() {
-            @Override
-            public void onResult(RequestWork req, ResponseWork resp) {
-                if(resp instanceof LoginResp){
-                    if(resp.isSuccess()){
-                        OpenData data = ((LoginResp) resp).getData();
-                        String userId = data.getUserId();
-                        String userSign = data.getUserSign();
-                        String token = ((LoginResp) resp).getToken();
-                        UserApi userApi = UserApi.instance();
-                        userApi.setUserId(userId);
-                        userApi.setUserSign(userSign);
-                        userApi.setNickName(userReq.getNickName());
-                        userApi.setUserIcon(userReq.getUserIcon());
-                        userApi.setMobile(userReq.getMobile());
-                        userApi.setPosition(userReq.getPosition());
-                        userApi.setDepartmentId(userReq.getDepartmentId());
-                        userApi.setDepartName(userReq.getDepartName());
-                        userApi.setCard(userReq.getCard());
-                        userApi.setEmail(userReq.getEmail());
-                        userApi.setToken(token);
-                        userApi.setCity(userReq.getCity());
-                        userApi.setGender(userReq.getGender());
-                        userApi.setUserSignature(userReq.getUserSignature());
-                        loginIM(listener);
-                        functionPrem = data.getFunctionPerm();
-                    }else{
-                        if(listener!=null){
-                            listener.loginFail("sysUser",((LoginResp) resp).getCode(),resp.getMessage());
-                        }
+        Yz.getSession().sysUser(userReq, (req, resp) -> {
+            if(resp instanceof LoginResp){
+                if(resp.isSuccess()){
+                    OpenData data = ((LoginResp) resp).getData();
+                    String userId = data.getUserId();
+                    String userSign = data.getUserSign();
+                    String token = ((LoginResp) resp).getToken();
+                    UserApi userApi = UserApi.instance();
+                    userApi.setUserId(userId);
+                    userApi.setUserSign(userSign);
+                    userApi.setNickName(userReq.getNickName());
+                    userApi.setUserIcon(userReq.getUserIcon());
+                    userApi.setMobile(userReq.getMobile());
+                    userApi.setPosition(userReq.getPosition());
+                    userApi.setDepartmentId(userReq.getDepartmentId());
+                    userApi.setDepartName(userReq.getDepartName());
+                    userApi.setCard(userReq.getCard());
+                    userApi.setEmail(userReq.getEmail());
+                    userApi.setToken(token);
+                    userApi.setCity(userReq.getCity());
+                    userApi.setGender(userReq.getGender());
+                    userApi.setUserSignature(userReq.getUserSignature());
+                    loginIM(listener);
+                    functionPrem = data.getFunctionPerm();
+                }else{
+                    if(listener!=null){
+                        listener.loginFail("sysUser",((LoginResp) resp).getCode(),resp.getMessage());
                     }
                 }
             }
@@ -296,8 +293,8 @@ public final class YzIMKitAgent {
         if(chatInfo==null){
             return;
         }
+        MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage,desc);
         if(chatInfo.isGroup()){
-            MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage,desc);
             groupChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
                 @Override
                 public void onSuccess(Object data) {
@@ -314,7 +311,6 @@ public final class YzIMKitAgent {
                 }
             });
         }else{
-            MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage,customMessage);
             c2CChatManagerKit(chatInfo).sendMessage(info, false, new IUIKitCallBack() {
                 @Override
                 public void onSuccess(Object data) {
@@ -333,42 +329,13 @@ public final class YzIMKitAgent {
         }
     }
     public void sendCustomMessage(String customMessage, YzMessageSendCallback callback){
-        MessageInfo info = MessageInfoUtil.buildCustomMessage(customMessage,customMessage);
         C2CChatManagerKit c2CChatManagerKit = C2CChatManagerKit.getInstance();
         if(c2CChatManagerKit.getCurrentChatInfo()!=null){
-            c2CChatManagerKit.sendMessage(info, false, new IUIKitCallBack() {
-                @Override
-                public void onSuccess(Object data) {
-                    if(callback!=null){
-                        callback.success();
-                    }
-                }
-
-                @Override
-                public void onError(String module, int errCode, String errMsg) {
-                    if(callback!=null){
-                        callback.error(errCode,errMsg);
-                    }
-                }
-            });
+            this.sendCustomMessage(c2CChatManagerKit.getCurrentChatInfo(),customMessage,callback);
         }else{
             GroupChatManagerKit groupChatManagerKit = GroupChatManagerKit.getInstance();
             if(groupChatManagerKit.getCurrentChatInfo()!=null){
-                groupChatManagerKit.sendMessage(info,false,new IUIKitCallBack() {
-                    @Override
-                    public void onSuccess(Object data) {
-                        if(callback!=null){
-                            callback.success();
-                        }
-                    }
-
-                    @Override
-                    public void onError(String module, int errCode, String errMsg) {
-                        if(callback!=null){
-                            callback.error(errCode,errMsg);
-                        }
-                    }
-                });
+                this.sendCustomMessage(groupChatManagerKit.getCurrentChatInfo(),customMessage,callback);
             }
         }
     }

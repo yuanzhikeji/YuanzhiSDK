@@ -189,6 +189,7 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
 
     protected void onReceiveMessage(final V2TIMMessage msg) {
         if (!safetyCall()) {
+            SLog.e("onReceiveMessage safetyCall");
             return;
         }
         addMessage(msg);
@@ -198,6 +199,7 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
 
     protected void addMessage(V2TIMMessage msg) {
         if (!safetyCall()) {
+            SLog.e("addMessage safetyCall");
             return;
         }
         final MessageInfo messageInfo = MessageInfoUtil.TIMMessage2MessageInfo(msg);
@@ -224,7 +226,8 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
             } else {
                 return;
             }
-            mCurrentProvider.addMessageInfo(messageInfo);
+            boolean add = mCurrentProvider.addMessageInfo(messageInfo);
+            SLog.i("add message:"+add);
             if (isChatFragmentShow()) {
                 messageInfo.setRead(true);
             }
@@ -237,6 +240,8 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
                     limitReadReport(userID, null);
                 }
             }
+        }else{
+            SLog.e("messageInfo is null");
         }
     }
 
