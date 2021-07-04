@@ -35,16 +35,19 @@
             android:id="@+id/mobile"
             android:layout_marginTop="44dp"
             android:hint="mobile"
+            android:text="18500000001"
             style="@style/EditorStyle"/>
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/password"
             android:layout_marginTop="@dimen/dp_16"
             android:hint="username"
+            android:text="test2test2"
             style="@style/EditorStyle"/>
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/phone"
             style="@style/EditorStyle"
             android:layout_marginTop="@dimen/dp_16"
+            android:text="1850000000054892407893891"
             android:hint="userid"/>
         <RelativeLayout
             android:visibility="gone"
