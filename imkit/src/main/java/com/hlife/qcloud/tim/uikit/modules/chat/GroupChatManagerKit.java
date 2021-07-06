@@ -205,7 +205,6 @@ public class GroupChatManagerKit extends ChatManagerKit {
     @Override
     public void setCurrentChatInfo(ChatInfo info) {
         super.setCurrentChatInfo(info);
-
         mCurrentChatInfo = (GroupInfo) info;
         mCurrentApplies.clear();
         mCurrentGroupMembers.clear();

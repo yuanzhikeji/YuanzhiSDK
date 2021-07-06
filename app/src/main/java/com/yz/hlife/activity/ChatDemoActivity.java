@@ -51,19 +51,23 @@ public class ChatDemoActivity extends BaseActivity implements ConversationListLa
             View sendCustom = findViewById(R.id.send_custom);
             sendCustom.setVisibility(View.VISIBLE);
             sendCustom.setOnClickListener(view -> {
-                    CustomMessage message = new CustomMessage();
-                    message.setBusinessID(IMKitConstants.BUSINESS_ID_CUSTOM_CARD);
-                    message.setLogo("https://yzkj-im.oss-cn-beijing.aliyuncs.com/user/16037885020911603788500745.png");
-                    message.setDesc("欢迎加入元讯大家庭！欢迎加入元讯大家庭！欢迎加入元讯大家庭！欢迎加入元讯大家庭！");
-                    message.setTitle("元讯IM生态工具元讯IM生态工具元讯IM生态工具元讯IM生态工具元讯IM生态工具");
-                    message.setLink("http://yzmsri.com/");
-                    message.setBusinessID(IMKitConstants.BUSINESS_ID_CUSTOM_CARD);
+//                    CustomMessage message = new CustomMessage();
+//                    message.setBusinessID(IMKitConstants.BUSINESS_ID_CUSTOM_CARD);
+//                    message.setLogo("https://yzkj-im.oss-cn-beijing.aliyuncs.com/user/16037885020911603788500745.png");
+//                    message.setDesc("欢迎加入元讯大家庭！欢迎加入元讯大家庭！欢迎加入元讯大家庭！欢迎加入元讯大家庭！");
+//                    message.setTitle("元讯IM生态工具元讯IM生态工具元讯IM生态工具元讯IM生态工具元讯IM生态工具");
+//                    message.setLink("http://yzmsri.com/");
+//                    message.setBusinessID(IMKitConstants.BUSINESS_ID_CUSTOM_CARD);
 
-//                ProductInfoMessageForYJ productInfoMessageForYJ = new ProductInfoMessageForYJ();
-//                productInfoMessageForYJ.setImgUrl("https://gimg2.baidu.com/image_search/src\\u003dhttp%3A%2F%2Fimage.it168.com%2Fn%2F640x480%2F7%2F7480%2F7480107.jpg\\u0026refer\\u003dhttp%3A%2F%2Fimage.it168.com\\u0026app\\u003d2002\\u0026size\\u003df9999,10000\\u0026q\\u003da80\\u0026n\\u003d0\\u0026g\\u003d0n\\u0026fmt\\u003djpeg?sec\\u003d1624446455\\u0026t\\u003d182cb71002d7ad118b03bf47b63d2e16");
-//                productInfoMessageForYJ.setCreateTimeStr("2021");
-//                productInfoMessageForYJ.setProductName("商品名称");
-                YzIMKitAgent.instance().sendCustomMessage(new Gson().toJson(message), new YzMessageSendCallback() {
+                ProductInfoMessageForYJ productInfoMessageForYJ = new ProductInfoMessageForYJ();
+                productInfoMessageForYJ.setImgUrl("https://gimg2.baidu.com/image_search/src\\u003dhttp%3A%2F%2Fimage.it168.com%2Fn%2F640x480%2F7%2F7480%2F7480107.jpg\\u0026refer\\u003dhttp%3A%2F%2Fimage.it168.com\\u0026app\\u003d2002\\u0026size\\u003df9999,10000\\u0026q\\u003da80\\u0026n\\u003d0\\u0026g\\u003d0n\\u0026fmt\\u003djpeg?sec\\u003d1624446455\\u0026t\\u003d182cb71002d7ad118b03bf47b63d2e16");
+                productInfoMessageForYJ.setLink("https://www.91hilife.com//vshop/mobileproduct/findProductIndex.action?productId\\u003d3950610181895113058\\u0026companyID\\u003d24322295870175816781872");
+                productInfoMessageForYJ.setMoneyText("0.1");
+                productInfoMessageForYJ.setCreateTimeStr("2021");
+                productInfoMessageForYJ.setProductName("教育培训测试1");
+                productInfoMessageForYJ.setShopName("教育培训测试11");
+                productInfoMessageForYJ.setType("0");
+                YzIMKitAgent.instance().sendCustomMessage(new Gson().toJson(productInfoMessageForYJ), new YzMessageSendCallback() {
                     @Override
                     public void success() {
 
@@ -82,13 +86,32 @@ public class ChatDemoActivity extends BaseActivity implements ConversationListLa
                 String data = "";
                 if(info.getTimMessage().getCustomElem().getData()!=null){
                     data = new String(info.getTimMessage().getCustomElem().getData());
-                    SLog.e("接收到自定义消息："+data);
+//                    SLog.e("接收到自定义消息："+data);
                 }else{
                     SLog.e("custom data null");
                 }
                 View tempView = LayoutInflater.from(ChatDemoActivity.this).inflate(R.layout.item_view,null,false);
                 TextView mText = tempView.findViewById(R.id.text);
                 mText.setText(data);
+                String finalData = data;
+                tempView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ChatInfo chatInfo1 = new ChatInfo();
+                        chatInfo1.setId("17774942284");
+                        YzIMKitAgent.instance().sendCustomMessage(chatInfo1, finalData, finalData, new YzMessageSendCallback() {
+                            @Override
+                            public void success() {
+                                SLog.e("转发成功");
+                            }
+
+                            @Override
+                            public void error(int code, String desc) {
+                                SLog.e("转发失败："+code+">"+desc);
+                            }
+                        });
+                    }
+                });
                 parent.addMessageItemView(tempView);
 //                // 获取到自定义消息的json数据
 //                if (info.getTimMessage().getElemType() != V2TIMMessage.V2TIM_ELEM_TYPE_CUSTOM) {

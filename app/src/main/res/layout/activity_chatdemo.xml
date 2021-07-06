@@ -13,12 +13,10 @@
         android:layout_gravity="bottom"
         android:layout_marginBottom="60dp"
         android:gravity="center"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/send_custom"
-            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="发一个自定义消息内容"/>

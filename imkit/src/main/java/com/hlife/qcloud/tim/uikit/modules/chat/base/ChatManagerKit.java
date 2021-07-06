@@ -227,7 +227,6 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
                 return;
             }
             boolean add = mCurrentProvider.addMessageInfo(messageInfo);
-            SLog.i("add message:"+add);
             if (isChatFragmentShow()) {
                 messageInfo.setRead(true);
             }
@@ -265,7 +264,6 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
 
             @Override
             public void onSuccess() {
-                SLog.i("deleteMessages success");
                 mCurrentProvider.remove(position);
                 ConversationManagerKit.getInstance().loadConversation(null);
             }
@@ -274,7 +272,6 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
 
     public void revokeMessage(final int position, final MessageInfo messageInfo) {
         if (!safetyCall()) {
-            SLog.w("revokeMessage unSafetyCall");
             return;
         }
         V2TIMManager.getMessageManager().revokeMessage(messageInfo.getTimMessage(), new V2TIMCallback() {
@@ -301,11 +298,26 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
 
     public void sendMessage(final MessageInfo message, boolean retry, final IUIKitCallBack callBack) {
         if (!safetyCall()) {
-            SLog.w("sendMessage unSafetyCall");
             return;
         }
+        String msgID = sendMessageId(message,true,callBack);
+        if(!TextUtils.isEmpty(msgID)){
+            //消息先展示，通过状态来确认发送是否成功
+            message.setId(msgID);
+            if (message.getMsgType() < MessageInfo.MSG_TYPE_TIPS) {
+                message.setStatus(MessageInfo.MSG_STATUS_SENDING);
+                if (retry) {
+                    mCurrentProvider.resendMessageInfo(message);
+                } else {
+                    mCurrentProvider.addMessageInfo(message);
+                }
+            }
+        }
+    }
+
+    public String sendMessageId(final MessageInfo message,final boolean isUpdate,final IUIKitCallBack callBack){
         if (message == null || message.getStatus() == MessageInfo.MSG_STATUS_SENDING) {
-            return;
+            return null;
         }
         message.setSelf(true);
         message.setRead(true);
@@ -337,7 +349,7 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
         v2TIMOfflinePushInfo.setAndroidOPPOChannelID("tuikit");
 
         V2TIMMessage v2TIMMessage = message.getTimMessage();
-        String msgID = V2TIMManager.getMessageManager().sendMessage(v2TIMMessage, isGroup ? null : userID, isGroup ? groupID : null,
+        return V2TIMManager.getMessageManager().sendMessage(v2TIMMessage, isGroup ? null : userID, isGroup ? groupID : null,
                 V2TIMMessage.V2TIM_PRIORITY_DEFAULT, false, v2TIMOfflinePushInfo, new V2TIMSendCallback<V2TIMMessage>() {
                     @Override
                     public void onProgress(int progress) {
@@ -350,11 +362,6 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
                         if (!safetyCall()) {
                             return;
                         }
-//                        if(code==20009){//不是好友
-//                            ToastUtil.error(TUIKit.getAppContext(),"您和对方不是好友，发送失败");
-//                        }else if(code == 20003){//userId错误
-//                            ToastUtil.error(TUIKit.getAppContext(),"对方ID错误或不存在，发送失败");
-//                        }
                         if (callBack != null) {
                             callBack.onError("SLog",code, desc);
                         }
@@ -362,12 +369,14 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
                             mYzChatMessageListener.onChatSendMessageError(code,desc);
                         }
                         message.setStatus(MessageInfo.MSG_STATUS_SEND_FAIL);
-                        mCurrentProvider.updateMessageInfo(message);
+                        if(isUpdate){
+                            mCurrentProvider.updateMessageInfo(message);
+                        }
                     }
 
                     @Override
-                    public void onSuccess(V2TIMMessage v2TIMMessage) {
-                        SLog.v("sendMessage onSuccess:" + v2TIMMessage.getMsgID());
+                    public void onSuccess(V2TIMMessage v2TIMMessage1) {
+                        SLog.v("sendMessage onSuccess:" + v2TIMMessage1.getMsgID());
                         if (!safetyCall()) {
                             SLog.w("sendMessage unSafetyCall");
                             return;
@@ -376,22 +385,12 @@ public abstract class ChatManagerKit extends V2TIMAdvancedMsgListener implements
                             callBack.onSuccess(mCurrentProvider);
                         }
                         message.setStatus(MessageInfo.MSG_STATUS_SEND_SUCCESS);
-                        message.setMsgTime(v2TIMMessage.getTimestamp());
-                        mCurrentProvider.updateMessageInfo(message);
+                        message.setMsgTime(v2TIMMessage1.getTimestamp());
+                        if(isUpdate){
+                            mCurrentProvider.updateMessageInfo(message);
+                        }
                     }
                 });
-
-        //消息先展示，通过状态来确认发送是否成功
-        SLog.i("sendMessage msgID:" + msgID);
-        message.setId(msgID);
-        if (message.getMsgType() < MessageInfo.MSG_TYPE_TIPS) {
-            message.setStatus(MessageInfo.MSG_STATUS_SENDING);
-            if (retry) {
-                mCurrentProvider.resendMessageInfo(message);
-            } else {
-                mCurrentProvider.addMessageInfo(message);
-            }
-        }
     }
 
     protected void assembleGroupMessage(MessageInfo message) {
