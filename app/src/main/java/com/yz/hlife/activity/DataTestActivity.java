@@ -162,14 +162,16 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 getConversation("123");
                 break;
             case R.id.del_conversation:
-                YzIMKitAgent.instance().deleteConversation("22222", new YzDeleteConversationListener() {
+                YzIMKitAgent.instance().deleteConversation("@TGS#17YBMK5GE", new YzDeleteConversationListener() {
                     @Override
                     public void success() {
+                        SLog.e(">>>success>>>");
                         ToastUtil.success(DataTestActivity.this,"删除成功");
                     }
 
                     @Override
                     public void error(int code, String desc) {
+                        SLog.e(">>>error>>>");
                         ToastUtil.error(DataTestActivity.this,"删除失败："+code+">"+desc);
                     }
                 });

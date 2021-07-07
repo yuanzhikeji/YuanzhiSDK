@@ -161,7 +161,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
                                     }
                                 }
                             });
-                            break;
+                            return;
                         }
                     }
                     if(nextSeq!=-1){
