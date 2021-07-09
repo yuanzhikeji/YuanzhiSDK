@@ -200,12 +200,13 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
 //                    YzIMKitAgent.instance().startChat(chatInfo,null);
 //                }
                 ChatInfo chatInfo1 = new ChatInfo();
-//                chatInfo1.setId("@TGS#2ZZ77CIHV");
-//                chatInfo1.setChatName("测试群");
-//                chatInfo1.setGroup(true);
-                chatInfo1.setId("1850000000054892407893890");
-                chatInfo1.setChatName("test1test1");
-                chatInfo1.setGroup(false);
+//                chatInfo1.setId("@TGS#2E2CYFIHJ");
+                chatInfo1.setId("@TGS#2TMIYFIH2");
+                chatInfo1.setChatName("测试群");
+                chatInfo1.setGroup(true);
+//                chatInfo1.setId("1850000000054892407893890");
+//                chatInfo1.setChatName("test1test1");
+//                chatInfo1.setGroup(false);
                 YzIMKitAgent.instance().startChat(chatInfo1,null);
                 break;
             case R.id.send_custom:
@@ -220,12 +221,17 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 List<String> s = new ArrayList<>();
 //                s.add("4624e6e2fd351a0eeaee47490997258e");
                 CreateGroupReq createGroupReq = new CreateGroupReq();
-                createGroupReq.Owner_Account = "5398762486586751595398";
+//                createGroupReq.Owner_Account = "5398762486586751595398";
+                createGroupReq.Owner_Account = "1850000000054892407893891";
                 createGroupReq.Name = "测试群"+UserApi.instance().getNickName();
                 createGroupReq.FaceUrl = "https://yzkj-pro.oss-cn-beijing.aliyuncs.com/avatar/lPto9oLiOp.jfif";
                 List<OpenGroupMember> members = new ArrayList<>();
                 OpenGroupMember openGroupMember = new OpenGroupMember();
-                openGroupMember.Member_Account = "4624e6e2fd351a0eeaee47490997258e";
+//                openGroupMember.Member_Account = "4624e6e2fd351a0eeaee47490997258e";
+                openGroupMember.Member_Account = "1850000000054892407893890";
+                members.add(openGroupMember);
+                openGroupMember = new OpenGroupMember();
+                openGroupMember.Member_Account = "1850000000054892407893891";
                 members.add(openGroupMember);
                 createGroupReq.MemberList = members;
                 Yz.getSession().createGroup(createGroupReq, new OnResultDataListener() {
