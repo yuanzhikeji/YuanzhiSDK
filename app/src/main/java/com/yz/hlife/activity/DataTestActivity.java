@@ -92,7 +92,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 conversationInfos = data;
 //                ToastUtil.info(DataTestActivity.this,yzChatType+":"+conversationInfos.toString());
                 for (ConversationInfo info:data) {
-                    SLog.e(info.getTitle()+">"+info.getLastMessageTime());
+                    SLog.e(info.getId()+">"+info.getTitle()+">"+info.getLastMessageTime());
                 }
             }
 
@@ -162,11 +162,12 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                 getConversation("123");
                 break;
             case R.id.del_conversation:
-                YzIMKitAgent.instance().deleteConversation("@TGS#17YBMK5GE", new YzDeleteConversationListener() {
+                YzIMKitAgent.instance().deleteConversation("@TGS#2XQFVEHH2", new YzDeleteConversationListener() {
                     @Override
                     public void success() {
                         SLog.e(">>>success>>>");
                         ToastUtil.success(DataTestActivity.this,"删除成功");
+                        loadConversation(YzChatType.GROUP);
                     }
 
                     @Override

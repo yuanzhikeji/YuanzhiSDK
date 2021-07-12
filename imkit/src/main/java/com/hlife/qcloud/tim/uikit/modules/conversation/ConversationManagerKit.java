@@ -168,7 +168,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
                         deleteConversation(id,nextSeq,listener);
                     }else{
                         if(listener!=null){
-                            listener.success();
+                            listener.error(-2,"conversation does not exist:"+id);
                         }
                     }
                 }
