@@ -1,6 +1,7 @@
 *.iml
 .gradle
 /local.properties
+.idea/
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
@@ -27,3 +28,5 @@ local.properties
 /recycler_view_helper/build/intermediates/javac/debug/classes/
 /utils/build/
 /utils/build/intermediates/javac/debug/classes/
+
+

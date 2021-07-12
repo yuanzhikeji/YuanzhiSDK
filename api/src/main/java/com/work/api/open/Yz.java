@@ -38,12 +38,17 @@ import com.work.api.open.model.SendGroupMessageReq;
 import com.work.api.open.model.SendMessageReq;
 import com.work.api.open.model.SendSmsReq;
 import com.work.api.open.model.SysUserReq;
+import com.work.api.open.model.UpdateFriendReq;
+import com.work.api.open.model.UpdateFriendResp;
 import com.work.api.open.model.UpdateMobileReq;
 import com.work.api.open.model.UploadResp;
+import com.work.api.open.model.client.UpdateFriendItem;
 import com.work.util.SLog;
 import com.work.util.SharedUtils;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by Administrator on 2019/4/2
@@ -270,5 +275,20 @@ public class Yz extends ApiClient {
         params.addHeader("token",token);
         ConnectDataTask dataTask = new ConnectDataTask(params);
         dataTask.uploadFile();
+    }
+
+    public void updateFriend(String friendId, String friendMark, OnResultDataListener listener) {
+        UpdateFriendReq req = new UpdateFriendReq();
+        UpdateFriendItem.SNSItem snsItem = new UpdateFriendItem.SNSItem();
+        snsItem.setTag("Tag_SNS_IM_Remark");
+        snsItem.setValue(friendMark);
+        UpdateFriendItem item = new UpdateFriendItem();
+        item.setToAccount(friendId);
+        item.setSnsItem(Collections.singletonList(snsItem));
+        req.setUpdateItem(Collections.singletonList(item));
+
+        String userId = SharedUtils.getString("userId");
+        req.setFromAccount(userId);
+        requestPost(ModeApi.updateFriend,req,new UpdateFriendResp(),listener);
     }
 }

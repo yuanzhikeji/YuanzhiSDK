@@ -29,6 +29,14 @@ public class BaseResp extends ResponseWork {
     }
 
     @Override
+    public String toString() {
+        return "BaseResp{" +
+                "msg='" + msg + '\'' +
+                ", code=" + code +
+                '}';
+    }
+
+    @Override
     public boolean isSuccess() {
         return getCode() == 200;
     }

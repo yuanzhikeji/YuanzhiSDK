@@ -110,10 +110,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     protected void onResume() {
         super.onResume();
         mPhone.setText(SharedUtils.getString("userid"));
-//        mPhone.setText("3080783285118258748");
+        mPhone.setText("1850000000054892407893891");
         mPassword.setText(SharedUtils.getString("nickname"));
+        mPassword.setText("test2test2");
         mMobile.setText(SharedUtils.getString("mobile"));
-//        mMobile.setText("13263338398");
+        mMobile.setText("18500000001");
     }
 
     @Override

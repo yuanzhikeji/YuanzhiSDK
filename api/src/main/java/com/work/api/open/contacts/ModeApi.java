@@ -139,4 +139,8 @@ public final class ModeApi {
      * 退出登录
      */
     public final static String logout = "user.logout";
+    /**
+     * 获取全部的群组
+     */
+    public final static String updateFriend = "/user/updateFriend";
 }
