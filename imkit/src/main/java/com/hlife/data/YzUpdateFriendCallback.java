@@ -1,6 +1,6 @@
 package com.hlife.data;
 
-public interface YzUpdateFriendListener {
+public interface YzUpdateFriendCallback {
     void success();
     void error(int code, String desc);
 }

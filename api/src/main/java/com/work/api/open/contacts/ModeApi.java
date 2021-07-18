@@ -140,7 +140,15 @@ public final class ModeApi {
      */
     public final static String logout = "user.logout";
     /**
-     * 获取全部的群组
+     * 更新备注
      */
-    public final static String updateFriend = "/user/updateFriend";
+    public final static String setRemark = "/user/setRemark";
+    /**
+     * 删除备注
+     */
+    public final static String deleteRemark = "/user/deleteRemark";
+    /**
+     * 获取备注
+     */
+    public final static String getRemarkList = "/user/getRemarkList";
 }

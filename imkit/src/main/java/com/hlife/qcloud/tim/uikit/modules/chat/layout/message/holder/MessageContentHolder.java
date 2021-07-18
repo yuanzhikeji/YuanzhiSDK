@@ -9,11 +9,13 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.hlife.data.IMFriendManager;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.tencent.imsdk.v2.V2TIMMessage;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.component.gatherimage.UserIconView;
 import com.hlife.qcloud.tim.uikit.config.TUIKitConfigs;
+import com.work.api.open.model.client.UserRemark;
 import com.work.util.SLog;
 
 import java.util.ArrayList;
@@ -110,7 +112,10 @@ public abstract class MessageContentHolder extends MessageEmptyHolder {
         }
         // 聊天界面设置头像和昵称
         V2TIMMessage timMessage = msg.getTimMessage();
-        if (!TextUtils.isEmpty(timMessage.getNameCard())) {
+        String userRemark = IMFriendManager.getInstance().getFriendRemark(timMessage.getSender());
+        if (!TextUtils.isEmpty(userRemark)) {
+            usernameText.setText(userRemark);
+        } else if (!TextUtils.isEmpty(timMessage.getNameCard())) {
             usernameText.setText(timMessage.getNameCard());
         } else if (!TextUtils.isEmpty(timMessage.getFriendRemark())) {
             usernameText.setText(timMessage.getFriendRemark());

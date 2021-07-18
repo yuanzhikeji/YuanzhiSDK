@@ -3,6 +3,10 @@ package com.hlife.data;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.hlife.qcloud.tim.uikit.business.modal.UserApi;
+import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
 import com.http.network.listener.OnResultDataListener;
 import com.http.network.model.RequestWork;
 import com.http.network.model.ResponseWork;
@@ -11,7 +15,14 @@ import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.imsdk.v2.V2TIMValueCallback;
 import com.work.api.open.Yz;
 import com.work.api.open.model.BaseResp;
+import com.work.api.open.model.RemarkListGetResponse;
+import com.work.api.open.model.client.UserRemark;
+import com.work.util.FileUtils;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,14 +45,27 @@ public class IMFriendManager {
     }
 
     private int retryTimes = 0;
-    private final ConcurrentMap<String, String> friendRemarks;
+    private final ConcurrentMap<String, UserRemark> friendRemarks;
+    private final Gson gson = new Gson();
+
     private IMFriendManager() {
         friendRemarks = new ConcurrentHashMap<>();
-        loadAllFriends();
+        retryTimes = 0;
     }
 
     public String getFriendRemark(String userId) {
-        return friendRemarks.get(userId);
+        UserRemark userRemark = friendRemarks.get(userId);
+        if (userRemark != null) {
+            return userRemark.getRemark();
+        }
+        return null;
+    }
+
+    public void setup() {
+        retryTimes = 0;
+        friendRemarks.clear();
+        loadFromLocalFile();
+        loadBackendRemarks();
     }
 
     public void clear() {
@@ -49,14 +73,20 @@ public class IMFriendManager {
         retryTimes = 0;
     }
 
-    public void updateFriendRemark(String userId, String friendRemark, YzUpdateFriendListener listener) {
-        Yz.getSession().updateFriend(userId, friendRemark, new OnResultDataListener() {
+    public void updateFriendRemark(String userId, String friendRemark, YzUpdateFriendCallback callback) {
+        String currentId = UserApi.instance().getUserId();
+        OnResultDataListener listener = new OnResultDataListener() {
             @Override
             public void onResult(RequestWork req, ResponseWork resp) throws Exception {
                 if (resp.isSuccess()) {
-                    friendRemarks.put(userId, friendRemark);
-                    if (listener != null) {
-                        listener.success();
+                    if (TextUtils.isEmpty(friendRemark)) {
+                        friendRemarks.remove(userId);
+                    } else {
+                        friendRemarks.put(userId, new UserRemark(currentId, userId, friendRemark));
+                    }
+                    saveToLocalFile();
+                    if (callback != null) {
+                        callback.success();
                     }
                 } else {
                     Log.e(TAG, "failed to update friend remark: " + resp);
@@ -70,30 +100,63 @@ public class IMFriendManager {
                         code = resp.getHttpCode();
                         desc = resp.getMessage();
                     }
-                    if (listener != null) {
-                        listener.error(code, desc);
+                    if (callback != null) {
+                        callback.error(code, desc);
                     }
                 }
             }
-        });
+        };
+        if (TextUtils.isEmpty(friendRemark)) {
+            Yz.getSession().deleteRemark(userId, listener);
+        } else {
+            Yz.getSession().updateRemark(userId, friendRemark, listener);
+        }
     }
 
-    private void loadAllFriends() {
-        V2TIMManager.getFriendshipManager().getFriendList(new V2TIMValueCallback<List<V2TIMFriendInfo>>() {
+    private void loadBackendRemarks() {
+        Yz.getSession().getRemarkList(new OnResultDataListener() {
             @Override
-            public void onSuccess(List<V2TIMFriendInfo> v2TIMFriendInfos) {
-                retryTimes = 0;
-                for (V2TIMFriendInfo info: v2TIMFriendInfos) {
-                    if (!TextUtils.isEmpty(info.getFriendRemark())) {
-                        friendRemarks.put(info.getUserID(), info.getFriendRemark());
+            public void onResult(RequestWork req, ResponseWork resp) throws Exception {
+                if (resp.isSuccess()) {
+                    if (resp instanceof RemarkListGetResponse) {
+                        RemarkListGetResponse response = (RemarkListGetResponse)resp;
+                        if (response.getData() != null) {
+                            String currentId = UserApi.instance().getUserId();
+                            Map<String, UserRemark> remarks = new HashMap<>();
+                            boolean illegal = false;
+                            for (UserRemark userRemark: response.getData()) {
+                                if (currentId.equals(userRemark.getFromUserId())) {
+                                    remarks.put(userRemark.getToUserId(), userRemark);
+                                } else {
+                                    illegal = true;
+                                    break;
+                                }
+                            }
+                            if (illegal) {
+                                Log.e(TAG, "illegal user remarks, not current login user's");
+                            } else {
+                                friendRemarks.clear();
+                                friendRemarks.putAll(remarks);
+                            }
+                        }
+                    } else {
+                        Log.e(TAG, "unknown response class: " + resp);
+                        retry();
                     }
+                } else {
+                    int code;
+                    String desc;
+                    if (resp instanceof BaseResp) {
+                        BaseResp baseResp = (BaseResp)resp;
+                        code = baseResp.getCode();
+                        desc = baseResp.getMessage();
+                    } else {
+                        code = resp.getHttpCode();
+                        desc = resp.getMessage();
+                    }
+                    Log.e(TAG, "Failed to load backend remarks: " + code + ", desc: " + desc);
+                    retry();
                 }
-            }
-
-            @Override
-            public void onError(int code, String desc) {
-                Log.e(TAG, "Failed to load tim friends: " + code + ", desc: " + desc);
-                retry();
             }
         });
     }
@@ -101,7 +164,36 @@ public class IMFriendManager {
     private void retry() {
         if (retryTimes < 3) {
             retryTimes++;
-            loadAllFriends();
+            loadBackendRemarks();
         }
+    }
+
+    private String getFilePath() {
+        String currentId = UserApi.instance().getUserId();
+        return String.format("%s/%s_remarks.json", IMKitConstants.APP_DIR, currentId);
+    }
+
+    private void loadFromLocalFile() {
+        String path = getFilePath();
+        Type typeOf = new TypeToken<Collection<UserRemark>>(){}.getType();
+        try {
+            Collection<UserRemark> userRemarks = gson.fromJson(new FileReader(path), typeOf);
+            Map<String, UserRemark> remarkMap = new HashMap<>();
+            for (UserRemark remark: userRemarks) {
+                remarkMap.put(remark.toString(), remark);
+            }
+            friendRemarks.clear();
+            friendRemarks.putAll(remarkMap);
+        } catch (FileNotFoundException e) {
+            Log.e(TAG, "failed to read file: " + path, e);
+        }
+    }
+
+    private void saveToLocalFile() {
+        String path = getFilePath();
+        Type typeOf = new TypeToken<Collection<UserRemark>>(){}.getType();
+        Collection<UserRemark> remarks = friendRemarks.values();
+        String content = gson.toJson(remarks, typeOf);
+        FileUtils.writeString(path, content);
     }
 }

@@ -34,6 +34,12 @@ import com.work.api.open.model.InviteUserReq;
 import com.work.api.open.model.LoginReq;
 import com.work.api.open.model.LoginResp;
 import com.work.api.open.model.RegisterReq;
+import com.work.api.open.model.RemarkDeleteRequest;
+import com.work.api.open.model.RemarkDeleteResponse;
+import com.work.api.open.model.RemarkListGetRequest;
+import com.work.api.open.model.RemarkListGetResponse;
+import com.work.api.open.model.RemarkUpdateRequest;
+import com.work.api.open.model.RemarkUpdateResponse;
 import com.work.api.open.model.SendGroupMessageReq;
 import com.work.api.open.model.SendMessageReq;
 import com.work.api.open.model.SendSmsReq;
@@ -277,18 +283,27 @@ public class Yz extends ApiClient {
         dataTask.uploadFile();
     }
 
-    public void updateFriend(String friendId, String friendMark, OnResultDataListener listener) {
-        UpdateFriendReq req = new UpdateFriendReq();
-        UpdateFriendItem.SNSItem snsItem = new UpdateFriendItem.SNSItem();
-        snsItem.setTag("Tag_SNS_IM_Remark");
-        snsItem.setValue(friendMark);
-        UpdateFriendItem item = new UpdateFriendItem();
-        item.setToAccount(friendId);
-        item.setSnsItem(Collections.singletonList(snsItem));
-        req.setUpdateItem(Collections.singletonList(item));
-
+    public void updateRemark(String friendId, String remark, OnResultDataListener listener) {
+        RemarkUpdateRequest req = new RemarkUpdateRequest();
         String userId = SharedUtils.getString("userId");
-        req.setFromAccount(userId);
-        requestPost(ModeApi.updateFriend,req,new UpdateFriendResp(),listener);
+        req.setFromUserId(userId);
+        req.setToUserId(friendId);
+        req.setRemark(remark);
+        requestPost(ModeApi.setRemark,req,new RemarkUpdateResponse(),listener);
+    }
+
+    public void deleteRemark(String friendId, OnResultDataListener listener) {
+        RemarkDeleteRequest req = new RemarkDeleteRequest();
+        String userId = SharedUtils.getString("userId");
+        req.setFromUserId(userId);
+        req.setToUserId(friendId);
+        requestPost(ModeApi.setRemark,req,new RemarkDeleteResponse(),listener);
+    }
+
+    public void getRemarkList(OnResultDataListener listener) {
+        RemarkListGetRequest req = new RemarkListGetRequest();
+        String userId = SharedUtils.getString("userId");
+        req.setFromUserId(userId);
+        requestPost(ModeApi.setRemark,req,new RemarkListGetResponse(),listener);
     }
 }

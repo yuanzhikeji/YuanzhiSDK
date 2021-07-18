@@ -3,6 +3,9 @@ package com.yz.hlife.activity;
 import android.content.Intent;
 import android.view.View;
 
+import androidx.fragment.app.DialogFragment;
+
+import com.hlife.data.YzUpdateFriendCallback;
 import com.hlife.qcloud.tim.uikit.YzIMKitAgent;
 import com.hlife.qcloud.tim.uikit.base.BaseActivity;
 import com.hlife.qcloud.tim.uikit.business.inter.YzChatHistoryMessageListener;
@@ -31,6 +34,7 @@ import com.work.api.open.model.client.OpenTIMElem;
 import com.work.util.SLog;
 import com.work.util.ToastUtil;
 import com.yz.hlife.R;
+import com.yz.hlife.dialog.RemarkUpdateDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +45,7 @@ import java.util.List;
  * email tangyx@live.com
  */
 
-public class DataTestActivity extends BaseActivity implements YzMessageWatcher, View.OnClickListener {
+public class DataTestActivity extends BaseActivity implements YzMessageWatcher, View.OnClickListener, RemarkUpdateDialogFragment.RemarkDialogListener {
     private List<ConversationInfo> conversationInfos;
 
     @Override
@@ -67,6 +71,7 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
         findViewById(R.id.chat_history).setOnClickListener(this);
         findViewById(R.id.del_conversation).setOnClickListener(this);
         findViewById(R.id.c2c_receiver_opt).setOnClickListener(this);
+        findViewById(R.id.update_remark).setOnClickListener(this);
     }
 
     private void groupApplicationList(){
@@ -363,6 +368,25 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
                     }
                 });
                 break;
+            case R.id.update_remark:
+                DialogFragment dialogFragment = new RemarkUpdateDialogFragment();
+                dialogFragment.show(getSupportFragmentManager(), "RemarkUpdate");
+                break;
         }
+    }
+
+    @Override
+    public void onUpdateRemark(String userId, String remark) {
+        YzIMKitAgent.instance().updateUserRemark(userId, remark, new YzUpdateFriendCallback() {
+            @Override
+            public void success() {
+                ToastUtil.success(DataTestActivity.this,"更新备注成功");
+            }
+
+            @Override
+            public void error(int code, String desc) {
+                ToastUtil.error(DataTestActivity.this,"更新备注错误：" + code+">>>"+desc);
+            }
+        });
     }
 }
