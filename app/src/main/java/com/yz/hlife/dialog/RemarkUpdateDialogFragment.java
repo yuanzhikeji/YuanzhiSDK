@@ -16,10 +16,8 @@ import androidx.fragment.app.DialogFragment;
 
 import com.yz.hlife.R;
 
-import org.jetbrains.annotations.NotNull;
-
 public class RemarkUpdateDialogFragment extends DialogFragment {
-    private static String lastUserId = null;
+    private static String lastUserId = "1850000000054892407893890";
 
     public interface RemarkDialogListener {
         public void onUpdateRemark(String userId, String remark);
@@ -28,7 +26,7 @@ public class RemarkUpdateDialogFragment extends DialogFragment {
     private RemarkDialogListener listener;
 
     @Override
-    public void onAttach(@NonNull @NotNull Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         try {
             // Instantiate the NoticeDialogListener so we can send events to the host

@@ -297,13 +297,13 @@ public class Yz extends ApiClient {
         String userId = SharedUtils.getString("userId");
         req.setFromUserId(userId);
         req.setToUserId(friendId);
-        requestPost(ModeApi.setRemark,req,new RemarkDeleteResponse(),listener);
+        requestPost(ModeApi.deleteRemark,req,new RemarkDeleteResponse(),listener);
     }
 
     public void getRemarkList(OnResultDataListener listener) {
         RemarkListGetRequest req = new RemarkListGetRequest();
         String userId = SharedUtils.getString("userId");
         req.setFromUserId(userId);
-        requestPost(ModeApi.setRemark,req,new RemarkListGetResponse(),listener);
+        requestPost(ModeApi.getRemarkList,req,new RemarkListGetResponse(),listener);
     }
 }
