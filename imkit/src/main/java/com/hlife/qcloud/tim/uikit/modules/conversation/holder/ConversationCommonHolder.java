@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.hlife.data.IMFriendManager;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.base.TUIConversationControllerListener;
@@ -19,6 +20,7 @@ import com.hlife.qcloud.tim.uikit.modules.conversation.base.DraftInfo;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.utils.DateTimeUtil;
 import com.hlife.qcloud.tim.uikit.utils.TUIKitConstants;
+import com.tencent.imsdk.v2.V2TIMConversation;
 import com.work.util.SLog;
 
 import java.util.ArrayList;
@@ -57,10 +59,22 @@ public class ConversationCommonHolder extends ConversationBaseHolder {
             if (lastMsg.isSelf()) {
                 lastMsg.setExtra(TUIKit.getAppContext().getString(R.string.revoke_tips_you));
             } else if (lastMsg.isGroup()) {
-                String message = TUIKitConstants.covert2HTMLString(
-                        TextUtils.isEmpty(lastMsg.getGroupNameCard())
-                                ? lastMsg.getFromUser()
-                                : lastMsg.getGroupNameCard());
+                String name = IMFriendManager.getInstance().getFriendRemark(lastMsg.getFromUser());
+                if (TextUtils.isEmpty(name)) {
+                    name = lastMsg.getGroupNameCard();
+                }
+                if (lastMsg.getTimMessage() != null) {
+                    if(TextUtils.isEmpty(name)){
+                        name = lastMsg.getTimMessage().getNameCard();
+                    }
+                    if(TextUtils.isEmpty(name)){
+                        name = lastMsg.getTimMessage().getNickName();
+                    }
+                }
+                if(TextUtils.isEmpty(name)){
+                    name = lastMsg.getFromUser();
+                }
+                String message = TUIKitConstants.covert2HTMLString(name);
                 lastMsg.setExtra(message + TUIKit.getAppContext().getString(R.string.revoke_tips));
             } else {
                 lastMsg.setExtra(TUIKit.getAppContext().getString(R.string.revoke_tips_other));
@@ -73,7 +87,17 @@ public class ConversationCommonHolder extends ConversationBaseHolder {
             leftItemLayout.setBackgroundColor(Color.WHITE);
         }
 
-        titleText.setText(conversation.getTitle());
+        if (conversation.getType() == V2TIMConversation.V2TIM_C2C) {
+            String remark = IMFriendManager.getInstance().getFriendRemark(conversation.getId());
+            if (!TextUtils.isEmpty(remark)) {
+                titleText.setText(remark);
+            } else {
+                titleText.setText(conversation.getTitle());
+            }
+        } else {
+            titleText.setText(conversation.getTitle());
+        }
+
         messageText.setText("");
         timelineText.setText("");
         DraftInfo draftInfo = conversation.getDraft();

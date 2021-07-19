@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
 import com.google.gson.Gson;
+import com.hlife.data.IMFriendManager;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.base.IBaseInfo;
@@ -374,7 +375,22 @@ public class MessageInfoUtil {
             if (msgInfo.isSelf()) {
                 msgInfo.setExtra(context.getString(R.string.revoke_tips_you));
             } else if (msgInfo.isGroup()) {
-                String message = TUIKitConstants.covert2HTMLString(msgInfo.getFromUser());
+                String name = IMFriendManager.getInstance().getFriendRemark(msgInfo.getFromUser());
+                if (TextUtils.isEmpty(name)) {
+                    name = msgInfo.getGroupNameCard();
+                }
+                if (msgInfo.getTimMessage() != null) {
+                    if(TextUtils.isEmpty(name)){
+                        name = msgInfo.getTimMessage().getNameCard();
+                    }
+                    if(TextUtils.isEmpty(name)){
+                        name = msgInfo.getTimMessage().getNickName();
+                    }
+                }
+                if(TextUtils.isEmpty(name)){
+                    name = msgInfo.getFromUser();
+                }
+                String message = TUIKitConstants.covert2HTMLString(name);
                 msgInfo.setExtra(message + context.getString(R.string.revoke_tips));
             } else {
                 msgInfo.setExtra(context.getString(R.string.revoke_tips_other));

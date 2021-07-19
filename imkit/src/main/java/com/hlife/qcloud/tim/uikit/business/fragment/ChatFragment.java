@@ -2,6 +2,7 @@ package com.hlife.qcloud.tim.uikit.business.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.hlife.data.IMFriendManager;
 import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.base.BaseFragment;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
@@ -75,6 +77,12 @@ public class ChatFragment extends BaseFragment implements YzMessageWatcher {
                 getActivity().finish();
             }
             return;
+        }
+        if (mChatInfo.getType() == V2TIMConversation.V2TIM_C2C) {
+            String remark = IMFriendManager.getInstance().getFriendRemark(mChatInfo.getId());
+            if (!TextUtils.isEmpty(remark)) {
+                mChatInfo.setChatName(remark);
+            }
         }
         //从布局文件中获取聊天面板组件
         mChatLayout = mBaseView.findViewById(R.id.chat_layout);

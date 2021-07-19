@@ -329,6 +329,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         if (type != V2TIMConversation.V2TIM_C2C && type != V2TIMConversation.V2TIM_GROUP) {
             return null;
         }
+        info.setType(type);
         boolean isGroup = type == V2TIMConversation.V2TIM_GROUP;
         String draftText = conversation.getDraftText();
         if (!TextUtils.isEmpty(draftText)) {
