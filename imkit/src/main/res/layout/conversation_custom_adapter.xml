@@ -15,7 +15,7 @@
         android:paddingRight="10dp"
         android:paddingTop="10dp">
 
-        <ImageView
+        <com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationIconView
             android:id="@+id/conversation_icon"
             android:layout_width="match_parent"
             android:layout_height="200dp" />
