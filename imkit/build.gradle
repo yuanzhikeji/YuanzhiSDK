@@ -31,6 +31,11 @@ android {
         flatDir {
             dirs 'libs'
         }
+        mavenCentral()
+        google()
+        maven {
+            url "https://jitpack.io"
+        }
 //        maven { url "https://mirrors.tencent.com/repository/maven/tencent_public"}
     }
 
