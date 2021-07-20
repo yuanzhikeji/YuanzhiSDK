@@ -31,7 +31,7 @@ android {
         flatDir {
             dirs 'libs'
         }
-        maven { url "https://mirrors.tencent.com/repository/maven/tencent_public"}
+//        maven { url "https://mirrors.tencent.com/repository/maven/tencent_public"}
     }
 
 }
