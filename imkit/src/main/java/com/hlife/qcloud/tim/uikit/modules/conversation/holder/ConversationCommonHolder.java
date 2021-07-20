@@ -87,7 +87,7 @@ public class ConversationCommonHolder extends ConversationBaseHolder {
             leftItemLayout.setBackgroundColor(Color.WHITE);
         }
 
-        if (conversation.getType() == V2TIMConversation.V2TIM_C2C) {
+        if (!conversation.isGroup()) {
             String remark = IMFriendManager.getInstance().getFriendRemark(conversation.getId());
             if (!TextUtils.isEmpty(remark)) {
                 titleText.setText(remark);

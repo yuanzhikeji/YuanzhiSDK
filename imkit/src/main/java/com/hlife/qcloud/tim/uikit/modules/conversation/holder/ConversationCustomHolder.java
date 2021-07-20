@@ -45,7 +45,7 @@ public class ConversationCustomHolder extends ConversationBaseHolder {
         conversationIconView.setDefaultImageResId(R.drawable.default_head);
         conversationIconView.setIconUrls(conversation.getIconUrlList());
 
-        if (conversation.getType() == V2TIMConversation.V2TIM_C2C) {
+        if (!conversation.isGroup()) {
             String remark = IMFriendManager.getInstance().getFriendRemark(conversation.getId());
             if (!TextUtils.isEmpty(remark)) {
                 titleText.setText(remark);
