@@ -64,7 +64,7 @@ dependencies {
 //    implementation 'com.tencent.liteav:LiteAVSDK_TRTC:8.2.9809'
     implementation 'com.tencent.liteav:LiteAVSDK_Professional:8.3.9882'
     //im即时通讯核心
-    api 'com.tencent.imsdk:imsdk-plus:5.4.666'
+    api 'com.tencent.imsdk:imsdk-plus:5.5.892'
 
     //底部菜单选项
     api 'com.ashokvarma.android:bottom-navigation-bar:2.2.0'
