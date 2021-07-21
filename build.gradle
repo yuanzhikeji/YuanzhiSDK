@@ -4,6 +4,7 @@ buildscript {
     repositories {
         mavenCentral()
         google()
+        jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.2'
@@ -20,11 +21,11 @@ allprojects {
             url "https://jitpack.io"
         }
         mavenCentral()
+        maven { url "https://mirrors.tencent.com/repository/maven/tencent_public"}
+        maven { url "https://mirrors.tencent.com/repository/maven/liteavsdk" }
+       // maven { url "https://mirrors.tencent.com/nexus/repository/maven-public/" }
         google()
         jcenter()
-//        maven { url "https://mirrors.tencent.com/repository/maven/tencent_public"}
-//        maven { url "https://mirrors.tencent.com/repository/maven/liteavsdk" }
-//        maven { url "https://mirrors.tencent.com/nexus/repository/maven-public/" }
     }
 }
 
