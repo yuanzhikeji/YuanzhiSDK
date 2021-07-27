@@ -132,6 +132,7 @@ dependencies {
     //im
     implementation project(path: ':imkit')
 //    implementation 'com.github.tangyxgit.HLifeYzAndroid:imkit:1.0.3.5'
+//    implementation 'com.github.yuanzhikeji.YuanzhiSDK:imkit:1.0.4'
     // bugly sdk
 //    implementation 'com.tencent.bugly:crashreport:3.2.422'
 //    implementation 'com.tencent.bugly:nativecrashreport:3.7.471'

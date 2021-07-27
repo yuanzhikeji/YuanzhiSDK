@@ -153,6 +153,11 @@ public class MessageInfo implements IBaseInfo,Serializable {
     private V2TIMMessage timMessage;
 
     /**
+     * 为用户设置的备注，目前只有在返回给上层的时候需要设置，其他时候暂不需要
+     */
+    private String remark;
+
+    /**
      * 获取消息唯一标识
      *
      * @return
@@ -490,5 +495,26 @@ public class MessageInfo implements IBaseInfo,Serializable {
 
     public boolean getIsIgnoreShow() {
         return isIgnoreShow;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public String getNickname() {
+        if (this.timMessage != null) {
+            return timMessage.getNickName();
+        }
+        return null;
+    }
+
+    public String getFriendRemark() {
+        if (!TextUtils.isEmpty(remark)) {
+            return remark;
+        }
+        if (timMessage != null) {
+            return timMessage.getFriendRemark();
+        }
+        return null;
     }
 }

@@ -98,6 +98,10 @@ public class DataTestActivity extends BaseActivity implements YzMessageWatcher, 
 //                ToastUtil.info(DataTestActivity.this,yzChatType+":"+conversationInfos.toString());
                 for (ConversationInfo info:data) {
                     SLog.e(info.getId()+">"+info.getTitle()+">"+info.getLastMessageTime());
+                    if (info.getLastMessage() != null) {
+                        MessageInfo lastMsg = info.getLastMessage();
+                        SLog.e(lastMsg.getFromUser() + ">" + lastMsg.getNickname() + ">" + lastMsg.getFriendRemark());
+                    }
                 }
             }
 

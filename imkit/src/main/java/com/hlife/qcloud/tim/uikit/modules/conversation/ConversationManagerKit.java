@@ -93,7 +93,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
                         || (type == YzChatType.C2C && !conversationInfo.isGroup())
                         || (type == YzChatType.ALL)){
                         unRead += conversationInfo.getUnRead();
-                        updateConversationTitle(conversationInfo);
+                        //updateConversationTitle(conversationInfo);
                         data.add(conversationInfo);
                     }
                 }
@@ -105,10 +105,20 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
         searchConversation(id,0,listener);
     }
     private void updateConversationTitle(ConversationInfo conversationInfo) {
+        if (conversationInfo == null) {
+            return;
+        }
         if (!conversationInfo.isGroup()) {
             String remark = IMFriendManager.getInstance().getFriendRemark(conversationInfo.getId());
             if (remark != null) {
                 conversationInfo.setTitle(remark);
+            }
+            MessageInfo lastMsg = conversationInfo.getLastMessage();
+            if (lastMsg != null) {
+                String msgRemark = IMFriendManager.getInstance().getFriendRemark(lastMsg.getFromUser());
+                if (msgRemark != null) {
+                    lastMsg.setRemark(remark);
+                }
             }
         }
     }
@@ -131,6 +141,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
                     if(conversationInfo==null && nextSeq!=-1){
                         searchConversation(id,nextSeq,listener);
                     }else{
+                        //updateConversationTitle(conversationInfo);
                         listener.onConversationData(conversationInfo);
                     }
                 }
@@ -285,6 +296,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
             if((mType== YzChatType.GROUP && conversationInfo.isGroup())
                     || (mType == YzChatType.C2C && !conversationInfo.isGroup())
                     || (mType == YzChatType.ALL)){
+                //updateConversationTitle(conversationInfo);
                 infos.add(conversationInfo);
             }
         }
@@ -392,6 +404,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
             info.setUnRead(conversation.getUnreadCount());
         }
         info.setTop(conversation.isPinned());
+        updateConversationTitle(info);
         return info;
     }
 

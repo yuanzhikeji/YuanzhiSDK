@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hlife.data.IMFriendManager;
 import com.hlife.qcloud.tim.uikit.TUIKit;
 import com.hlife.qcloud.tim.uikit.modules.conversation.holder.ConversationBaseHolder;
 import com.hlife.qcloud.tim.uikit.modules.conversation.holder.ConversationCommonHolder;
@@ -16,6 +17,7 @@ import com.hlife.qcloud.tim.uikit.modules.conversation.interfaces.IConversationA
 import com.hlife.qcloud.tim.uikit.modules.conversation.interfaces.IConversationProvider;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
+import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.utils.ScreenUtil;
 
 import java.util.ArrayList;
@@ -45,6 +47,23 @@ public class ConversationListAdapter extends IConversationAdapter {
 
     public void setDataProvider(IConversationProvider provider) {
         mDataSource = provider.getDataSource();
+        if (mDataSource != null) {
+            for (ConversationInfo info: mDataSource) {
+                if (!info.isGroup()) {
+                    String remark = IMFriendManager.getInstance().getFriendRemark(info.getId());
+                    if (!TextUtils.isEmpty(remark)) {
+                        info.setTitle(remark);
+                    }
+                }
+                MessageInfo lastMsg = info.getLastMessage();
+                if (lastMsg != null) {
+                    String remark = IMFriendManager.getInstance().getFriendRemark(lastMsg.getFromUser());
+                    if (!TextUtils.isEmpty(remark)) {
+                        lastMsg.setRemark(remark);
+                    }
+                }
+            }
+        }
         if (provider instanceof ConversationProvider) {
             provider.attachAdapter(this);
         }
@@ -126,6 +145,19 @@ public class ConversationListAdapter extends IConversationAdapter {
     }
 
     public void addItem(int position, ConversationInfo info) {
+        if (!info.isGroup()) {
+            String remark = IMFriendManager.getInstance().getFriendRemark(info.getId());
+            if (!TextUtils.isEmpty(remark)) {
+                info.setTitle(remark);
+            }
+            MessageInfo lastMsg = info.getLastMessage();
+            if (lastMsg != null) {
+                String msgRemark = IMFriendManager.getInstance().getFriendRemark(lastMsg.getFromUser());
+                if (!TextUtils.isEmpty(msgRemark)) {
+                    lastMsg.setRemark(msgRemark);
+                }
+            }
+        }
         mDataSource.add(position, info);
         notifyItemInserted(position);
         notifyDataSetChanged();
