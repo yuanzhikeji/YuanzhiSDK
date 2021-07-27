@@ -243,6 +243,12 @@ public class Yz extends ApiClient {
         requestPost(ModeApi.getTenantGroupList,getTenantGroupListReq,new GetTenantGroupListResp(),onResultDataListener);
     }
     /**
+     * 修改群组
+     */
+    public void updateGroupMaster(CreateGroupReq createGroupReq,OnResultDataListener onResultDataListener){
+        requestPost(ModeApi.updateGroupMaster,createGroupReq,new CreateGroupResp(),onResultDataListener);
+    }
+    /**
      * 获取打车链接
      */
     public void getCarWebViewUrl(String url,OnResultDataListener onResultDataListener){

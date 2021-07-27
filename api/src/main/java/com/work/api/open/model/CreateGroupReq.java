@@ -13,6 +13,7 @@ import java.util.List;
 public class CreateGroupReq extends BaseReq {
     public String GroupId;
     public String Owner_Account;
+    public String NewOwner_Account;
     public String Type="Public";
     public String Name;
     public String Introduction;
