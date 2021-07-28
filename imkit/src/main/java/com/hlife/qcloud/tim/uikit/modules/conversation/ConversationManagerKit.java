@@ -104,6 +104,7 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
     public void getConversation(final String id, final YzConversationDataListener listener){
         searchConversation(id,0,listener);
     }
+
     private void updateConversationTitle(ConversationInfo conversationInfo) {
         if (conversationInfo == null) {
             return;
@@ -113,12 +114,12 @@ public class ConversationManagerKit implements MessageRevokedManager.MessageRevo
             if (remark != null) {
                 conversationInfo.setTitle(remark);
             }
-            MessageInfo lastMsg = conversationInfo.getLastMessage();
-            if (lastMsg != null) {
-                String msgRemark = IMFriendManager.getInstance().getFriendRemark(lastMsg.getFromUser());
-                if (msgRemark != null) {
-                    lastMsg.setRemark(remark);
-                }
+        }
+        MessageInfo lastMsg = conversationInfo.getLastMessage();
+        if (lastMsg != null) {
+            String msgRemark = IMFriendManager.getInstance().getFriendRemark(lastMsg.getFromUser());
+            if (msgRemark != null) {
+                lastMsg.setRemark(msgRemark);
             }
         }
     }
