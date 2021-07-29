@@ -56,12 +56,15 @@ public class IMFriendManager {
     public String getFriendRemark(String userId) {
         UserRemark userRemark = friendRemarks.get(userId);
         if (userRemark != null) {
+            Log.i(TAG, "SDKLOG get remark " + userId + ", got" + userRemark.getRemark());
             return userRemark.getRemark();
         }
+        Log.i(TAG, "SDKLOG get remark " + userId + ", nothing");
         return null;
     }
 
     public void setup() {
+        Log.i(TAG, "SDKLOG setup friend manager");
         retryTimes = 0;
         friendRemarks.clear();
         loadFromLocalFile();
@@ -69,6 +72,7 @@ public class IMFriendManager {
     }
 
     public void clear() {
+        Log.i(TAG, "SDKLOG clear friend manager");
         friendRemarks.clear();
         retryTimes = 0;
     }
@@ -107,8 +111,10 @@ public class IMFriendManager {
             }
         };
         if (TextUtils.isEmpty(friendRemark)) {
+            Log.i(TAG, "SDKLOG delete remark for " + userId);
             Yz.getSession().deleteRemark(userId, listener);
         } else {
+            Log.i(TAG, "SDKLOG set remark for " + userId + " with " + friendRemark);
             Yz.getSession().updateRemark(userId, friendRemark, listener);
         }
     }
@@ -180,7 +186,7 @@ public class IMFriendManager {
             Collection<UserRemark> userRemarks = gson.fromJson(new FileReader(path), typeOf);
             Map<String, UserRemark> remarkMap = new HashMap<>();
             for (UserRemark remark: userRemarks) {
-                remarkMap.put(remark.toString(), remark);
+                remarkMap.put(remark.getToUserId(), remark);
             }
             friendRemarks.clear();
             friendRemarks.putAll(remarkMap);

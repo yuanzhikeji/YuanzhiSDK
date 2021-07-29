@@ -118,8 +118,15 @@ public class ConversationCommonHolder extends ConversationBaseHolder {
                     }
                 } else {
                     if (lastMsg.getExtra() != null) {
+                        String name = lastMsg.getFriendRemark();
+                        if (TextUtils.isEmpty(name)) {
+                            name = lastMsg.getNickname();
+                        }
+                        if (TextUtils.isEmpty(name)) {
+                            name = lastMsg.getFromUser();
+                        }
                         String result = emojiJudge(lastMsg.getExtra().toString());
-                        messageText.setText(Html.fromHtml(result));
+                        messageText.setText(String.format("%s : %s", name, Html.fromHtml(result)));
                         messageText.setTextColor(rootView.getResources().getColor(R.color.list_bottom_text_bg));
                     }
                     timelineText.setText(DateTimeUtil.getTimeFormatText(new Date(lastMsg.getMsgTime() * 1000)));
