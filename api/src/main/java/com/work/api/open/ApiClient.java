@@ -59,7 +59,7 @@ public class ApiClient {
         String postData = getPostData(requestWork);
         RequestParams params = getParams(url,postData,requestWork,responseWork,onResultDataListener,objects);
         ConnectDataTask connectDataTask = new ConnectDataTask(params);
-        Log.i("ApiClient", "SDKLOG request " + url);
+//        Log.i("ApiClient", "SDKLOG request " + url);
         connectDataTask.doPost();
     }
 
