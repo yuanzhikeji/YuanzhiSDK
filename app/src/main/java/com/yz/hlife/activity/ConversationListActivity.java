@@ -29,6 +29,7 @@ public class ConversationListActivity extends BaseActivity {
 
     private RecyclerView recyclerView;
     private ConversationListAdapter adapter;
+    private YzChatType chatType;
 
     @Override
     public void onInitView() throws Exception {
@@ -42,7 +43,7 @@ public class ConversationListActivity extends BaseActivity {
     public void onInitValue() throws Exception {
         super.onInitValue();
 
-        YzChatType chatType = YzChatType.ALL;
+        chatType = YzChatType.ALL;
         int type = getIntent().getIntExtra(ConversationType, 0);
         switch (type) {
             case 1:
@@ -62,19 +63,7 @@ public class ConversationListActivity extends BaseActivity {
         });
         recyclerView.setAdapter(adapter);
 
-        YzIMKitAgent.instance().loadConversation(0, chatType, new YzConversationDataListener() {
-            @Override
-            public void onConversationData(List<ConversationInfo> data, long unRead, long nextSeq) {
-                Log.i(TAG, "load conversations: " + data.size());
-                adapter.setNewData(data);
-                setTitle("未读消息:" + unRead);
-            }
-
-            @Override
-            public void onConversationError(int code, String desc) {
-                ToastUtil.info(ConversationListActivity.this,"获取会话列表失败："+ code + ", desc:" + desc);
-            }
-        });
+        reload();
 
         //YzIMKitAgent.instance().sendCustomMessage();
 
@@ -90,10 +79,28 @@ public class ConversationListActivity extends BaseActivity {
 
             @Override
             public void updateConversion() {
+                Log.i(TAG, "reload conversations");
+                reload();
             }
 
             @Override
             public void updateJoinGroup() {
+            }
+        });
+    }
+
+    private void reload() {
+        YzIMKitAgent.instance().loadConversation(0, chatType, new YzConversationDataListener() {
+            @Override
+            public void onConversationData(List<ConversationInfo> data, long unRead, long nextSeq) {
+                Log.i(TAG, "load conversations: " + data.size());
+                adapter.setNewData(data);
+                setTitle("未读消息:" + unRead);
+            }
+
+            @Override
+            public void onConversationError(int code, String desc) {
+                ToastUtil.info(ConversationListActivity.this,"获取会话列表失败："+ code + ", desc:" + desc);
             }
         });
     }
