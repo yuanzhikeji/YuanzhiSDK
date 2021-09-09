@@ -79,6 +79,9 @@ public abstract class MessageBaseHolder extends RecyclerView.ViewHolder implemen
                     case MessageInfo.MSG_TYPE_FILE:
                         holder = new MessageFileHolder(view);
                         break;
+                    case MessageInfo.MSG_TYPE_LOCATION:
+                        holder = new MessageLocationHolder(view);
+                        break;
 //                case MessageInfo.MSG_TYPE_MERGE:
 //                    holder = new MessageForwardHolder(view);
 //                    break;
