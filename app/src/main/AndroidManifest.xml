@@ -16,7 +16,7 @@
         <!-- 地图 -->
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="ab887fbd22354b21ed5581fb8d859bb6"/>
+            android:value="8b2a7b5bd1999465e57fc5333a350490"/>
         <service android:name="com.amap.api.location.APSService" />
 
         <meta-data

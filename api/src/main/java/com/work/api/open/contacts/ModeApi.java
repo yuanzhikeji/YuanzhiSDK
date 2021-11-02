@@ -136,6 +136,10 @@ public final class ModeApi {
      */
     public final static String sendCustomGroupTextMsg="api/sendCustomGroupTextMsg";
     /**
+     * 修改群主
+     */
+    public final static String updateGroupMaster="newgroup/updateGroupMaster";
+    /**
      * 退出登录
      */
     public final static String logout = "user.logout";
