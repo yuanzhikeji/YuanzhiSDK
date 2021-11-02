@@ -139,7 +139,7 @@ public final class YzIMKitAgent {
         UserApi userApi = UserApi.instance();
         userApi.setStore("im sdk");
         //配置网络相关
-        ApiClient.setApiConfig(new ApiClient.ApiConfig().setHostName(isDev?"https://dev1-imapi.yzmetax.com/":"https://imapi.yzmetax.com/").setParamObj(userApi));
+        ApiClient.setApiConfig(new ApiClient.ApiConfig().setHostName(isDev?"https://yztdev-imapi.yzsophia.com/":"https://yzt-imapi.yzsophia.com/").setParamObj(userApi));
     }
 
     public static void init(Context context,String appId){
