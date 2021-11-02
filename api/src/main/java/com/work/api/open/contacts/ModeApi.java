@@ -139,4 +139,16 @@ public final class ModeApi {
      * 退出登录
      */
     public final static String logout = "user.logout";
+    /**
+     * 更新备注
+     */
+    public final static String setRemark = "/user/setRemark";
+    /**
+     * 删除备注
+     */
+    public final static String deleteRemark = "/user/deleteRemark";
+    /**
+     * 获取备注
+     */
+    public final static String getRemarkList = "/user/getRemarkList";
 }

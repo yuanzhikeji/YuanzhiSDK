@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
+import com.hlife.data.IMFriendManager;
 import com.hlife.qcloud.tim.uikit.modules.message.MessageInfo;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.utils.IMKitConstants;
@@ -45,12 +46,20 @@ public class MessageTipsHolder extends MessageEmptyHolder {
             if (msg.isSelf()) {
                 msg.setExtra("您撤回了一条消息");
             } else if (msg.isGroup()) {
-                String name = msg.getGroupNameCard();
-                if(TextUtils.isEmpty(name)){
-                    name = msg.getTimMessage().getNameCard();
+                String name = IMFriendManager.getInstance().getFriendRemark(msg.getFromUser());
+                if (TextUtils.isEmpty(name)) {
+                    name = msg.getGroupNameCard();
+                }
+                if (msg.getTimMessage() != null) {
+                    if(TextUtils.isEmpty(name)){
+                        name = msg.getTimMessage().getNameCard();
+                    }
+                    if(TextUtils.isEmpty(name)){
+                        name = msg.getTimMessage().getNickName();
+                    }
                 }
                 if(TextUtils.isEmpty(name)){
-                    name = msg.getTimMessage().getNickName();
+                    name = msg.getFromUser();
                 }
                 String message = IMKitConstants.covert2HTMLString(name);
                 msg.setExtra(message + "撤回了一条消息");

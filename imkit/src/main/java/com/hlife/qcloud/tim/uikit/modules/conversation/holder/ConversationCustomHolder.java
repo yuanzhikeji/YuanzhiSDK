@@ -1,13 +1,16 @@
 package com.hlife.qcloud.tim.uikit.modules.conversation.holder;
 
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.hlife.data.IMFriendManager;
 import com.hlife.qcloud.tim.uikit.R;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationIconView;
 import com.hlife.qcloud.tim.uikit.modules.conversation.base.ConversationInfo;
+import com.tencent.imsdk.v2.V2TIMConversation;
 
 /**
  * 自定义会话Holder
@@ -42,7 +45,17 @@ public class ConversationCustomHolder extends ConversationBaseHolder {
         conversationIconView.setDefaultImageResId(R.drawable.default_head);
         conversationIconView.setIconUrls(conversation.getIconUrlList());
 
-        titleText.setText(conversation.getTitle());
+        if (!conversation.isGroup()) {
+            String remark = IMFriendManager.getInstance().getFriendRemark(conversation.getId());
+            if (!TextUtils.isEmpty(remark)) {
+                titleText.setText(remark);
+            } else {
+                titleText.setText(conversation.getTitle());
+            }
+        } else {
+            titleText.setText(conversation.getTitle());
+        }
+
         messageText.setText("");
         timelineText.setText("");
 

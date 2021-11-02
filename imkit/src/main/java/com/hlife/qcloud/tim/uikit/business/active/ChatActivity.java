@@ -6,10 +6,12 @@ import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
 
+import com.hlife.data.IMFriendManager;
 import com.hlife.qcloud.tim.uikit.business.Constants;
 import com.hlife.qcloud.tim.uikit.business.fragment.ChatFragment;
 import com.hlife.qcloud.tim.uikit.config.ChatViewConfig;
 import com.hlife.qcloud.tim.uikit.modules.chat.base.ChatInfo;
+import com.tencent.imsdk.v2.V2TIMConversation;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.hlife.qcloud.tim.uikit.R;
 
@@ -58,6 +60,12 @@ public class ChatActivity extends IMBaseActivity {
         if (mChatInfo == null) {
             finish();
             return;
+        }
+        if (mChatInfo.getType() == V2TIMConversation.V2TIM_C2C) {
+            String remark = IMFriendManager.getInstance().getFriendRemark(mChatInfo.getId());
+            if (!TextUtils.isEmpty(remark)) {
+                mChatInfo.setChatName(remark);
+            }
         }
         if (V2TIMManager.getInstance().getLoginStatus() == V2TIM_STATUS_LOGINED) {
             ChatFragment mChatFragment = new ChatFragment();

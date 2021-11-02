@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
 
+import com.hlife.data.IMFriendManager;
+import com.hlife.data.YzUpdateFriendCallback;
 import com.hlife.qcloud.tim.uikit.base.IMEventListener;
 import com.hlife.qcloud.tim.uikit.base.IUIKitCallBack;
 import com.hlife.qcloud.tim.uikit.base.TUIKitListenerManager;
@@ -137,7 +139,7 @@ public final class YzIMKitAgent {
         UserApi userApi = UserApi.instance();
         userApi.setStore("im sdk");
         //配置网络相关
-        ApiClient.setApiConfig(new ApiClient.ApiConfig().setHostName(isDev?"https://dev1-imapi.yzmetax.com/":"https://imapi.yzmetax.com/").setParamObj(userApi));
+        ApiClient.setApiConfig(new ApiClient.ApiConfig().setHostName(isDev?"https://yztdev-imapi.yzsophia.com/":"https://yzt-imapi.yzsophia.com/").setParamObj(userApi));
     }
 
     public static void init(Context context,String appId){
@@ -254,6 +256,7 @@ public final class YzIMKitAgent {
                 if(listener!=null){
                     listener.loginSuccess(data);
                 }
+                IMFriendManager.getInstance().setup();
             }
 
             @Override
@@ -1009,8 +1012,13 @@ public final class YzIMKitAgent {
      */
     public void unInit() {
         TUIKitImpl.unInit();
+        IMFriendManager.getInstance().clear();
         if(mIMKitStatusListener!=null){
             mIMKitStatusListener.logout();
         }
+    }
+
+    public void updateUserRemark(String userId, String remark, YzUpdateFriendCallback callback) {
+        IMFriendManager.getInstance().updateFriendRemark(userId, remark, callback);
     }
 }

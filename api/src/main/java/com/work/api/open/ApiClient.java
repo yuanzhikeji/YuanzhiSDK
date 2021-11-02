@@ -1,6 +1,7 @@
 package com.work.api.open;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.http.network.RequestParams;
 import com.http.network.listener.OnResultDataListener;
@@ -58,6 +59,7 @@ public class ApiClient {
         String postData = getPostData(requestWork);
         RequestParams params = getParams(url,postData,requestWork,responseWork,onResultDataListener,objects);
         ConnectDataTask connectDataTask = new ConnectDataTask(params);
+//        Log.i("ApiClient", "SDKLOG request " + url);
         connectDataTask.doPost();
     }
 
@@ -186,6 +188,7 @@ public class ApiClient {
         params.addHeader("Content-Type", "application/json;charset=UTF-8");
         params.addHeader("token", SharedUtils.getString("userToken"));
         params.addHeader("appid", SharedUtils.getString("YzAppId"));
+//        Log.i("ApiClient", "token:" + SharedUtils.getString("userToken"));
         if(requestWork!=null){
             Map<String,String> header = requestWork.getRequestHeader();
             if(header!=null && header.size()>0){

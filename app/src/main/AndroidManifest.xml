@@ -45,6 +45,7 @@
         <activity android:name=".activity.DataTestActivity"/>
         <activity android:name=".activity.ChatDemoActivity"/>
         <activity android:name=".activity.GroupListDemoActivity"/>
+        <activity android:name=".activity.ConversationListActivity"/>
     </application>
 
 </manifest>
